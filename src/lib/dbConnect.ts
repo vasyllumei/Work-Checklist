@@ -17,6 +17,8 @@ if (!cached) {
     cached = global.mongoose = { conn: null, promise: null }
 }
 
+console.log('logdd', MONGODB_URI)
+
 async function dbConnect () {
     if (cached.conn) {
         return cached.conn
