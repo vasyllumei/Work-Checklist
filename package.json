@@ -8,24 +8,37 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "resolutions": {
+    "prettier": "2.8.2"
+  },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/material": "^5.11.15",
+    "@mui/styled-engine-sc": "^5.11.11",
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "18.15.10",
     "@types/react": "18.0.30",
     "@types/react-dom": "18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
-    "babel-eslint": "^10.1.0",
+    "@typescript-eslint/parser": "^5.48.1",
     "bcryptjs": "^2.4.3",
-    "eslint": "8.36.0",
-    "eslint-config-next": "13.2.4",
-    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-es": "^4.1.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.3",
     "next": "13.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "styled-components": "^5.3.9",
     "typescript": "5.0.2"
+  },
+  "devDependencies": {
+    "eslint": "8.27.0",
+    "eslint-config-next": "13.2.4",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.32.0",
+    "prettier": "^2.8.2"
   }
 }
