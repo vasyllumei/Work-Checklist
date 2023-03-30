@@ -51,6 +51,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'import/no-unresolved': 'error',
     'import/no-duplicates': 'off',
+    'react/react-in-jsx-scope': 0,
   },
   settings: {
     react: {
