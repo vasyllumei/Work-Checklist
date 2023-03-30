@@ -17,8 +17,6 @@ if (!cached) {
     cached = global.mongoose = { conn: null, promise: null }
 }
 
-console.log('logdd', MONGODB_URI)
-
 async function dbConnect () {
     if (cached.conn) {
         return cached.conn
@@ -27,10 +25,6 @@ async function dbConnect () {
     if (!cached.promise) {
         // eslint-disable-next-line @typescript-eslint/no-shadow
         cached.promise = mongoose.connect(MONGODB_URI!).then(mongoose => {
-            console.log('mongoose', mongoose.connections)
-            console.log('succ')
-
-            
             return mongoose
         })
     }

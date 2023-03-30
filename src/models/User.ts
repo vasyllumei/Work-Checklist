@@ -1,36 +1,68 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
-const Schema = mongoose.Schema;
+export type UserDocument = Document & {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role: string;
+    token: string;
+    refreshToken: string;
+    comparePassword: (candidatePassword: string) => Promise<boolean>;
+};
 
-const userSchema = new Schema({
-    firstName: {
-        type: String,
-        required: true
+const UserSchema = new Schema<UserDocument>(
+    {
+        firstName: {
+            type: String,
+            default: '',
+        },
+        lastName: {
+            type: String,
+            default: '',
+        },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+        },
+        password: {
+            type: String,
+            required: true,
+        },
+        role: {
+            type: String,
+            enum: ['admin', 'user'],
+            default: 'user',
+        },
+        token: {
+            type: String,
+        },
+        refreshToken: {
+            type: String,
+        },
     },
-    lastName: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        enum: ['admin', 'user'],
-        default: 'user'
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+    { timestamps: true },
+);
+
+// Middleware to hash the password before saving
+UserSchema.pre<UserDocument>('save', async function (next) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const user = this;
+
+    if (!user.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(user.password, salt);
+
+    user.password = hash;
+    next();
 });
 
-const User =  mongoose.models.User || mongoose.model('User', userSchema);
+// Method to compare the candidate password with the hashed password
+UserSchema.methods.comparePassword = async function (candidatePassword: string) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
 
-export default User;
+export default mongoose.models.User || mongoose.model<UserDocument>('User', UserSchema);

@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import dbConnect from '@/lib/dbConnect';
 import User from '../../../models/User';
-import {CreateUserType, UserType} from '@/types/User';
+import {CreateUserType} from '@/types/User';
+import authenticateToken from '@/middlewares/authenticateToken';
 
-export default async function handler(
+async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<{ success: boolean, data?: UserType[] }>
+    res: NextApiResponse<{ success: boolean, data?: any }>
 ) {
 
     const { method } = req;
@@ -36,3 +37,5 @@ export default async function handler(
             break
     }
 }
+
+export default authenticateToken(handler);
