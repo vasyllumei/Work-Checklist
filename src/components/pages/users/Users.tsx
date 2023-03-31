@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { getUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
 import { StyledUsers } from '@/components/pages/users/UsersStyles';
 
-export default function Users() {
+export const Users: FC = () => {
   const [users, setUsers] = useState<UserType[]>([]);
 
   const fetchUsers = async () => {
@@ -22,4 +22,4 @@ export default function Users() {
       <StyledUsers.List>Users</StyledUsers.List>
     </StyledUsers.Container>
   );
-}
+};
