@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import User from '../../../models/User';
 import { CreateUserType } from '@/types/User';
-import authenticateToken from '@/middlewares/authenticateToken';
+// import authenticateToken from '@/middlewares/authenticateToken';
 
-async function handler(req: NextApiRequest, res: NextApiResponse<{ success: boolean; data?: any }>) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   await dbConnect();
@@ -14,24 +14,25 @@ async function handler(req: NextApiRequest, res: NextApiResponse<{ success: bool
       try {
         const users = await User.find({});
 
-        res.status(200).json({ success: true, data: users });
+        res.status(200).json({ data: users });
       } catch (error) {
-        res.status(400).json({ success: false });
+        res.status(400).json({ message: 'Internal server error' });
       }
       break;
     case 'POST':
       try {
         const user = await User.create(req.body as CreateUserType);
 
-        res.status(201).json({ success: true, data: user });
+        res.status(201).json({ data: user });
       } catch (error) {
-        res.status(400).json({ success: false });
+        res.status(400).json({ message: 'Internal server error' });
       }
       break;
     default:
-      res.status(400).json({ success: false });
+      res.status(400).json({ message: 'Internal server error' });
       break;
   }
 }
 
-export default authenticateToken(handler);
+// export default authenticateToken(handler);
+export default handler;
