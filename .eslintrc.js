@@ -52,6 +52,7 @@ module.exports = {
     'import/no-unresolved': 'error',
     'import/no-duplicates': 'off',
     'react/react-in-jsx-scope': 0,
+    'linebreak-style': 0,
   },
   settings: {
     react: {
