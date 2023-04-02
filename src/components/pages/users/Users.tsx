@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { getUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
 import { StyledUsers } from '@/components/pages/users/UsersStyles';
+import { Button } from '@/components/Button';
 
 export const Users: FC = () => {
   const [users, setUsers] = useState<UserType[]>([]);
@@ -20,6 +21,7 @@ export const Users: FC = () => {
   return (
     <StyledUsers.Container>
       <StyledUsers.List>Users</StyledUsers.List>
+      <Button text="Test text" onClick={() => console.log('hello')} />
     </StyledUsers.Container>
   );
 };
