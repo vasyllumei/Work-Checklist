@@ -16,7 +16,7 @@ if (!cached) {
     // @ts-ignore
     cached = global.mongoose = { conn: null, promise: null }
 }
-
+ 
 async function dbConnect () {
     if (cached.conn) {
         return cached.conn
