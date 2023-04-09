@@ -3,6 +3,7 @@ import { getUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
 import { StyledUsers } from '@/components/pages/users/UsersStyles';
 import { Button } from '@/components/Button';
+import { Layout } from '@/components/Layout/Layout';
 
 export const Users: FC = () => {
   const [users, setUsers] = useState<UserType[]>([]);
@@ -19,9 +20,11 @@ export const Users: FC = () => {
   console.log('users', users);
 
   return (
-    <StyledUsers.Container>
-      <StyledUsers.List>Users</StyledUsers.List>
-      <Button text="Test text" onClick={() => console.log('hello')} />
-    </StyledUsers.Container>
+    <Layout headTitle="Portal | Users">
+      <StyledUsers.Container>
+        <StyledUsers.List>Users</StyledUsers.List>
+        <Button text="Test text" onClick={() => console.log('hello')} />
+      </StyledUsers.Container>
+    </Layout>
   );
 };
