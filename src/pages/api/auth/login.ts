@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import User, { UserDocument } from '../../../models/User';
+import User, { UserDocumentType } from '../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dbConnect from '@/lib/dbConnect';
@@ -22,7 +22,7 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
     await dbConnect();
 
     // Check if user exists
-    const user: UserDocument | null = await User.findOne({ email });
+    const user: UserDocumentType | null = await User.findOne({ email });
 
     if (!user) {
       res.status(401).json({ message: 'Invalid credentials' });

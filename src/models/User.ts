@@ -1,18 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { UserRoleType } from '@/types/User';
 
-export type UserDocument = Document & {
+export type UserDocumentType = Document & {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  role: string;
+  role?: UserRoleType;
   token: string;
   refreshToken: string;
   comparePassword: (candidatePassword: string) => Promise<boolean>;
 };
 
-const UserSchema = new Schema<UserDocument>(
+const UserSchema = new Schema<UserDocumentType>(
   {
     firstName: {
       type: String,
@@ -34,8 +35,8 @@ const UserSchema = new Schema<UserDocument>(
     },
     role: {
       type: String,
-      enum: ['admin', 'user'],
-      default: 'user',
+      enum: [UserRoleType.ADMIN, UserRoleType.USER],
+      default: UserRoleType.USER,
     },
     token: {
       type: String,
@@ -48,7 +49,7 @@ const UserSchema = new Schema<UserDocument>(
 );
 
 // Middleware to hash the password before saving
-UserSchema.pre<UserDocument>('save', async function (next) {
+UserSchema.pre<UserDocumentType>('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
 
@@ -65,4 +66,4 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string) 
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.models.User || mongoose.model<UserDocument>('User', UserSchema);
+export default mongoose.models.User || mongoose.model<UserDocumentType>('User', UserSchema);

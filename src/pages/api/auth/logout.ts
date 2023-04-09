@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import User, { UserDocument } from '@/models/User';
+import User, { UserDocumentType } from '@/models/User';
 import dbConnect from '@/lib/dbConnect';
 
 export interface MyNextApiRequest extends NextApiRequest {
@@ -17,7 +17,7 @@ const handleLogout = async (req: MyNextApiRequest, res: NextApiResponse): Promis
 
   try {
     await dbConnect();
-    const user: UserDocument | null = await User.findById(userId);
+    const user: UserDocumentType | null = await User.findById(userId);
 
     if (!user) {
       res.status(401).json({ message: 'User not found' });

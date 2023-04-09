@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import User, { UserDocument } from '@/models/User';
+import User, { UserDocumentType } from '@/models/User';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 
@@ -21,7 +21,7 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
     await dbConnect();
 
     // Check if user already exists
-    const existingUser: UserDocument | null = await User.findOne({ email });
+    const existingUser: UserDocumentType | null = await User.findOne({ email });
 
     if (existingUser) {
       res.status(409).json({ message: 'User already exists' });
@@ -35,7 +35,7 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
 
     // Create new user
     const newUser = new User({ email, password: hashedPassword });
-    const savedUser: UserDocument = await newUser.save();
+    const savedUser: UserDocumentType = await newUser.save();
 
     res.status(201).json({
       message: 'User created successfully',
