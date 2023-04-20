@@ -5,7 +5,7 @@ import User, { UserDocumentType } from '@/models/User';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
     const { id } = req.query;
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, role } = req.body;
 
     try {
       await dbConnect();
@@ -18,13 +18,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       user.firstName = firstName || user.firstName;
       user.lastName = lastName || user.lastName;
-      user.email = email || user.email;
-      user.password = password || user.password;
       user.role = role || user.role;
 
       const updatedUser = await user.save();
 
-      return res.status(200).json({ user: updatedUser });
+      return res
+        .status(200)
+        .json({ user: { firstName: updatedUser.firstName, lastName: updatedUser.lastName, role: updatedUser.role } });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: 'Internal server error' });
