@@ -23,7 +23,7 @@ export const Users: FC = () => {
     <Layout headTitle="Portal | Users">
       <StyledUsers.Container>
         <StyledUsers.List>Users</StyledUsers.List>
-        <Button text="Test text" onClick={() => console.log('hello')} />
+        <Button text="Test text" onClick={() => console.log('hello')} disabled />
       </StyledUsers.Container>
     </Layout>
   );
