@@ -1,4 +1,1 @@
-const zalupa = () => {
-  return 'Zalupa ..';
-};
-export default zalupa;
+export * from './TextInput';

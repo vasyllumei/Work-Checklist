@@ -1,0 +1,18 @@
+.button {
+    margin-top: 33px;
+    padding: 10px 8px;
+    width: 100%;
+    max-width: 410px;
+    height: 54px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+    background-color: #4318fe;
+    color: #fff;
+    border-radius: 16px;
+    border: 1px solid #000000;
+}
+
+.buttonDisabled {
+    background-color: #c6bdec;
+    color: #625e5e;
+}
+
