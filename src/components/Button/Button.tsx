@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import { StyledButton } from '@/components/Button/ButtonStyles';
+import styles from './Button.module.css';
+import classNames from 'classnames';
 
 interface ButtonPropsType {
   text: string;
@@ -8,8 +9,12 @@ interface ButtonPropsType {
 }
 export const Button: FC<ButtonPropsType> = ({ text, onClick, disabled }) => {
   return (
-    <StyledButton.Button onClick={onClick} disabled={disabled}>
+    <button
+      className={classNames(styles.button, { [styles.buttonDisabled]: disabled })}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {text}
-    </StyledButton.Button>
+    </button>
   );
 };
