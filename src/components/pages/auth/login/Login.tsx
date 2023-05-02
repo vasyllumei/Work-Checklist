@@ -19,54 +19,59 @@ export const Login: FC = () => {
         router.push('/');
     };
     return (
+        <div className={styles.Container}>
+        <div className={styles.leftContainer}>
 
-        <body className={styles.body}>
-        <div className={styles.left} id="left">
-            <form className={styles.form}>
+            <div className={styles.form}>
+                <div className={styles.a}>
+                <a className={styles.back} href="/signup"> &#8249; Back to dashboard</a>
+                </div>
                 <div className={styles.headText}> Sign In </div>
                 <div className={styles.frontText}>Enter your email and password to sign in!</div>
-            <div className={styles.lineGroup}>
-                <hr className={styles.line}/>
-                <div className={styles.or}>or</div>
-                <hr className={styles.line}/>
-            </div>
-            <label htmlFor="uname">
-                <b className={styles.inputEmail}>Email*</b>
-                <TextInput value={email} onChange={setEmail} placeHolder="mail@simmmple.com"/>
-            </label>
-            <label htmlFor="uname">
-                <b className={styles.inputPassword}>Password*</b>
-                <TextInput value={password} onChange={setPassword} placeHolder={'Min. 8 characters'}/>
-            </label>
-            <div className={styles.checkboxContainer}>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={handleRememberMe}
-                        name="remember"
-                    />
-                    Keep me logged in
+                <div className={styles.lineGroup}>
+                    <hr className={styles.line}/>
+                    <div className={styles.or}>or</div>
+                    <hr className={styles.line}/>
+                </div>
+                <label htmlFor="uname">
+                    <b className={styles.inputEmail}>Email*</b>
+                    <TextInput value={email} onChange={setEmail} placeHolder="mail@simmmple.com"/>
                 </label>
-                <a href="/signup">Forget password?</a>
+                <label htmlFor="uname">
+                    <b className={styles.inputPassword}>Password*</b>
+                    <TextInput value={password} onChange={setPassword} placeHolder={'Min. 8 characters'}/>
+                </label>
+                <div className={styles.checkboxContainer}>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={handleRememberMe}
+                            name="remember"
+                        />
+                        Keep me logged in
+                    </label>
+                    <a className={styles.create} href="/signup">Forget password?</a>
+                </div>
+                <Button text={'Sign In'} onClick={login}/>
+                <div className={styles.forgotText}>
+                    Not registered yet? <a className={styles.create} href="/signup">Create an Account</a>
+                </div>
+                <div className={styles.footer}>
+                <footer>
+                    © 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!</footer>
+                </div>
             </div>
-            <Button text={'Sign In'} onClick={login}/>
-            <div className={styles.forgotText}>
-                Not registered yet? <a href="/signup">Create an Account</a>
-            </div>
-            </form>
 
-            <footer className={styles.footer}>
-                © 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!</footer>
-            <div className={styles.right} id="right">
-                <div className={styles.square}>
-                  <div className={styles.logo}>
-                <img src="https://i.ibb.co/Tq5b2hy/Screenshot-2.png" alt="Логотип"/>
-                  </div>
-                <div/>
-            </div>
+        </div>
+
+        <div className={styles.rightContainer}>
+            <div >
+                <div className={styles.logoContainer}>
+                <img src="https://i.ibb.co/Tq5b2hy/Screenshot-2.png" alt="Логотип" className={styles.logo}/>
+                </div>
             </div>
         </div>
-        </body>
+        </div>
     );
 };

@@ -1,26 +1,34 @@
-.body {
-    width: 70%;
-    height: 100%;
+.Container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0 auto;
 }
 
+.leftContainer,
+.rightContainer {
+    flex: 1;
+    max-height: 100%;
+    max-width: 50%;
+}
 
-.square {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 50%;
-    height: 100vh;
+.rightContainer {
+    min-height: 100vh;
+    max-width: 50%;
     background-image: url("https://s3-alpha-sig.figma.com/img/cc6f/992d/a23f25d992a4db354584463d19897b48?Expires=1683504000&Signature=NagBKOucsHxgjCIsXTtj2OVbgzgQ7hI5wHm8itjV5gKe6HdM6IJYhT0WOK-Ih2-c7P8P3dL6fCKcXJrWGObO2zafjbMWf04iJx8L~HgqYIuF-Dah5~otYzEPCTTtcPfsjRmHhpBgpfIT~pE6zfmQK93kGQFnjuWf0tzsmse2JDtFfcUck0IOyZmarY9pvZFboe6eueYbot2ATgfoyuzU-1kqD~tje9kmGlmcpHvmFXX1zQvX-WE1Ual5Karrr0Bggz3fLkfKHAI7Z5DHjp4pTPxH6r5n924PU1LBlgG0jFU8pwTWPmreCXCV~0mie~X4~az8MObfeO4ywHYprosz2A__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4");
     background-size: cover;
     background-position: center;
-    background-color: #4318FF;
     border-bottom-left-radius: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
 .form {
     max-width: 410px;
-    width: 50%;
-    height: auto;
     margin: 180px auto;
 }
 
@@ -33,9 +41,6 @@
 
 .frontText {
     width: 290px;
-    height: 16px;
-    top: 335px;
-    left: 324px;
     font: 400 16px/16px "DM Sans", sans-serif;
     letter-spacing: -0.05em;
     color: #A3AED0;
@@ -44,8 +49,6 @@
 .headText {
     width: 110px;
     height: 56px;
-    top: 271px;
-    left: 323px;
     font: 700 36px/56px "DM Sans", sans-serif;
     letter-spacing: -0.05em;
     text-align: left;
@@ -54,11 +57,10 @@
     border-radius: 28px;
 }
 
-.inputEmail, .inputPassword {
+.inputEmail,
+.inputPassword {
     width: 42px;
     height: 14px;
-    top: 513px;
-    left: 323px;
     color: #2B3674;
     font: 500 17px/14px "DM Sans", sans-serif;
     letter-spacing: -0.05em;
@@ -80,17 +82,15 @@
 
 .or {
     margin: 0 10px;
-    font-weight: bold;
-    color: #A2ADCE;
     font: 14px/24px "DM Sans", sans-serif;
+    font-weight: bold;
     letter-spacing: 1px;
+    color: #A2ADCE;
 }
 
 .checkbox {
     width: 18px;
     height: 18px;
-    top: 724px;
-    left: 323px;
     border-radius: 2px;
     border: 2px solid #4318FF;
     background-color: transparent;
@@ -98,32 +98,49 @@
 
 .forgotText {
     margin-top: 26px;
-    width: 244px;
-    height: 26px;
-    top: 855px;
-    left: 323px;
     font: 400 14px/26px "DM Sans", sans-serif;
     letter-spacing: -0.05em;
     color: #7081AE;
+    width: 100%;
+    text-align: left;
 }
 
-.footer {
-
-    padding: 1% 25%;
-}
-.logo {
-    width: 150px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.logo img {
-    max-width: 100%;
-    height: auto;
-}
 .checkboxContainer {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.footer {
+    margin-top: 200px;
+    width: 500px;
+}
+
+.logoContainer {
+    max-width: 300px;
+}
+
+.logo {
+    max-width: 150px;
+    position: relative;
+}
+
+.a {
+    padding-bottom: 100px;
+}
+
+.back {
+    text-decoration: none;
+    color: #A3AED0;
+    margin-top: 50px;
+}
+
+.create {
+    text-decoration: none;
+    color: #3814d5;
+}
+
+.arrowLeft{
+    transform: rotate(135deg);
 }
