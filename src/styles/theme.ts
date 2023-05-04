@@ -1,9 +1,9 @@
-import { Roboto } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import { createTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
 
-export const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
+export const dmSans = DM_Sans({
+  weight: ['400', '500', '700'],
   subsets: ['latin'],
   display: 'swap',
   fallback: ['Helvetica', 'Arial', 'sans-serif'],
@@ -23,7 +23,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: roboto.style.fontFamily,
+    fontFamily: dmSans.style.fontFamily,
   },
 });
 
