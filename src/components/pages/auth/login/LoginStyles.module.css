@@ -1,4 +1,4 @@
-.Container {
+.container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,7 +16,7 @@
 .rightContainer {
     min-height: 100vh;
     max-width: 50%;
-    background-image: url("https://s3-alpha-sig.figma.com/img/cc6f/992d/a23f25d992a4db354584463d19897b48?Expires=1683504000&Signature=NagBKOucsHxgjCIsXTtj2OVbgzgQ7hI5wHm8itjV5gKe6HdM6IJYhT0WOK-Ih2-c7P8P3dL6fCKcXJrWGObO2zafjbMWf04iJx8L~HgqYIuF-Dah5~otYzEPCTTtcPfsjRmHhpBgpfIT~pE6zfmQK93kGQFnjuWf0tzsmse2JDtFfcUck0IOyZmarY9pvZFboe6eueYbot2ATgfoyuzU-1kqD~tje9kmGlmcpHvmFXX1zQvX-WE1Ual5Karrr0Bggz3fLkfKHAI7Z5DHjp4pTPxH6r5n924PU1LBlgG0jFU8pwTWPmreCXCV~0mie~X4~az8MObfeO4ywHYprosz2A__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4");
+    background-image: url("../../../../LogBackground.jpg");
     background-size: cover;
     background-position: center;
     border-bottom-left-radius: 200px;
@@ -32,7 +32,7 @@
     margin: 180px auto;
 }
 
-.loginForm {
+.login-form {
     height: 368px;
     width: 410px;
     margin-left: 600px;
@@ -57,8 +57,7 @@
     border-radius: 28px;
 }
 
-.inputEmail,
-.inputPassword {
+.inputField {
     width: 42px;
     height: 14px;
     color: #2B3674;
@@ -73,14 +72,14 @@
     margin: 20px 0;
 }
 
-.line {
+.lineForm {
     border: none;
     background-color: #dee3f0;
     height: 1px;
     flex-grow: 1;
 }
 
-.or {
+.orForm {
     margin: 0 10px;
     font: 14px/24px "DM Sans", sans-serif;
     font-weight: bold;
@@ -112,7 +111,7 @@
     margin-top: 20px;
 }
 
-.footer {
+.footerLogin {
     margin-top: 200px;
     width: 500px;
 }
@@ -126,17 +125,17 @@
     position: relative;
 }
 
-.a {
+.backLink {
     padding-bottom: 100px;
 }
 
-.back {
+.backDashboard {
     text-decoration: none;
     color: #A3AED0;
     margin-top: 50px;
 }
 
-.create {
+.authLink {
     text-decoration: none;
     color: #3814d5;
 }

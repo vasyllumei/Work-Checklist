@@ -7,6 +7,7 @@ interface ButtonPropsType {
   onClick: () => void;
   disabled?: boolean;
 }
+
 export const Button: FC<ButtonPropsType> = ({ text, onClick, disabled }) => {
   return (
     <button
