@@ -3,6 +3,7 @@ import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/navigation';
 import styles from './LoginStyles.module.css';
+import 'src/assets/image/LogBackground.jpg';
 
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
@@ -53,23 +54,44 @@ export const Login: FC = () => {
           </div>
           <Button text="Sign In" onClick={login} />
           <div className={styles.forgotText}>
-            Not registered yet?{' '}
+            Not registered yet?
             <a className={styles.authLink} href="/signup">
               Create an Account
             </a>
           </div>
-          <div className={styles.footerLogin}>
-            <footer>© 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!</footer>
-          </div>
         </div>
+        <footer>
+          <ul className={styles.leftFooter}>
+            <li>
+              <a>© 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!</a>
+            </li>
+          </ul>
+        </footer>
       </div>
-
       <div className={styles.rightContainer}>
         <div>
-          <div className={styles.logoContainer}>
-            <img src="https://i.ibb.co/Tq5b2hy/Screenshot-2.png" alt="Логотип" className={styles.logo} />
+          <div className={styles.logoContainer}></div>
+          <div className={styles.infoBox}>
+            <p className={styles.learnInfo}>Learn more about Horizon UI on </p>
+            <p className={styles.infoLink}>horizon-ui.com</p>
           </div>
         </div>
+        <footer>
+          <ul className={styles.rightFooter}>
+            <li>
+              <a>Marketplace</a>
+            </li>
+            <li>
+              <a>License</a>
+            </li>
+            <li>
+              <a>Terms of Use</a>
+            </li>
+            <li>
+              <a>Blog</a>
+            </li>
+          </ul>
+        </footer>
       </div>
     </div>
   );
