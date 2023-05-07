@@ -25,6 +25,11 @@
 
 .form {
     max-width: 410px;
+/*    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 40px 0;*/
 }
 
 .login-form {
@@ -36,7 +41,8 @@
 
 .frontText {
     width: 290px;
-    font: 400 16px/16px "DM Sans", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
     letter-spacing: -0.05em;
     color: #a3aed0;
 }
@@ -44,7 +50,8 @@
 .headText {
     width: 110px;
     height: 56px;
-    font: 700 36px/56px "DM Sans", sans-serif;
+    font-weight: 700;
+    font-size: 36px;
     letter-spacing: -0.05em;
     text-align: left;
     color: #2b3674;
@@ -55,8 +62,9 @@
 .inputField {
     width: 42px;
     height: 14px;
-    color: #2b3674;
-    font: 500 17px/14px "DM Sans", sans-serif;
+    color: #2B3674;
+    font-weight: 500;
+    font-size: 17px;
     letter-spacing: -0.05em;
     margin-top: 31px;
 }
@@ -76,7 +84,6 @@
 
 .orForm {
     margin: 0 10px;
-    font: 14px/24px "DM Sans", sans-serif;
     font-weight: bold;
     letter-spacing: 1px;
     color: #a2adce;
@@ -92,7 +99,8 @@
 
 .forgotText {
     margin-top: 26px;
-    font: 400 14px/26px "DM Sans", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
     letter-spacing: -0.05em;
     color: #7081ae;
     width: 100%;
@@ -108,8 +116,13 @@
 }
 
 .footerLogin {
-    margin-top: 200px;
     width: 500px;
+}
+
+.footerLogin footer {
+    font-size: 13px;
+    color:#A3AED0;
+    font-weight: 700;
 }
 
 .logoContainer {
@@ -128,7 +141,6 @@
 }
 
 .backLink {
-    padding-bottom: 100px;
 }
 
 .backDashboard {
