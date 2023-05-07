@@ -25,11 +25,12 @@
 
 .form {
     max-width: 410px;
-/*    display: flex;
+    display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: start;
     height: 100vh;
-    padding: 40px 0;*/
+    padding: 40px 0;
 }
 
 .login-form {
@@ -187,17 +188,12 @@
     justify-content: space-between;
     list-style: none;
     width: 500px;
-    height: 90px;
     color: white;
 }
 .leftFooter {
-    display: flex;
-    align-items: flex-end;
-    list-style: none;
-    margin-left: 250px;
-    width: 800px;
-    height: 270px;
-    color: #100404;
+    font-size: 13px;
+    color:#A3AED0;
+    font-weight: 700;
 }
 
 
