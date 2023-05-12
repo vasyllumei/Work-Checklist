@@ -5,9 +5,16 @@
     height: 54px;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
     background-color: #4318fe;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 100%;
+    text-align: center;
+    letter-spacing: -0.02em;
+
     color: #fff;
     border-radius: 16px;
     border: 1px solid #000000;
+    cursor: pointer;
 }
 
 .buttonDisabled {
