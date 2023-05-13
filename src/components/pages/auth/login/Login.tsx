@@ -8,23 +8,36 @@ import { validateEmail, validatePassword } from '@/utils';
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-
-  const emailHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-    if (!validateEmail(event.target.value)) {
-      setEmailError('Invalid Email');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  console.log(errors);
+  const emailHandler = (value: string) => {
+    setEmail(value);
+    if (!validateEmail(value)) {
+      setErrors(prevState => ({
+        ...prevState,
+        email: 'Invalid Email',
+      }));
     } else {
-      setEmailError('');
+      setErrors(prevState => {
+        delete prevState.email;
+        return prevState;
+      });
     }
   };
-  const passwordHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-    if (!validatePassword(event.target.value)) {
-      setPasswordError('Invalid Password');
-    } else setPasswordError('');
+  const passwordHandler = (value: string) => {
+    setPassword(value);
+    if (!validatePassword(value)) {
+      setErrors(prevState => ({
+        ...prevState,
+        password: 'Invalid Password',
+      }));
+    } else {
+      setErrors(prevState => {
+        delete prevState.password;
+        return prevState;
+      });
+    }
   };
 
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +49,7 @@ export const Login: FC = () => {
     console.log(password);
     router.push('/');
   };
-
+  const signInDisabled = !email || !password || Object.keys(errors).length !== 0;
   return (
     <div className={styles.container}>
       <div className={styles.leftContainer}>
@@ -61,7 +74,7 @@ export const Login: FC = () => {
                 value={email}
                 onChange={emailHandler}
                 placeHolder="mail@simmmple.com"
-                error={emailError}
+                error={errors.email}
               />
             </label>
             <label className={styles.passwordLabel} htmlFor="uname">
@@ -69,9 +82,9 @@ export const Login: FC = () => {
               <TextInput
                 name="password"
                 value={password}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => passwordHandler(event)}
+                onChange={passwordHandler}
                 placeHolder={'Min. 5 characters'}
-                error={passwordError}
+                error={errors.password}
               />
               <div className={styles.eyePassword}></div>
             </label>
@@ -84,7 +97,7 @@ export const Login: FC = () => {
                 Forget password?
               </a>
             </div>
-            <Button text="Sign In" onClick={login} />
+            <Button disabled={signInDisabled} text="Sign In" onClick={login} />
             <div className={styles.forgotText}>
               Not registered yet?
               <a className={styles.authLink} href="/signup">

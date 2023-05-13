@@ -1,9 +1,10 @@
-import { FC, ChangeEvent } from 'react';
+import { FC } from 'react';
 import styles from './TextInput.module.css';
+import classNames from 'classnames';
 
 interface InputPropsType {
   value: string;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onChange: (value: string) => void;
   placeHolder: string;
   name: string;
   error?: string;
@@ -12,10 +13,10 @@ export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHold
   return (
     <div className={styles.container}>
       <input
-        className={error ? `${styles.input} ${styles.inputError}` : styles.input}
+        className={classNames(styles.input, { [styles.inputError]: error })}
         name={name}
         value={value}
-        onChange={onChange}
+        onChange={event => onChange(event.target.value)}
         placeholder={placeHolder}
       />
       {error && <span className={styles.error}>{error}</span>}
