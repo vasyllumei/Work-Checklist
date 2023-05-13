@@ -3,6 +3,7 @@ import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/navigation';
 import styles from './LoginStyles.module.css';
+import { validateEmail, validatePassword } from '@/utils';
 
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
@@ -13,9 +14,7 @@ export const Login: FC = () => {
 
   const emailHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
-    const re =
-      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    if (!re.test(String(event.target.value).toLowerCase())) {
+    if (!validateEmail(event.target.value)) {
       setEmailError('Invalid Email');
     } else {
       setEmailError('');
@@ -23,8 +22,8 @@ export const Login: FC = () => {
   };
   const passwordHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
-    if (event.target.value.length < 5 || event.target.value.length > 12) {
-      setPasswordError('Password must be longer than 5 and less than 12 characters');
+    if (!validatePassword(event.target.value)) {
+      setPasswordError('Invalid Password');
     } else setPasswordError('');
   };
 
@@ -57,13 +56,12 @@ export const Login: FC = () => {
             </div>
             <label htmlFor="uname">
               <b className={styles.inputField}>Email*</b>
-              {emailError && <div className={styles.errorInput}></div>}
               <TextInput
                 name="email"
                 value={email}
-                onChange={event => emailHandler(event)}
+                onChange={emailHandler}
                 placeHolder="mail@simmmple.com"
-                className={emailError ? styles.invalidInput : ''}
+                error={emailError}
               />
             </label>
             <label className={styles.passwordLabel} htmlFor="uname">
@@ -73,7 +71,7 @@ export const Login: FC = () => {
                 value={password}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => passwordHandler(event)}
                 placeHolder={'Min. 5 characters'}
-                className={passwordError ? styles.invalidInput : ''}
+                error={passwordError}
               />
               <div className={styles.eyePassword}></div>
             </label>

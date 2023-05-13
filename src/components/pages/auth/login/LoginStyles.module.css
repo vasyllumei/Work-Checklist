@@ -191,10 +191,7 @@
     color:#A3AED0;
     font-weight: 700;
 }
-.invalidInput {
-    border-color: red;
 
-}
 .passwordLabel{
     position: relative;
 }

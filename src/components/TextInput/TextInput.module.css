@@ -22,3 +22,10 @@
     letter-spacing: -0.02em;
     color: #A3AED0;
 }
+.error {
+    font-size: 14px;
+    color: red;
+}
+.inputError {
+    border-color: red;
+}

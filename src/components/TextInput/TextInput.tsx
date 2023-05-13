@@ -6,16 +6,19 @@ interface InputPropsType {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   placeHolder: string;
   name: string;
-  className?: string;
+  error?: string;
 }
-export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHolder, className }) => {
+export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHolder, error }) => {
   return (
-    <input
-      className={`${styles.input} ${className}`}
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeHolder}
-    />
+    <div className={styles.container}>
+      <input
+        className={error ? `${styles.input} ${styles.inputError}` : styles.input}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeHolder}
+      />
+      {error && <span className={styles.error}>{error}</span>}
+    </div>
   );
 };
