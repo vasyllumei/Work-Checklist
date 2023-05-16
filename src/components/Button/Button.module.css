@@ -10,7 +10,6 @@
     line-height: 100%;
     text-align: center;
     letter-spacing: -0.02em;
-
     color: #fff;
     border-radius: 16px;
     border: 1px solid #000000;
@@ -18,7 +17,9 @@
 }
 
 .buttonDisabled {
-    background-color: #c6bdec;
-    color: #625e5e;
+    background-color: #A3AED0;
+    color: #f8f2f2;
+    border: white;
+    box-shadow: none;
 }
 

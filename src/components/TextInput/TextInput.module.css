@@ -11,8 +11,8 @@
     line-height: 14px;
     letter-spacing: -0.02em;
     color: #2B3674;
-    margin-bottom: 15px;
-    margin-top: 5px;
+
+    position: relative;
     }
 .input::placeholder {
 
@@ -25,7 +25,12 @@
 .error {
     font-size: 14px;
     color: red;
+    margin-bottom: 60px;
+    height: 36px;
+    word-wrap: break-word;
+    box-sizing: border-box;
 }
+
 .inputError {
     border-color: red;
 }

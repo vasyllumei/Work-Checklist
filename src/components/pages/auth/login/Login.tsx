@@ -8,12 +8,25 @@ import { validateEmail, validatePassword } from '@/utils';
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailDirty, setEmailDirty] = useState(false);
+  const [passwordDirty, setPasswordDirty] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [type, setType] = useState('password');
   console.log(errors);
+
+  const blurHandler = (value: string) => {
+    switch (value) {
+      case 'email':
+        setEmailDirty(true);
+        break;
+      case 'password':
+        setPasswordDirty(true);
+    }
+  };
   const emailHandler = (value: string) => {
     setEmail(value);
-    if (!validateEmail(value)) {
+    if (!validateEmail(value) && !emailDirty) {
       setErrors(prevState => ({
         ...prevState,
         email: 'Invalid Email',
@@ -27,10 +40,10 @@ export const Login: FC = () => {
   };
   const passwordHandler = (value: string) => {
     setPassword(value);
-    if (!validatePassword(value)) {
+    if (!validatePassword(value) && !passwordDirty) {
       setErrors(prevState => ({
         ...prevState,
-        password: 'Invalid Password',
+        password: 'Password must have 5-12 characters, special symbol and uppercase letter',
       }));
     } else {
       setErrors(prevState => {
@@ -67,30 +80,47 @@ export const Login: FC = () => {
               <div className={styles.orForm}>or</div>
               <hr className={styles.lineForm} />
             </div>
-            <label htmlFor="uname">
+            <label className={styles.emailLabel} htmlFor="uname">
               <b className={styles.inputField}>Email*</b>
-              <TextInput
-                name="email"
-                value={email}
-                onChange={emailHandler}
-                placeHolder="mail@simmmple.com"
-                error={errors.email}
-              />
+              <div className={styles.mailInput}>
+                <TextInput
+                  name="email"
+                  value={email}
+                  onChange={emailHandler}
+                  placeHolder="mail@simmmple.com"
+                  error={errors.email}
+                  onBlur={blurHandler}
+                />
+              </div>
             </label>
             <label className={styles.passwordLabel} htmlFor="uname">
               <b className={styles.inputField}>Password*</b>
-              <TextInput
-                name="password"
-                value={password}
-                onChange={passwordHandler}
-                placeHolder={'Min. 5 characters'}
-                error={errors.password}
-              />
-              <div className={styles.eyePassword}></div>
+              <div className={styles.passwordInput}>
+                <TextInput
+                  name="password"
+                  value={password}
+                  onChange={passwordHandler}
+                  placeHolder={'Min. 5 characters'}
+                  error={errors.password}
+                  type={type}
+                  onBlur={blurHandler}
+                />
+              </div>
+              {type === 'password' ? (
+                <div className={styles.eyePassword} onClick={() => setType('text')}></div>
+              ) : (
+                <div className={styles.eyePassword} onClick={() => setType('password')}></div>
+              )}
             </label>
             <div className={styles.checkboxContainer}>
               <label>
-                <input type="checkbox" checked={rememberMe} onChange={handleRememberMe} name="remember" />
+                <input
+                  className={styles.checkbox}
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={handleRememberMe}
+                  name="remember"
+                />
                 Keep me logged in
               </label>
               <a className={styles.authLink} href="/signup">

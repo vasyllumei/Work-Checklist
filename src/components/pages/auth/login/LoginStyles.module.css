@@ -29,7 +29,6 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: start;
     height: 100vh;
     padding: 40px 0;
 }
@@ -89,13 +88,7 @@
     color: #a2adce;
 }
 
-.checkbox {
-    width: 18px;
-    height: 18px;
-    border-radius: 2px;
-    border: 2px solid #4318ff;
-    background-color: transparent;
-}
+
 
 .forgotText {
     padding: 16px;
@@ -117,6 +110,10 @@
     letter-spacing: -0.02em;
     color: #2B3674;
     padding-bottom: 15px;
+    padding-top: 20px;
+}
+.checkbox {
+    cursor: pointer;
 }
 
 .logoContainer {
@@ -192,16 +189,21 @@
     font-weight: 700;
 }
 
-.passwordLabel{
-    position: relative;
-}
     .eyePassword {
         background-image: url("../../../../assets/image/EyePassword.png");
         position: absolute;
         height: 16px;
         width: 16px;
-        top: 47px;
+        top: 41px;
         right: 30px;
-        cursor: pointer;;
+        cursor: pointer;
     }
-
+.mailInput {
+    height: 80px;
+}
+.passwordInput {
+    height: 80px;
+}
+.passwordLabel{
+    position: relative;
+}
