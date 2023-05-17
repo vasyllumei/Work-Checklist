@@ -34,3 +34,13 @@
 .inputError {
     border-color: red;
 }
+
+.eyePassword {
+    background-image: url("../../assets/image/EyePassword.png");
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    top: 41px;
+    right: 30px;
+    cursor: pointer;
+}

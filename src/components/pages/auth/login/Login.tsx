@@ -8,25 +8,23 @@ import { validateEmail, validatePassword } from '@/utils';
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailDirty, setEmailDirty] = useState(false);
-  const [passwordDirty, setPasswordDirty] = useState(false);
+  const [touchedFields, setTouchFields] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [type, setType] = useState('password');
   console.log(errors);
 
   const blurHandler = (value: string) => {
     switch (value) {
       case 'email':
-        setEmailDirty(true);
+        setTouchFields(true);
         break;
       case 'password':
-        setPasswordDirty(true);
+        setTouchFields(true);
     }
   };
   const emailHandler = (value: string) => {
     setEmail(value);
-    if (!validateEmail(value) && !emailDirty) {
+    if (!validateEmail(value) && !touchedFields) {
       setErrors(prevState => ({
         ...prevState,
         email: 'Invalid Email',
@@ -40,7 +38,7 @@ export const Login: FC = () => {
   };
   const passwordHandler = (value: string) => {
     setPassword(value);
-    if (!validatePassword(value) && !passwordDirty) {
+    if (!validatePassword(value) && !touchedFields) {
       setErrors(prevState => ({
         ...prevState,
         password: 'Password must have 5-12 characters, special symbol and uppercase letter',
@@ -61,6 +59,10 @@ export const Login: FC = () => {
   const login = () => {
     console.log(password);
     router.push('/');
+  };
+  const signUp = () => {
+    console.log(password);
+    router.push('/signUp');
   };
   const signInDisabled = !email || !password || Object.keys(errors).length !== 0;
   return (
@@ -89,7 +91,7 @@ export const Login: FC = () => {
                   onChange={emailHandler}
                   placeHolder="mail@simmmple.com"
                   error={errors.email}
-                  onBlur={blurHandler}
+                  {...blurHandler}
                 />
               </div>
             </label>
@@ -102,15 +104,9 @@ export const Login: FC = () => {
                   onChange={passwordHandler}
                   placeHolder={'Min. 5 characters'}
                   error={errors.password}
-                  type={type}
-                  onBlur={blurHandler}
+                  {...blurHandler}
                 />
               </div>
-              {type === 'password' ? (
-                <div className={styles.eyePassword} onClick={() => setType('text')}></div>
-              ) : (
-                <div className={styles.eyePassword} onClick={() => setType('password')}></div>
-              )}
             </label>
             <div className={styles.checkboxContainer}>
               <label>
@@ -130,7 +126,7 @@ export const Login: FC = () => {
             <Button disabled={signInDisabled} text="Sign In" onClick={login} />
             <div className={styles.forgotText}>
               Not registered yet?
-              <a className={styles.authLink} href="/signup">
+              <a className={styles.authLink} href="/signUp" onClick={signUp}>
                 Create an Account
               </a>
             </div>

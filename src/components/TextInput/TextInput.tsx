@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import styles from './TextInput.module.css';
 import classNames from 'classnames';
 
@@ -9,10 +9,12 @@ interface InputPropsType {
   name: string;
   error?: string;
   type?: string;
-  onBlur: (value: string) => void;
 }
-export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHolder, error, type, onBlur }) => {
+
+export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHolder, error }) => {
   const [focused, setFocused] = useState(false);
+  const [inputType, setInputType] = useState(name === 'password' ? 'password' : 'text'); // Set inputType state based on the name prop
+
   return (
     <div className={styles.container}>
       <input
@@ -21,14 +23,27 @@ export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHold
         value={value}
         onChange={event => onChange(event.target.value)}
         placeholder={placeHolder}
-        type={type}
-        onFocus={() => setFocused(true)}
+        type={inputType}
+        onFocus={() => {
+          if (!error) {
+            setFocused(true);
+          }
+        }}
         onBlur={() => {
           setFocused(false);
-          onBlur(value);
         }}
       />
-      {!focused && error && <span className={styles.error}>{error}</span>}
+      {name === 'password' && (
+        <div
+          className={styles.eyePassword}
+          onClick={() => setInputType(inputType === 'password' ? 'text' : 'password')}
+        />
+      )}
+      {!focused && error && (
+        <span className={styles.error} onClick={() => setFocused(true)}>
+          {error}
+        </span>
+      )}
     </div>
   );
 };

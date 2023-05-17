@@ -189,15 +189,6 @@
     font-weight: 700;
 }
 
-    .eyePassword {
-        background-image: url("../../../../assets/image/EyePassword.png");
-        position: absolute;
-        height: 16px;
-        width: 16px;
-        top: 41px;
-        right: 30px;
-        cursor: pointer;
-    }
 .mailInput {
     height: 80px;
 }
