@@ -8,12 +8,13 @@ interface InputPropsType {
   placeHolder: string;
   name: string;
   error?: string;
-  type?: string;
+  type?: 'text' | 'password' | 'email';
 }
 
-export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHolder, error }) => {
+export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHolder, error, type = 'text' }) => {
   const [focused, setFocused] = useState(false);
-  const [inputType, setInputType] = useState(name === 'password' ? 'password' : 'text'); // Set inputType state based on the name prop
+  const [inputType, setInputType] = useState(type === 'password' ? 'password' : 'text');
+  const showError = error && focused;
 
   return (
     <div className={styles.container}>
@@ -25,21 +26,16 @@ export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHold
         placeholder={placeHolder}
         type={inputType}
         onFocus={() => {
-          if (!error) {
-            setFocused(true);
-          }
-        }}
-        onBlur={() => {
-          setFocused(false);
+          setFocused(true);
         }}
       />
-      {name === 'password' && (
+      {type === 'password' && (
         <div
           className={styles.eyePassword}
           onClick={() => setInputType(inputType === 'password' ? 'text' : 'password')}
         />
       )}
-      {!focused && error && (
+      {showError && (
         <span className={styles.error} onClick={() => setFocused(true)}>
           {error}
         </span>

@@ -1,70 +1,67 @@
-import React, { FC, useState } from 'react';
-import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import styles from './LoginStyles.module.css';
-import { validateEmail, validatePassword } from '@/utils';
+import { validateInput } from '@/utils';
+import { FC, useState } from 'react';
+import { TextInput } from '@/components/TextInput';
+
+interface ErrorType {
+  email?: string;
+  password?: string;
+}
 
 export const Login: FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [touchedFields, setTouchFields] = useState(false);
+  const [value, setValue] = useState<{ [key: string]: string }>({});
+  const [touchedFields, setTouchFields] = useState<{ [key: string]: boolean }>({});
   const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  console.log(errors);
+  const [errors, setErrors] = useState<ErrorType>({});
 
-  const blurHandler = (value: string) => {
-    switch (value) {
-      case 'email':
-        setTouchFields(true);
-        break;
-      case 'password':
-        setTouchFields(true);
-    }
-  };
-  const emailHandler = (value: string) => {
-    setEmail(value);
-    if (!validateEmail(value) && !touchedFields) {
-      setErrors(prevState => ({
-        ...prevState,
-        email: 'Invalid Email',
-      }));
-    } else {
-      setErrors(prevState => {
-        delete prevState.email;
-        return prevState;
-      });
-    }
-  };
-  const passwordHandler = (value: string) => {
-    setPassword(value);
-    if (!validatePassword(value) && !touchedFields) {
-      setErrors(prevState => ({
-        ...prevState,
-        password: 'Password must have 5-12 characters, special symbol and uppercase letter',
-      }));
-    } else {
-      setErrors(prevState => {
-        delete prevState.password;
-        return prevState;
-      });
-    }
-  };
+  const inputHandler = (name: string, value: string) => {
+    setValue(prevValue => ({ ...prevValue, [name]: value }));
 
+    setTouchFields(prev => ({ ...prev, [name]: true }));
+
+    if (name === 'email') {
+      if (!validateInput(value, name) && touchedFields[name]) {
+        setErrors(prevState => ({
+          ...prevState,
+          email: 'Invalid Email',
+        }));
+      } else {
+        setErrors(prevState => {
+          const { email, ...restErrors } = prevState;
+          return restErrors;
+        });
+      }
+    } else if (name === 'password') {
+      if (!validateInput(value, name) && touchedFields[name]) {
+        setErrors(prevState => ({
+          ...prevState,
+          password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
+        }));
+      } else {
+        setErrors(prevState => {
+          const { password, ...restErrors } = prevState;
+          return restErrors;
+        });
+      }
+    }
+  };
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
 
   const router = useRouter();
   const login = () => {
-    console.log(password);
+    console.log(value);
     router.push('/');
   };
   const signUp = () => {
-    console.log(password);
+    console.log(value);
     router.push('/signUp');
   };
-  const signInDisabled = !email || !password || Object.keys(errors).length !== 0;
+  const signInDisabled = !value.email || !value.password || Object.keys(errors).length !== 0;
+
   return (
     <div className={styles.container}>
       <div className={styles.leftContainer}>
@@ -87,11 +84,10 @@ export const Login: FC = () => {
               <div className={styles.mailInput}>
                 <TextInput
                   name="email"
-                  value={email}
-                  onChange={emailHandler}
+                  value={value.email || ''}
+                  onChange={newValue => inputHandler('email', newValue)}
                   placeHolder="mail@simmmple.com"
                   error={errors.email}
-                  {...blurHandler}
                 />
               </div>
             </label>
@@ -100,11 +96,11 @@ export const Login: FC = () => {
               <div className={styles.passwordInput}>
                 <TextInput
                   name="password"
-                  value={password}
-                  onChange={passwordHandler}
+                  value={value.password || ''}
+                  onChange={newValue => inputHandler('password', newValue)}
                   placeHolder={'Min. 5 characters'}
                   error={errors.password}
-                  {...blurHandler}
+                  type="password"
                 />
               </div>
             </label>
