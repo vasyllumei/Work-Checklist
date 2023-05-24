@@ -6,8 +6,7 @@ import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
 
 interface ErrorType {
-  email?: string;
-  password?: string;
+  [key: string]: string;
 }
 
 export const Login: FC = () => {
@@ -18,7 +17,6 @@ export const Login: FC = () => {
 
   const inputHandler = (name: string, value: string) => {
     setValue(prevValue => ({ ...prevValue, [name]: value }));
-
     setTouchFields(prev => ({ ...prev, [name]: true }));
 
     if (name === 'email') {
@@ -29,8 +27,9 @@ export const Login: FC = () => {
         }));
       } else {
         setErrors(prevState => {
-          const { email, ...restErrors } = prevState;
-          return restErrors;
+          const updatedErrors = { ...prevState };
+          delete updatedErrors[name];
+          return updatedErrors;
         });
       }
     } else if (name === 'password') {
@@ -41,8 +40,9 @@ export const Login: FC = () => {
         }));
       } else {
         setErrors(prevState => {
-          const { password, ...restErrors } = prevState;
-          return restErrors;
+          const updatedErrors = { ...prevState };
+          delete updatedErrors[name];
+          return updatedErrors;
         });
       }
     }
