@@ -1,30 +1,73 @@
-import React, { FC, useState } from 'react';
-import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import styles from './LoginStyles.module.css';
-import 'src/assets/image/LogBackground.jpg';
+import { validateInput } from '@/utils';
+import { FC, useState } from 'react';
+import { TextInput } from '@/components/TextInput';
+
+interface ErrorType {
+  [key: string]: string;
+}
 
 export const Login: FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [value, setValue] = useState<{ [key: string]: string }>({});
+  const [touchedFields, setTouchFields] = useState<{ [key: string]: boolean }>({});
   const [rememberMe, setRememberMe] = useState(false);
+  const [errors, setErrors] = useState<ErrorType>({});
+
+  const inputHandler = (name: string, value: string) => {
+    setValue(prevValue => ({ ...prevValue, [name]: value }));
+    setTouchFields(prev => ({ ...prev, [name]: true }));
+
+    if (name === 'email') {
+      if (!validateInput(value, name) && touchedFields[name]) {
+        setErrors(prevState => ({
+          ...prevState,
+          email: 'Invalid Email',
+        }));
+      } else {
+        setErrors(prevState => {
+          const updatedErrors = { ...prevState };
+          delete updatedErrors[name];
+          return updatedErrors;
+        });
+      }
+    } else if (name === 'password') {
+      if (!validateInput(value, name) && touchedFields[name]) {
+        setErrors(prevState => ({
+          ...prevState,
+          password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
+        }));
+      } else {
+        setErrors(prevState => {
+          const updatedErrors = { ...prevState };
+          delete updatedErrors[name];
+          return updatedErrors;
+        });
+      }
+    }
+  };
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
 
   const router = useRouter();
   const login = () => {
-    console.log(password);
+    console.log(value);
     router.push('/');
   };
+  const signUp = () => {
+    console.log(value);
+    router.push('/signUp');
+  };
+  const signInDisabled = !value.email || !value.password || Object.keys(errors).length !== 0;
+
   return (
     <div className={styles.container}>
       <div className={styles.leftContainer}>
         <div className={styles.form}>
           <div className={styles.backLink}>
             <a className={styles.backDashboard} href="/signup">
-              {' '}
               &#8249; Back to dashboard
             </a>
           </div>
@@ -36,27 +79,50 @@ export const Login: FC = () => {
               <div className={styles.orForm}>or</div>
               <hr className={styles.lineForm} />
             </div>
-            <label htmlFor="uname">
+            <label className={styles.emailLabel} htmlFor="uname">
               <b className={styles.inputField}>Email*</b>
-              <TextInput value={email} onChange={setEmail} placeHolder="mail@simmmple.com" />
+              <div className={styles.mailInput}>
+                <TextInput
+                  name="email"
+                  value={value.email || ''}
+                  onChange={newValue => inputHandler('email', newValue)}
+                  placeHolder="mail@simmmple.com"
+                  error={errors.email}
+                />
+              </div>
             </label>
-            <label htmlFor="uname">
+            <label className={styles.passwordLabel} htmlFor="uname">
               <b className={styles.inputField}>Password*</b>
-              <TextInput value={password} onChange={setPassword} placeHolder={'Min. 8 characters'} />
+              <div className={styles.passwordInput}>
+                <TextInput
+                  name="password"
+                  value={value.password || ''}
+                  onChange={newValue => inputHandler('password', newValue)}
+                  placeHolder={'Min. 5 characters'}
+                  error={errors.password}
+                  type="password"
+                />
+              </div>
             </label>
             <div className={styles.checkboxContainer}>
               <label>
-                <input type="checkbox" checked={rememberMe} onChange={handleRememberMe} name="remember" />
+                <input
+                  className={styles.checkbox}
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={handleRememberMe}
+                  name="remember"
+                />
                 Keep me logged in
               </label>
               <a className={styles.authLink} href="/signup">
                 Forget password?
               </a>
             </div>
-            <Button text="Sign In" onClick={login} />
+            <Button disabled={signInDisabled} text="Sign In" onClick={login} />
             <div className={styles.forgotText}>
               Not registered yet?
-              <a className={styles.authLink} href="/signup">
+              <a className={styles.authLink} href="/signUp" onClick={signUp}>
                 Create an Account
               </a>
             </div>
@@ -70,29 +136,29 @@ export const Login: FC = () => {
         </div>
       </div>
       <div className={styles.rightContainer}>
-        <div>
+        <div className={styles.logo}>
           <div className={styles.logoContainer}></div>
           <div className={styles.infoBox}>
             <p className={styles.learnInfo}>Learn more about Horizon UI on </p>
             <p className={styles.infoLink}>horizon-ui.com</p>
           </div>
+          <footer>
+            <ul className={styles.rightFooter}>
+              <li>
+                <a>Marketplace</a>
+              </li>
+              <li>
+                <a>License</a>
+              </li>
+              <li>
+                <a>Terms of Use</a>
+              </li>
+              <li>
+                <a>Blog</a>
+              </li>
+            </ul>
+          </footer>
         </div>
-        <footer>
-          <ul className={styles.rightFooter}>
-            <li>
-              <a>Marketplace</a>
-            </li>
-            <li>
-              <a>License</a>
-            </li>
-            <li>
-              <a>Terms of Use</a>
-            </li>
-            <li>
-              <a>Blog</a>
-            </li>
-          </ul>
-        </footer>
       </div>
     </div>
   );
