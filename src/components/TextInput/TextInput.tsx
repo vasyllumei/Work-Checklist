@@ -9,15 +9,33 @@ interface InputPropsType {
   name: string;
   error?: string;
   type?: 'text' | 'password' | 'email';
+  onBlur?: () => void;
+  onFocus?: () => void;
+  label?: string;
 }
 
-export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHolder, error, type = 'text' }) => {
-  const [focused, setFocused] = useState(false);
+export const TextInput: FC<InputPropsType> = ({
+  onChange,
+  onBlur,
+  name,
+  value,
+  placeHolder,
+  error,
+  type = 'text',
+  onFocus,
+  label,
+}) => {
   const [inputType, setInputType] = useState(type === 'password' ? 'password' : 'text');
-  const showError = error && focused;
 
   return (
     <div className={styles.container}>
+      {type === 'password' && (
+        <div
+          className={styles.eyePassword}
+          onClick={() => setInputType(inputType === 'password' ? 'text' : 'password')}
+        />
+      )}
+      {label && <label className={styles.inputField}>{label}</label>}
       <input
         className={classNames(styles.input, { [styles.inputError]: error })}
         name={name}
@@ -25,21 +43,11 @@ export const TextInput: FC<InputPropsType> = ({ onChange, name, value, placeHold
         onChange={event => onChange(event.target.value)}
         placeholder={placeHolder}
         type={inputType}
-        onFocus={() => {
-          setFocused(true);
-        }}
+        onBlur={onBlur}
+        onFocus={onFocus}
       />
-      {type === 'password' && (
-        <div
-          className={styles.eyePassword}
-          onClick={() => setInputType(inputType === 'password' ? 'text' : 'password')}
-        />
-      )}
-      {showError && (
-        <span className={styles.error} onClick={() => setFocused(true)}>
-          {error}
-        </span>
-      )}
+
+      {error && <span className={styles.error}>{error}</span>}
     </div>
   );
 };

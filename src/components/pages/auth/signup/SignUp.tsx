@@ -1,96 +1,152 @@
 import React, { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
-import { useRouter } from 'next/router';
 import styles from './SignUp.module.css';
 import { Button } from '@/components/Button';
+import { validateInput } from '@/utils';
+import { signUp } from '@/services/auth';
+import { useRouter } from 'next/router';
+
+interface ErrorType {
+  [key: string]: string;
+}
 
 export const SignUp: FC = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [values, setValues] = useState<{ [key: string]: string }>({});
+  const [touchedFields, setTouchedFields] = useState<{ [key: string]: boolean }>({});
   const [rememberMe, setRememberMe] = useState(false);
+  const [errors, setErrors] = useState<ErrorType>({});
+  const [signUpError, setSignUpError] = useState('');
+
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
+  const inputHandler = (name: string, inputValue: string) => {
+    setValues(prevValue => ({ ...prevValue, [name]: inputValue }));
+
+    const errorMessages: ErrorType = {
+      firstName: 'Enter you first name',
+      lastName: 'Enter you last name',
+      email: 'Invalid email',
+      password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
+    };
+
+    const inputValid = validateInput(inputValue, name);
+    const updatedErrors = { ...errors };
+
+    if (!inputValid && inputValue !== '') {
+      updatedErrors[name] = errorMessages[name];
+    } else {
+      delete updatedErrors[name];
     }
-    router.push('/success');
+
+    if (name === 'confirmPassword') {
+      if (inputValue !== values.password) {
+        updatedErrors.confirmPassword = 'Password did not match';
+      } else {
+        delete updatedErrors.confirmPassword;
+      }
+    }
+    setErrors(updatedErrors);
   };
-  const login = () => {
-    console.log(password);
-    router.push('/');
-  };
+
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
+
+  const handleSingUp = async () => {
+    try {
+      if (values.email && values.password) {
+        await signUp({
+          email: values.email,
+          password: values.password,
+          firstName: values.firstName,
+          lastName: values.lastName,
+        });
+
+        router.push('/login');
+      }
+    } catch (error: any) {
+      setSignUpError(error.response.data.message);
+    }
+  };
+
+  const signUpDisabled =
+    !values.firstName ||
+    !values.lastName ||
+    !values.email ||
+    !values.password ||
+    !values.confirmPassword ||
+    Object.keys(errors).length !== 0;
 
   return (
     <div className={styles.container}>
       <div className={styles.leftContainer}>
         <div className={styles.form}>
-          <div>
-            <div className={styles.headText}> Sign Up </div>
-            <div className={styles.lineGroup}>
-              <hr className={styles.lineForm} />
-              <div className={styles.orForm}>or</div>
-              <hr className={styles.lineForm} />
+          <div className={styles.contentForm}>
+            <div className={styles.headText}> Sign Up</div>
+            <TextInput
+              label="First Name:"
+              onBlur={() => setTouchedFields(prev => ({ ...prev, firstName: true }))}
+              name="firstName"
+              value={values.firstName}
+              onChange={newValue => inputHandler('firstName', newValue)}
+              placeHolder={'Enter your first name'}
+              error={touchedFields.firstName ? errors.firstName : ''}
+            />
+            <TextInput
+              label="Last Name"
+              onBlur={() => setTouchedFields(prev => ({ ...prev, lastName: true }))}
+              name="lastName"
+              value={values.lastName}
+              onChange={newValue => inputHandler('lastName', newValue)}
+              placeHolder={'Enter your first name'}
+              error={touchedFields.lastName ? errors.lastName : ''}
+            />
+            <TextInput
+              label="Email"
+              onBlur={() => setTouchedFields(prev => ({ ...prev, email: true }))}
+              name="email"
+              value={values.email}
+              onChange={newValue => inputHandler('email', newValue)}
+              placeHolder={'Enter your email address'}
+              error={touchedFields.email ? errors.email : ''}
+            />
+            <TextInput
+              label="Password"
+              onBlur={() => setTouchedFields(prev => ({ ...prev, password: true }))}
+              name="password"
+              value={values.password || ''}
+              onChange={newValue => inputHandler('password', newValue)}
+              placeHolder={'Min. 8 characters'}
+              error={touchedFields.password ? errors.password : ''}
+              type="password"
+            />
+            <TextInput
+              label="Confirm Password"
+              onBlur={() => setTouchedFields(prev => ({ ...prev, confirmPassword: true }))}
+              name="confirmPassword"
+              value={values.confirmPassword || ''}
+              onChange={newValue => inputHandler('confirmPassword', newValue)}
+              placeHolder={'Min. 8 characters'}
+              error={touchedFields.confirmPassword ? errors.confirmPassword : ''}
+              type="password"
+            />
+            {signUpError && <div className={styles.signUpError}>{signUpError}</div>}
+            <div className={styles.checkboxContainer}>
+              <label>
+                <input
+                  className={styles.checkbox}
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={handleRememberMe}
+                  name="remember"
+                />
+                Keep me logged in
+              </label>
             </div>
-            <form onSubmit={handleSubmit}>
-              <label>
-                First Name:
-                <TextInput
-                  name="first name"
-                  value={firstName}
-                  onChange={setFirstName}
-                  placeHolder={'Min. 8 characters'}
-                />
-              </label>
-              <label>
-                Last Name:
-                <TextInput name="last name" value={lastName} onChange={setLastName} placeHolder={'Min. 8 characters'} />
-              </label>
-              <label>
-                Email:
-                <TextInput name="email" value={email} onChange={setEmail} placeHolder={'Enter your email address'} />
-              </label>
-              <label>
-                Password:
-                <TextInput name="password" value={password} onChange={setPassword} placeHolder={'Min. 8 characters'} />
-              </label>
-              <label>
-                Confirm Password:
-                <TextInput
-                  name="confirmPasswoird"
-                  value={confirmPassword}
-                  onChange={setConfirmPassword}
-                  placeHolder={'Min. 8 characters'}
-                />
-              </label>
-              <div className={styles.checkboxContainer}>
-                <label>
-                  <input
-                    className={styles.checkbox}
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={handleRememberMe}
-                    name="remember"
-                  />
-                  Keep me logged in
-                </label>
-              </div>
-              <Button text="Sign In" onClick={login} />
-            </form>
+            <Button disabled={signUpDisabled} text="Sign Up" onClick={handleSingUp} />
           </div>
           <footer>
-            <div className={styles.leftFooter}>
-              {' '}
-              © 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!
-            </div>
+            <div className={styles.leftFooter}>© 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!</div>
           </footer>
         </div>
       </div>
@@ -122,3 +178,5 @@ export const SignUp: FC = () => {
     </div>
   );
 };
+
+export default SignUp;
