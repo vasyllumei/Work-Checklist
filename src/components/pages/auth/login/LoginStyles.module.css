@@ -198,3 +198,8 @@
 .passwordLabel{
     position: relative;
 }
+
+.loginError {
+    margin: 20px 0;
+    color: red;
+}

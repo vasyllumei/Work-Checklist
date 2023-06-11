@@ -1,8 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { getUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
-import { StyledUsers } from '@/components/pages/users/UsersStyles';
-import { Button } from '@/components/Button';
 import { Layout } from '@/components/Layout/Layout';
 
 export const Users: FC = () => {
@@ -21,10 +19,12 @@ export const Users: FC = () => {
 
   return (
     <Layout headTitle="Portal | Users">
-      <StyledUsers.Container>
-        <StyledUsers.List>Users</StyledUsers.List>
-        <Button text="Test text" onClick={() => console.log('hello')} disabled />
-      </StyledUsers.Container>
+      <div>
+        ggg
+        {users.map(user => (
+          <div key={user.email}>{user.email}</div>
+        ))}
+      </div>
     </Layout>
   );
 };

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import User, { UserDocumentType } from '../../../models/User';
-import bcrypt from 'bcryptjs';
+import { compare } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dbConnect from '@/lib/dbConnect';
 
@@ -25,16 +25,15 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
     const user: UserDocumentType | null = await User.findOne({ email });
 
     if (!user) {
-      res.status(401).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Incorrect email' });
 
       return;
     }
 
     // Check if password is correct
-    const passwordMatches = await bcrypt.compare(password, user.password);
-
+    const passwordMatches = await compare(password, user.password);
     if (!passwordMatches) {
-      res.status(401).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Incorrect password' });
 
       return;
     }

@@ -4,6 +4,7 @@ import styles from './LoginStyles.module.css';
 import { validateInput } from '@/utils';
 import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
+import { login } from '@/services/auth';
 
 interface ErrorType {
   [key: string]: string;
@@ -11,16 +12,16 @@ interface ErrorType {
 
 export const Login: FC = () => {
   const [value, setValue] = useState<{ [key: string]: string }>({});
-  const [touchedFields, setTouchFields] = useState<{ [key: string]: boolean }>({});
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<ErrorType>({});
+  const [touchedFields, setTouchFields] = useState<{ [key: string]: boolean }>({});
+  const [loginError, setLoginError] = useState('');
 
   const inputHandler = (name: string, value: string) => {
     setValue(prevValue => ({ ...prevValue, [name]: value }));
-    setTouchFields(prev => ({ ...prev, [name]: true }));
 
     if (name === 'email') {
-      if (!validateInput(value, name) && touchedFields[name]) {
+      if (!validateInput(value, name) && value !== '') {
         setErrors(prevState => ({
           ...prevState,
           email: 'Invalid Email',
@@ -33,7 +34,7 @@ export const Login: FC = () => {
         });
       }
     } else if (name === 'password') {
-      if (!validateInput(value, name) && touchedFields[name]) {
+      if (!validateInput(value, name) && value !== '') {
         setErrors(prevState => ({
           ...prevState,
           password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
@@ -47,19 +48,25 @@ export const Login: FC = () => {
       }
     }
   };
+
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
 
   const router = useRouter();
-  const login = () => {
-    console.log(value);
-    router.push('/');
+  const handleLogin = async () => {
+    try {
+      const { token } = await login({ email: value.email, password: value.password });
+
+      sessionStorage.setItem('token', token);
+      router.push('/');
+    } catch (error: any) {
+      if (error.response.data.message) {
+        setLoginError(error.response.data.message);
+      }
+    }
   };
-  const signUp = () => {
-    console.log(value);
-    router.push('/signUp');
-  };
+
   const signInDisabled = !value.email || !value.password || Object.keys(errors).length !== 0;
 
   return (
@@ -79,31 +86,28 @@ export const Login: FC = () => {
               <div className={styles.orForm}>or</div>
               <hr className={styles.lineForm} />
             </div>
-            <label className={styles.emailLabel} htmlFor="uname">
-              <b className={styles.inputField}>Email*</b>
-              <div className={styles.mailInput}>
-                <TextInput
-                  name="email"
-                  value={value.email || ''}
-                  onChange={newValue => inputHandler('email', newValue)}
-                  placeHolder="mail@simmmple.com"
-                  error={errors.email}
-                />
-              </div>
-            </label>
-            <label className={styles.passwordLabel} htmlFor="uname">
-              <b className={styles.inputField}>Password*</b>
-              <div className={styles.passwordInput}>
-                <TextInput
-                  name="password"
-                  value={value.password || ''}
-                  onChange={newValue => inputHandler('password', newValue)}
-                  placeHolder={'Min. 5 characters'}
-                  error={errors.password}
-                  type="password"
-                />
-              </div>
-            </label>
+
+            <TextInput
+              label="Email"
+              onBlur={() => setTouchFields(prev => ({ ...prev, email: true }))}
+              name="email"
+              value={value.email || ''}
+              onChange={newValue => inputHandler('email', newValue)}
+              placeHolder="mail@simmmple.com"
+              error={touchedFields.email ? errors.email : ''}
+            />
+
+            <TextInput
+              label="Password"
+              onBlur={() => setTouchFields(prev => ({ ...prev, password: true }))}
+              name="password"
+              value={value.password || ''}
+              onChange={newValue => inputHandler('password', newValue)}
+              placeHolder={'Min. 5 characters'}
+              error={touchedFields.password ? errors.password : ''}
+              type="password"
+            />
+            {loginError && <div className={styles.loginError}>{loginError}</div>}
             <div className={styles.checkboxContainer}>
               <label>
                 <input
@@ -119,10 +123,10 @@ export const Login: FC = () => {
                 Forget password?
               </a>
             </div>
-            <Button disabled={signInDisabled} text="Sign In" onClick={login} />
+            <Button disabled={signInDisabled} text="Sign In" onClick={handleLogin} />
             <div className={styles.forgotText}>
               Not registered yet?
-              <a className={styles.authLink} href="/signUp" onClick={signUp}>
+              <a className={styles.authLink} href="/signUp" onClick={() => router.push('/signUp')}>
                 Create an Account
               </a>
             </div>

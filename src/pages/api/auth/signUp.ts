@@ -1,11 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import User, { UserDocumentType } from '@/models/User';
-import bcrypt from 'bcryptjs';
+import { hash } from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 
 interface ISignUpRequestBody {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
 }
 
 const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
@@ -15,7 +17,7 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
     return;
   }
 
-  const { email, password } = req.body as ISignUpRequestBody;
+  const { email, password, firstName, lastName } = req.body as ISignUpRequestBody;
 
   try {
     await dbConnect();
@@ -31,10 +33,9 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
 
     // Hash the password
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+    const hashedPassword = await hash(password, saltRounds);
     // Create new user
-    const newUser = new User({ email, password: hashedPassword });
+    const newUser = new User({ email, password: hashedPassword, firstName, lastName });
     const savedUser: UserDocumentType = await newUser.save();
 
     res.status(201).json({
