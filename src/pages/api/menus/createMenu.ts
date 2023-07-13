@@ -13,10 +13,11 @@ const handleCreateMenu = async (req: NextApiRequest, res: NextApiResponse): Prom
   const { name, link, order, chindren } = req.body;
 
   try {
-
-
     const newMenu: MenuDocumentType = new Menu({
-      name, link, order, chindren
+      name,
+      link,
+      order,
+      chindren,
     });
 
     const savedMenu = await newMenu.save();
