@@ -96,7 +96,6 @@ export const Login: FC = () => {
               placeHolder="mail@simmmple.com"
               error={touchedFields.email ? errors.email : ''}
             />
-
             <TextInput
               label="Password"
               onBlur={() => setTouchFields(prev => ({ ...prev, password: true }))}
