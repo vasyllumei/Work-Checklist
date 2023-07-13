@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.10.6",
     "@mui/material": "^5.11.15",
     "@mui/styled-engine-sc": "^5.11.11",
+    "@svgr/webpack": "^8.0.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.1",

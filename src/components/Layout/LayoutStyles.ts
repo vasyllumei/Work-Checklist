@@ -10,7 +10,7 @@ export const StyledLayout = {
   }),
   Menu: styled('div')({
     width: '290px',
-    height: '500px',
+    height: '100vh',
     background: '#ffffff',
     borderBottomRightRadius: '20px',
   }),
