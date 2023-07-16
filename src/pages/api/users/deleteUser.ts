@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import User, { UserDocumentType } from '../../../models/User';
 import dbConnect from '@/lib/dbConnect';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlerDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     method,
     query: { id },
@@ -28,4 +28,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handler;
+export default handlerDelete;

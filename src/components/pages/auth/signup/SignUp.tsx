@@ -62,7 +62,7 @@ export const SignUp: FC = () => {
           lastName: values.lastName,
         });
 
-        router.push('/login');
+        router.push('/users');
       }
     } catch (error: any) {
       setSignUpError(error.response.data.message);
