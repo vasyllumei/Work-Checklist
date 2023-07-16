@@ -1,17 +1,10 @@
-export type CreateUserType = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
-
 export type UserType = {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  password?: string;
   role: UserRoleType;
-  createdAt: Date;
+  id?: string;
 };
 
 export enum UserRoleType {

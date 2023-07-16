@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import User, { UserDocumentType } from '@/models/User';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlerUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
     const { id } = req.query;
-    const { firstName, lastName, role } = req.body;
+    const { firstName, lastName, role, password } = req.body;
 
     try {
       await dbConnect();
@@ -18,13 +18,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       user.firstName = firstName || user.firstName;
       user.lastName = lastName || user.lastName;
+      user.password = password || user.password;
       user.role = role || user.role;
 
       const updatedUser = await user.save();
 
-      return res
-        .status(200)
-        .json({ user: { firstName: updatedUser.firstName, lastName: updatedUser.lastName, role: updatedUser.role } });
+      return res.status(200).json({
+        user: {
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          role: updatedUser.role,
+          password: updatedUser.password,
+        },
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: 'Internal server error' });
@@ -34,4 +40,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handler;
+export default handlerUpdate;
