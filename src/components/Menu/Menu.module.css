@@ -20,6 +20,19 @@
     align-items: center;
     justify-content: space-between;
 }
+.childrenBox{
+    display: flex;
+    flex-direction: row;
+    width: 257px;
+    height: 36px;
+    top: 168px;
+    left: 33px;
+    border-radius: 25px;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 30px;
+
+}
 
 .text {
     width: 257px;
@@ -77,6 +90,10 @@
 
 .box:hover .text {
     color: #2B3674;
+}
+
+.arrowIcon {
+    margin-right: 10px;
 }
 
 
