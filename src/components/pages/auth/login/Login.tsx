@@ -89,22 +89,23 @@ export const Login: FC = () => {
 
             <TextInput
               label="Email"
+              type="email"
               onBlur={() => setTouchFields(prev => ({ ...prev, email: true }))}
               name="email"
               value={value.email || ''}
               onChange={newValue => inputHandler('email', newValue)}
-              placeHolder="mail@simmmple.com"
+              placeholder="mail@simmmple.com"
               error={touchedFields.email ? errors.email : ''}
             />
             <TextInput
               label="Password"
+              type="password"
               onBlur={() => setTouchFields(prev => ({ ...prev, password: true }))}
               name="password"
               value={value.password || ''}
               onChange={newValue => inputHandler('password', newValue)}
-              placeHolder={'Min. 5 characters'}
+              placeholder={'Min. 5 characters'}
               error={touchedFields.password ? errors.password : ''}
-              type="password"
             />
             {loginError && <div className={styles.loginError}>{loginError}</div>}
             <div className={styles.checkboxContainer}>

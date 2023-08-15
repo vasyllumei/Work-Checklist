@@ -6,11 +6,14 @@ interface ButtonPropsType {
   text: string;
   onClick: () => void;
   disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  className?: string;
 }
 
-export const Button: FC<ButtonPropsType> = ({ text, onClick, disabled }) => {
+export const Button: FC<ButtonPropsType> = ({ text, onClick, disabled, type = 'button' }) => {
   return (
     <button
+      type={type}
       className={classNames(styles.button, { [styles.buttonDisabled]: disabled })}
       onClick={onClick}
       disabled={disabled}

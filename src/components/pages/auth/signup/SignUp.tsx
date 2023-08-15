@@ -84,12 +84,12 @@ export const SignUp: FC = () => {
           <div className={styles.contentForm}>
             <div className={styles.headText}> Sign Up</div>
             <TextInput
-              label="First Name:"
+              label="First Name"
               onBlur={() => setTouchedFields(prev => ({ ...prev, firstName: true }))}
               name="firstName"
               value={values.firstName}
               onChange={newValue => inputHandler('firstName', newValue)}
-              placeHolder={'Enter your first name'}
+              placeholder={'Enter your first name'}
               error={touchedFields.firstName ? errors.firstName : ''}
             />
             <TextInput
@@ -98,35 +98,36 @@ export const SignUp: FC = () => {
               name="lastName"
               value={values.lastName}
               onChange={newValue => inputHandler('lastName', newValue)}
-              placeHolder={'Enter your first name'}
+              placeholder={'Enter your last name'}
               error={touchedFields.lastName ? errors.lastName : ''}
             />
             <TextInput
               label="Email"
+              type="email"
               onBlur={() => setTouchedFields(prev => ({ ...prev, email: true }))}
               name="email"
               value={values.email}
               onChange={newValue => inputHandler('email', newValue)}
-              placeHolder={'Enter your email address'}
+              placeholder={'Enter your email address'}
               error={touchedFields.email ? errors.email : ''}
             />
             <TextInput
               label="Password"
+              type="password"
               onBlur={() => setTouchedFields(prev => ({ ...prev, password: true }))}
               name="password"
               value={values.password || ''}
               onChange={newValue => inputHandler('password', newValue)}
-              placeHolder={'Min. 8 characters'}
+              placeholder={'Min. 8 characters'}
               error={touchedFields.password ? errors.password : ''}
-              type="password"
             />
             <TextInput
-              label="Confirm Password"
+              label="Confirm password"
               onBlur={() => setTouchedFields(prev => ({ ...prev, confirmPassword: true }))}
               name="confirmPassword"
               value={values.confirmPassword || ''}
               onChange={newValue => inputHandler('confirmPassword', newValue)}
-              placeHolder={'Min. 8 characters'}
+              placeholder={'Min. 8 characters'}
               error={touchedFields.confirmPassword ? errors.confirmPassword : ''}
               type="password"
             />
