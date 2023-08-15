@@ -8,26 +8,75 @@ import {
   DialogTitle,
   FormControl,
   Grid,
-  IconButton,
   MenuItem,
   Select,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-
+import * as Yup from 'yup';
 import { TextInput } from '../../TextInput';
 import { Button } from '@/components/Button';
 import { Layout } from '@/components/Layout/Layout';
 import { UserType, UserRoleType } from '@/types/User';
 import { getUsers, createUser, deleteUser, updateUser } from '@/services/user/userService';
+import { useFormik } from 'formik';
+import { UserActionsCell } from '@/components/pages/users/UserActionsCell';
+import styles from './Users.module.css';
 
-const initialUserForm = { firstName: '', lastName: '', email: '', password: '', role: UserRoleType.USER };
+const initialUserForm = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  role: UserRoleType.USER,
+  id: '',
+  editMode: false,
+};
 export const Users: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
-  const [userForm, setUserForm] = useState<UserType>(initialUserForm);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [errorExist, setErrorExist] = useState('');
+  const [userIdToDelete, setUserIdToDelete] = useState<string>('');
 
+  const ValidationSchema = Yup.object().shape({
+    firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('First name is required'),
+    lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Last name is required'),
+    email: Yup.string()
+      .email('Invalid email')
+      .when('editMode', (editMode, schema) => {
+        if (!editMode[0]) return schema.required('Email is required');
+        return schema;
+      }),
+    editMode: Yup.boolean(),
+    password: Yup.string()
+      .min(4, 'Password is too short - should be 4 chars min')
+      .when('editMode', (editMode, schema) => {
+        if (!editMode[0]) return schema.required('Password is required');
+        console.log('editMode', editMode);
+        return schema;
+      }),
+  });
+
+  const formik = useFormik({
+    initialValues: initialUserForm,
+    validationSchema: ValidationSchema,
+    onSubmit: async () => {
+      try {
+        if (formik.values.id) {
+          await handleSaveUpdatedUser();
+        } else {
+          await handleUserCreate();
+        }
+
+        if (errorExist) {
+          handleDialogClose();
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
+    },
+  });
+  const isEditMode = formik.values.editMode;
   const columns: GridColDef[] = [
     {
       field: 'firstName',
@@ -82,36 +131,94 @@ export const Users: FC = () => {
       editable: false,
 
       renderCell: ({ row }) => (
-        <Grid container justifyContent="center" spacing={2}>
-          <>
-            <Grid item>
-              <IconButton onClick={() => handleUserEdit(row.id as string)}>
-                <EditIcon />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <IconButton onClick={() => handleUserDelete(row.id as string)}>
-                <DeleteIcon />
-              </IconButton>
-            </Grid>
-          </>
-        </Grid>
+        <UserActionsCell
+          row={row}
+          handleUserEdit={handleUserEdit}
+          handleOpenDeleteModal={handleOpenDeleteModal}
+          handleCloseDeleteModal={handleCloseDeleteModal}
+          handleUserDelete={handleUserDelete}
+          isDeleteModalOpen={isDeleteModalOpen}
+          userIdToDelete={userIdToDelete}
+        />
       ),
     },
   ];
-
   const handleUserCreate = async () => {
     try {
-      if (userForm?.email && userForm.password && userForm.firstName && userForm.lastName) {
-        await createUser(userForm);
+      if (formik.isValid) {
+        await createUser(formik.values);
         await fetchUsers();
         handleDialogClose();
       }
-    } catch (error) {
-      console.error('Error creating the user:', error);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorExist(error.response.data.message);
+      } else {
+        console.error('Error creating the user:', error);
+      }
     }
   };
+  const handleUserDelete = async (userId: string): Promise<void> => {
+    try {
+      await deleteUser(userId);
+      await fetchUsers();
+    } catch (error) {
+      console.error('Error deleting the user:', error);
+    }
+  };
+  const handleUserEdit = (userId: string) => {
+    try {
+      const userData = users.find(user => user.id === userId);
+      if (userData) {
+        formik.setValues({
+          ...initialUserForm,
+          ...userData,
+          editMode: true,
+        });
+        setIsDialogOpen(true);
+      }
+    } catch (error) {
+      console.error('Error updating the user', error);
+    }
+  };
+  const handleSaveUpdatedUser = async (): Promise<void> => {
+    try {
+      await updateUser(formik.values.id, formik.values);
+      await fetchUsers();
+      handleDialogClose();
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+  const handleOpenDeleteModal = (userId: string) => {
+    setUserIdToDelete(userId);
+    setIsDeleteModalOpen(true);
+  };
 
+  const handleCloseDeleteModal = () => {
+    setUserIdToDelete('');
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDialogOpen = () => {
+    setErrorExist('');
+    formik.setValues(initialUserForm);
+    setIsDialogOpen(true);
+  };
+  const handleDialogClose = () => {
+    setErrorExist('');
+    formik.resetForm();
+    setIsDialogOpen(false);
+  };
+  const getError = (fieldName: string): string | undefined => {
+    const touchedField = formik.touched[fieldName as keyof typeof formik.touched];
+    const errorField = formik.errors[fieldName as keyof typeof formik.errors];
+
+    if (touchedField && errorField) {
+      return errorField;
+    }
+    return undefined;
+  };
   const fetchUsers = async () => {
     try {
       const fetchedUsers: UserType[] = (await getUsers()).data;
@@ -120,55 +227,6 @@ export const Users: FC = () => {
       console.error('Error retrieving the list of users:', error);
     }
   };
-
-  const handleUserDelete = async (userId: string) => {
-    try {
-      await deleteUser(userId);
-      await fetchUsers();
-    } catch (error) {
-      console.error('Error deleting the user:', error);
-    }
-  };
-
-  const handleUserEdit = (userId: string) => {
-    try {
-      const userData = users.find(user => user.id === userId);
-      if (userData) {
-        setUserForm(userData);
-        setIsDialogOpen(true);
-      } else {
-        console.error('Error: User data not found');
-      }
-    } catch (error) {
-      console.error('Error updating the user', error);
-    }
-  };
-
-  const handleDialogOpen = () => {
-    setUserForm(initialUserForm);
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-  };
-
-  const handleSaveUpdatedUser = async () => {
-    try {
-      if (userForm && userForm.email && userForm.firstName && userForm.lastName) {
-        if (userForm.id) {
-          await updateUser(userForm.id, userForm);
-          await fetchUsers();
-        } else {
-          console.error('Error: User ID is not defined.');
-        }
-      }
-    } catch (error) {
-      console.error('Error updating userForm:', error);
-    }
-    handleDialogClose();
-  };
-
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -202,53 +260,66 @@ export const Users: FC = () => {
           <Button onClick={handleDialogOpen} text="Add User" />
         </Grid>
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>Add new user</DialogTitle>
-          <DialogContent>
+          <DialogTitle>{!isEditMode ? 'Add new user' : 'Edit existing user'}</DialogTitle>
+          <DialogContent style={{ overflowX: 'hidden' }}>
             <DialogContentText>
-              To add a new user, please enter their first name, last name, email, password and select their role
+              {!isEditMode
+                ? 'To add a new user, please enter their first name, last name, email, password and select their role'
+                : 'To edit the user, you can modify their first name, last name and role'}
             </DialogContentText>
-
-            <TextInput
-              name="firstName"
-              type="text"
-              value={userForm?.firstName || ''}
-              onChange={value => {
-                setUserForm({ ...userForm, firstName: value });
-              }}
-              placeHolder="Имя"
-            />
-            <TextInput
-              name="lastName"
-              type="text"
-              value={userForm?.lastName || ''}
-              onChange={value => {
-                setUserForm({ ...userForm, lastName: value });
-              }}
-              placeHolder="Last Name"
-            />
-            <TextInput
-              name="email"
-              type="email"
-              value={userForm?.email || ''}
-              onChange={value => {
-                setUserForm({ ...userForm, email: value });
-              }}
-              placeHolder="Email"
-            />
-            <TextInput
-              name="password"
-              type="password"
-              value={userForm?.password || ''}
-              onChange={value => {
-                setUserForm({ ...userForm, password: value });
-              }}
-              placeHolder="Password"
-            />
-            <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+            <div>
+              <TextInput
+                label="First Name"
+                name="firstName"
+                value={formik.values.firstName || ''}
+                onChange={value => {
+                  formik.setFieldValue('firstName', value);
+                }}
+                placeholder="Enter first name"
+                error={getError('firstName')}
+              />
+            </div>
+            <div>
+              <TextInput
+                label="Last Name"
+                name="lastName"
+                value={formik.values.lastName || ''}
+                onChange={value => {
+                  formik.setFieldValue('lastName', value);
+                }}
+                placeholder="Enter last name"
+                error={getError('lastName')}
+              />
+            </div>
+            <div>
+              <TextInput
+                label="Email"
+                name="email"
+                type="email"
+                value={formik.values.email || ''}
+                onChange={value => formik.setFieldValue('email', value)}
+                placeholder="Enter email address"
+                error={getError('email')}
+                disabled={isEditMode}
+              />
+            </div>
+            {!isEditMode && (
+              <TextInput
+                label="Password"
+                name="password"
+                type="password"
+                value={formik.values.password || ''}
+                onChange={value => formik.setFieldValue('password', value)}
+                placeholder="Enter password"
+                error={getError('password')}
+              />
+            )}
+            {errorExist && <div className={styles.errorExist}>{errorExist}</div>}
+            <FormControl variant="standard" sx={{ m: 2, minWidth: 300 }}>
               <Select
-                value={userForm?.role || UserRoleType.USER}
+                value={formik.values?.role || UserRoleType.USER}
                 onChange={event => {
-                  setUserForm({ ...userForm, role: event.target.value as UserRoleType });
+                  formik.setFieldValue('role', event.target.value as UserRoleType);
                 }}
               >
                 <MenuItem value={UserRoleType.USER}>User</MenuItem>
@@ -258,11 +329,7 @@ export const Users: FC = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDialogClose} text="Cancel" />
-            {userForm.id ? (
-              <Button onClick={handleSaveUpdatedUser} text="Save Changes" />
-            ) : (
-              <Button onClick={handleUserCreate} text="Add User" />
-            )}
+            <Button onClick={formik.handleSubmit} text={formik.values.id ? 'Save Changes' : 'Add User'} />
           </DialogActions>
         </Dialog>
       </Box>
