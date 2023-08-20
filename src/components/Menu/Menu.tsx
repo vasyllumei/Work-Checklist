@@ -8,6 +8,7 @@ import TablesIcon from '../../assets/image/menuicon/tablesIcon.svg';
 import KanbanIcon from '../../assets/image/menuicon/kanbasicon.svg';
 import ProfileIcon from '../../assets/image/menuicon/prifoleicon.svg';
 import SignInIcon from '../../assets/image/menuicon/signinicon.svg';
+import SettingIcon from '../../assets/image/menuicon/settingicon.svg';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
@@ -24,7 +25,7 @@ const pages = [
     icon: ProfileIcon,
     children: [
       { id: 10, title: 'Profile', link: '/1', disabled: false, icon: DashboardIcon },
-      { id: 11, title: 'Setting', link: '/1', disabled: false, icon: MarketPlaceIcon },
+      { id: 11, title: 'Setting', link: '/1', disabled: false, icon: SettingIcon },
     ],
   },
   {
@@ -35,9 +36,10 @@ const pages = [
     icon: SignInIcon,
     children: [
       { id: 20, title: 'Profile', link: '/1', disabled: false, icon: DashboardIcon },
-      { id: 21, title: 'Setting', link: '/1', disabled: false, icon: MarketPlaceIcon },
+      { id: 21, title: 'Setting', link: '/1', disabled: false, icon: SettingIcon },
     ],
   },
+  { id: 7, title: 'Setting', link: '/menulist', disabled: false, icon: SettingIcon },
 ];
 
 export const Menu: FC = () => {

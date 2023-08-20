@@ -19,6 +19,7 @@
     border-radius: 25px;
     align-items: center;
     justify-content: space-between;
+    cursor: pointer;
 }
 .childrenBox{
     display: flex;
@@ -26,11 +27,12 @@
     width: 257px;
     height: 36px;
     top: 168px;
-    left: 33px;
+    left: 10px;
     border-radius: 25px;
     align-items: center;
     justify-content: space-between;
-    margin-left: 30px;
+    margin-left: 5px;
+    cursor: pointer;
 
 }
 
@@ -89,6 +91,10 @@
 }
 
 .box:hover .text {
+    color: #2B3674;
+}
+
+.childrenBox:hover .text {
     color: #2B3674;
 }
 
