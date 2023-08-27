@@ -16,8 +16,8 @@ export const StyledLayout = {
   }),
   Content: styled('div')({
     width: '100%',
-    height: '100vh',
-    overflowY: 'scroll',
+    height: '100%',
+    overflowY: 'visible',
     padding: 20,
   }),
 };
