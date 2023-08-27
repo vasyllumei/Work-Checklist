@@ -10,19 +10,18 @@ const handleCreateMenu = async (req: NextApiRequest, res: NextApiResponse): Prom
 
   await dbConnect();
 
-  const { name, link, order, chindren } = req.body;
+  const { name, link, order, children } = req.body;
 
   try {
     const newMenu: MenuDocumentType = new Menu({
       name,
       link,
       order,
-      chindren,
+      children,
     });
 
     const savedMenu = await newMenu.save();
-
-    res.status(201).json({ ...savedMenu });
+    res.status(201).json({ menu: savedMenu });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
