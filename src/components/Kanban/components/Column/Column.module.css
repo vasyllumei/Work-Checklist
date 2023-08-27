@@ -1,0 +1,54 @@
+.column {
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+}
+
+.column:not(:last-child) {
+    margin-right: 24px;
+}
+
+.cardsContainer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 48px;
+}
+
+.titleColumn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-height: 33px;
+}
+
+.title {
+    flex:5;
+    font-family: "DM Sans", sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 32px;
+    letter-spacing: -0.02em;
+    color: #2B3674;
+    margin-left: -5px;
+    margin-bottom: 7px;
+}
+
+.addButton {
+    cursor: pointer;
+    flex:1;
+    background-color: #F4F7FE;
+    height: 35px;
+    padding: 0 8px 0 8px;
+    border-radius: 12px;
+    margin-right: 2px;
+    margin-top: 4px;
+    border: none;
+}
