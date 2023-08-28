@@ -12,7 +12,7 @@ import SettingIcon from '../../assets/image/menuicon/settingicon.svg';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
-const pages = [
+export const pages = [
   { id: 1, title: 'Dashboard', link: '/', disabled: false, icon: DashboardIcon },
   { id: 2, title: 'Users', link: '/users', disabled: false, icon: MarketPlaceIcon },
   { id: 3, title: 'Tables', link: '/tables', disabled: false, icon: TablesIcon },

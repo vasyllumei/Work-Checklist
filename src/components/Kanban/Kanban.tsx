@@ -1,6 +1,7 @@
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from 'src/components/Kanban/components/Column';
+/*import LogoutIcon from '@mui/icons-material/Logout';*/
 interface CardData {
   title: string;
   content: string;
@@ -83,6 +84,9 @@ export const Kanban = () => {
   ];
   return (
     <Layout>
+      {/*      <div className={styles.logout}>
+        <LogoutIcon />
+      </div>*/}
       <div className={styles.mainContainer}>
         <Column title="Backlog" cards={backlogCards} />
         <Column title="In progress" cards={inProgressCards} />
