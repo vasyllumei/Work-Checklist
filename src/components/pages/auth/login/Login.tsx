@@ -57,11 +57,10 @@ export const Login: FC = () => {
   const handleLogin = async () => {
     try {
       const { token } = await login({ email: value.email, password: value.password });
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('token', token);
-        localStorage.setItem('userid', value.userid);
-        localStorage.setItem('token', value.token);
-      }
+
+      sessionStorage.setItem('token', token);
+      localStorage.setItem('userid', value.userid);
+      localStorage.setItem('token', value.token);
 
       router.push('/');
     } catch (error: any) {
