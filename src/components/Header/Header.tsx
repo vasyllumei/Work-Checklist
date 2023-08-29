@@ -1,20 +1,23 @@
-import { FC } from 'react';
-import { useRouter } from 'next/router';
+import BreadcrumbsComponent from '@/components/Header/Breadcrumbs/BreadcrumbsPath';
 import styles from '@/components/Header/Header.module.css';
-import BreadcrumbsComponent from '@/components/Header/Breadcrumbs/Breadcrumbs';
-import { pages } from './../Menu/Menu';
 import SearchBar from '@/components/Header/SearchBar/SearchBar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { FC } from 'react';
+import DropDown from '@/components/Header/DropDown/DropDown';
 
-export const Header: FC = () => {
-  const router = useRouter();
-  const currentPage = pages.find(page => page.link === router.pathname);
-  const breadcrumbData =
-    router.pathname === '/'
-      ? [{ title: 'Dashboard', link: '/' }]
-      : [{ title: 'Dashboard', link: '/' }, currentPage || { title: '', link: '' }];
+interface Breadcrumb {
+  title: string;
+  link: string;
+}
+
+interface HeaderProps {
+  breadcrumbData: Breadcrumb[];
+}
+
+export const Header: FC<HeaderProps> = ({ breadcrumbData }) => {
+  const currentPage = breadcrumbData[breadcrumbData.length - 1];
 
   return (
     <div className={styles.titleContent}>
@@ -31,7 +34,9 @@ export const Header: FC = () => {
           <NotificationsNoneIcon className={styles.notificationIcon} />
           <NightlightRoundIcon className={styles.moonIcon} />
           <InfoOutlinedIcon className={styles.infoIcon} />
-          <img className={styles.headerAvatar} src="/headerAvatar.png" alt="Header Avatar" />
+          <div className={styles.headerAvatar}>
+            <DropDown />
+          </div>
         </div>
       </div>
     </div>

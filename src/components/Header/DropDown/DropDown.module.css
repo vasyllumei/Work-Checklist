@@ -1,0 +1,9 @@
+
+.headerAvatar{
+ max-height: 40px;
+ max-width: 40px;
+}
+.buttonList {
+ display: flex;
+ flex-direction: column;
+}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
-import styles from './Breadcrumbs.module.css';
+import styles from './BreadcrumbsPath.module.css';
 
 interface Breadcrumb {
   title: string;
@@ -12,7 +12,7 @@ interface BreadcrumbsComponentProps {
   breadcrumbData: Breadcrumb[];
 }
 
-export default function BreadcrumbsComponent({ breadcrumbData }: BreadcrumbsComponentProps) {
+export default function BreadcrumbsPath({ breadcrumbData }: BreadcrumbsComponentProps) {
   return (
     <div className={styles.breadcrumbs}>
       <Breadcrumbs aria-label="breadcrumb">

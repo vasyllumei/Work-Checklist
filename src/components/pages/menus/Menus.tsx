@@ -71,7 +71,13 @@ export const Menus = () => {
   };
 
   return (
-    <Layout>
+    <Layout
+      headTitle="Menus"
+      breadcrumbs={[
+        { title: 'Dashboard', link: '/' },
+        { title: 'Settings', link: '/menulist' },
+      ]}
+    >
       <Box
         sx={{
           height: 400,

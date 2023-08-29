@@ -232,7 +232,13 @@ export const Users: FC = () => {
   }, []);
 
   return (
-    <Layout>
+    <Layout
+      headTitle="Users"
+      breadcrumbs={[
+        { title: 'Dashboard', link: '/' },
+        { title: 'Users', link: '/users' },
+      ]}
+    >
       <Box
         sx={{
           height: 400,

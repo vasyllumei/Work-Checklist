@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/router';
-import styles from './LoginStyles.module.css';
+import styles from './Login.module.css';
 import { validateInput } from '@/utils';
 import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
@@ -57,8 +57,12 @@ export const Login: FC = () => {
   const handleLogin = async () => {
     try {
       const { token } = await login({ email: value.email, password: value.password });
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('token', token);
+        localStorage.setItem('userid', value.userid);
+        localStorage.setItem('token', value.token);
+      }
 
-      sessionStorage.setItem('token', token);
       router.push('/');
     } catch (error: any) {
       if (error.response.data.message) {

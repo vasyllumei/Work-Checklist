@@ -61,6 +61,6 @@
     cursor: pointer;
 }
 .headerAvatar {
-    height: 100%;
+    max-width: 45px;
     cursor: pointer;
 }

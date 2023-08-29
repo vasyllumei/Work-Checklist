@@ -83,10 +83,13 @@ export const Kanban = () => {
     },
   ];
   return (
-    <Layout>
-      {/*      <div className={styles.logout}>
-        <LogoutIcon />
-      </div>*/}
+    <Layout
+      headTitle="Kanban"
+      breadcrumbs={[
+        { title: 'Dashboard', link: '/' },
+        { title: 'Kanban', link: '/kanban' },
+      ]}
+    >
       <div className={styles.mainContainer}>
         <Column title="Backlog" cards={backlogCards} />
         <Column title="In progress" cards={inProgressCards} />
