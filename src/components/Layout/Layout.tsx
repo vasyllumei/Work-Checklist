@@ -14,13 +14,14 @@ interface LayoutProps {
   children: ReactNode;
   headTitle?: string;
   breadcrumbs?: Breadcrumb[];
+  handleSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  searchText: string;
 }
 
-export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs }) => {
+export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, handleSearch }) => {
   const router = useRouter();
   const currentPage = pages.find(page => page.link === router.pathname);
-
-  const pageTitle = headTitle || (currentPage && currentPage.title);
+  const pageTitle = headTitle || currentPage?.title;
 
   return (
     <StyledLayout.Container>
@@ -33,7 +34,7 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs }) =>
       </StyledLayout.Menu>
 
       <StyledLayout.Content>
-        {breadcrumbs !== undefined && <Header breadcrumbData={breadcrumbs} />}
+        {breadcrumbs && <Header searchText={searchText} handleSearch={handleSearch} breadcrumbData={breadcrumbs} />}
         {children}
         <Footer />
       </StyledLayout.Content>

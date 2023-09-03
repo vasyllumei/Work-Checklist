@@ -1,17 +1,10 @@
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from 'src/components/Kanban/components/Column';
-/*import LogoutIcon from '@mui/icons-material/Logout';*/
-interface CardData {
-  title: string;
-  content: string;
-  buttonState: 'Pending' | 'Updates' | 'Errors' | 'Done';
-  image?: string;
-  avatars?: string[];
-}
+import CardsProps from '@/components/Kanban/components/Card/Card';
 
 export const Kanban = () => {
-  const backlogCards: CardData[] = [
+  const backlogCards: CardsProps[] = [
     {
       title: 'Option to "use local / server version" feature',
       content:
@@ -35,7 +28,7 @@ export const Kanban = () => {
     },
   ];
 
-  const inProgressCards: CardData[] = [
+  const inProgressCards: CardsProps[] = [
     {
       title: "General ideas to improve 'Edit' workflow",
       content:
@@ -60,7 +53,7 @@ export const Kanban = () => {
     },
   ];
 
-  const doneCards: CardData[] = [
+  const doneCards: CardsProps[] = [
     {
       title: 'Copy/Paste elements between pages',
       content: 'We can only copy/paste elements (or group of elements) in the same page, which is quite limited.',

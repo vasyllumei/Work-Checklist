@@ -2,10 +2,10 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import styles from '@/components/Header/Header.module.css';
+import styles from '@/components/Header/UserMenu/UserMenu.module.css';
 import { useRouter } from 'next/router';
 
-export default function DropDown() {
+export const UserMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -25,7 +25,6 @@ export default function DropDown() {
   return (
     <div className={styles.headerAvatar}>
       <Button
-        className={styles.dropdownButton}
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
@@ -49,4 +48,4 @@ export default function DropDown() {
       </Menu>
     </div>
   );
-}
+};

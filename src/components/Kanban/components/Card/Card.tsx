@@ -1,8 +1,7 @@
 import React from 'react';
 import styles from './Card.module.css';
 import EditIcon from '@mui/icons-material/Edit';
-
-interface CardProps {
+export default interface CardsProps {
   title: string;
   content: string;
   buttonState: 'Pending' | 'Updates' | 'Errors' | 'Done';
@@ -10,7 +9,7 @@ interface CardProps {
   avatars?: string[];
 }
 
-export const Card: React.FC<CardProps> = ({ title, content, buttonState, image, avatars }) => {
+export const Card: React.FC<CardsProps> = ({ title, content, buttonState, image, avatars }) => {
   let buttonColor;
 
   if (buttonState === 'Pending') {

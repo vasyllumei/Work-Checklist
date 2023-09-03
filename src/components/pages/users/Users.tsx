@@ -37,6 +37,7 @@ export const Users: FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [errorExist, setErrorExist] = useState('');
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
+  const [searchText, setSearchText] = useState('');
 
   const ValidationSchema = Yup.object().shape({
     firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('First name is required'),
@@ -230,9 +231,12 @@ export const Users: FC = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
-
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  };
   return (
     <Layout
+      handleSearch={handleSearch}
       headTitle="Users"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -250,7 +254,12 @@ export const Users: FC = () => {
         }}
       >
         <DataGrid
-          rows={users}
+          rows={users.filter(
+            user =>
+              user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
+              user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
+              user.email.toLowerCase().includes(searchText.toLowerCase()),
+          )}
           columns={columns}
           initialState={{
             pagination: {
