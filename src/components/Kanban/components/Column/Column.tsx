@@ -1,18 +1,11 @@
 import React from 'react';
 import styles from './Column.module.css';
-import { Card } from '@/components/Kanban/components/Card';
+import CardsProps, { Card } from './../Card/Card';
 import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
-interface CardData {
-  title: string;
-  content: string;
-  buttonState: 'Pending' | 'Updates' | 'Errors' | 'Done';
-  image?: string;
-  avatars?: string[];
-}
 
 interface ColumnProps {
   title: string;
-  cards: CardData[];
+  cards: CardsProps[];
 }
 
 export const Column: React.FC<ColumnProps> = ({ title, cards }) => {
