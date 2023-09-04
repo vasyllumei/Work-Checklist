@@ -4,9 +4,15 @@ import { MenuDocumentType } from '@/models/Menu';
 import { getAllMenus } from '@/services/menu/menuService';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
+interface MenusProps {
+  handleSearch?: (text: string) => void;
+}
 
-export const Menus = () => {
+export const Menus = ({ handleSearch }: MenusProps) => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
+  const [filteredMenus, setFilteredMenus] = useState<MenuDocumentType[]>([]);
+  const [searchText, setSearchText] = useState('');
+
   const columns: GridColDef[] = [
     {
       field: 'name',
@@ -56,11 +62,7 @@ export const Menus = () => {
       editable: false,
     },*/
   ];
-  useEffect(() => {
-    fetchedMenus();
-  }, []);
-
-  const fetchedMenus = async () => {
+  const fetchMenus = async () => {
     try {
       const fetchedMenusData = await getAllMenus();
       const fetchedMenus: MenuDocumentType[] = fetchedMenusData.data;
@@ -70,8 +72,19 @@ export const Menus = () => {
     }
   };
 
+  useEffect(() => {
+    fetchMenus();
+  }, [searchText]);
+
+  useEffect(() => {
+    const filtered = menus.filter(menu => menu.name.toLowerCase().includes(searchText.toLowerCase()));
+    setFilteredMenus(filtered);
+  }, [menus, searchText]);
+
   return (
     <Layout
+      handleSearch={() => handleSearch}
+      setSearchText={setSearchText}
       headTitle="Menus"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -89,7 +102,7 @@ export const Menus = () => {
         }}
       >
         <DataGrid
-          rows={menus}
+          rows={filteredMenus}
           columns={columns}
           initialState={{
             pagination: {
