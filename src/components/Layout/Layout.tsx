@@ -2,13 +2,22 @@ import { FC, ReactNode } from 'react';
 import Head from 'next/head';
 import { StyledLayout } from '@/components/Layout/LayoutStyles';
 import { Menu } from '@/components/Menu/Menu';
+import { Header } from '@/components/Header/Header';
+import { Footer } from '@/components/Footer/Footer';
 
+interface Breadcrumb {
+  title: string;
+  link: string;
+}
 interface LayoutProps {
   children: ReactNode;
   headTitle?: string;
+  breadcrumbs?: Breadcrumb[];
+  handleSearch?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  searchText?: any;
 }
 
-export const Layout: FC<LayoutProps> = ({ children, headTitle }) => {
+export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, handleSearch }) => {
   return (
     <StyledLayout.Container>
       <Head>
@@ -16,9 +25,16 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </Head>
       <StyledLayout.Menu>
-        <Menu />{' '}
+        <Menu />
       </StyledLayout.Menu>
-      <StyledLayout.Content>{children}</StyledLayout.Content>
+
+      <StyledLayout.Content>
+        {breadcrumbs && (
+          <Header searchText={searchText} handleSearch={() => handleSearch} breadcrumbData={breadcrumbs} />
+        )}
+        {children}
+        <Footer />
+      </StyledLayout.Content>
     </StyledLayout.Container>
   );
 };

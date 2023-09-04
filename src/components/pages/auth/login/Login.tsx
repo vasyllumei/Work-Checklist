@@ -1,10 +1,11 @@
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/router';
-import styles from './LoginStyles.module.css';
+import styles from './Login.module.css';
 import { validateInput } from '@/utils';
 import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
 import { login } from '@/services/auth';
+import { LOCAL_STORAGE_TOKEN } from '@/constants';
 
 interface ErrorType {
   [key: string]: string;
@@ -56,10 +57,11 @@ export const Login: FC = () => {
   const router = useRouter();
   const handleLogin = async () => {
     try {
-      const { token } = await login({ email: value.email, password: value.password });
+      await login({ email: value.email, password: value.password });
+      localStorage.setItem('userid', value.userid);
+      localStorage.setItem(LOCAL_STORAGE_TOKEN, value.token);
 
-      sessionStorage.setItem('token', token);
-      router.push('/');
+      await router.push('/');
     } catch (error: any) {
       if (error.response.data.message) {
         setLoginError(error.response.data.message);
