@@ -72,6 +72,8 @@ export const Menus = () => {
 
   return (
     <Layout
+      handleSearch={() => ''}
+      searchText={''}
       headTitle="Menus"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },

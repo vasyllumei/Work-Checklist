@@ -77,6 +77,8 @@ export const Kanban = () => {
   ];
   return (
     <Layout
+      handleSearch={() => ''}
+      searchText={''}
       headTitle="Kanban"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
