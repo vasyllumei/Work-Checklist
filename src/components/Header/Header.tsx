@@ -1,4 +1,4 @@
-import Breadcrumbs, { Breadcrumb } from './Breadcrumbs/Breadcrumb';
+import BreadcrumbsItem, { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
 import styles from '@/components/Header/Header.module.css';
 import SearchBar from '@/components/Header/SearchBar/SearchBar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -8,7 +8,7 @@ import { FC } from 'react';
 import { UserMenu } from '@/components/Header/UserMenu/UserMenu';
 
 interface HeaderProps {
-  breadcrumbData: Breadcrumbs[];
+  breadcrumbData: BreadcrumbsItem[];
   searchText: string;
   handleSearch: (text: string) => void;
 }
@@ -19,7 +19,7 @@ export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSear
   return (
     <div className={styles.titleContent}>
       <h1 className={styles.title}>
-        <Breadcrumb data={breadcrumbData} />
+        <Breadcrumbs data={breadcrumbData} />
         {currentPage ? currentPage.title : ''}
       </h1>
       <div className={styles.misc}>

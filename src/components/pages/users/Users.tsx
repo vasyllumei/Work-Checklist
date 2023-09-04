@@ -236,7 +236,6 @@ export const Users: FC = () => {
   };
   return (
     <Layout
-      searchText={''}
       handleSearch={handleSearch}
       headTitle="Users"
       breadcrumbs={[

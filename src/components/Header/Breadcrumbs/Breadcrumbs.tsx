@@ -1,20 +1,20 @@
 import * as React from 'react';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { Breadcrumbs as BreadcrumbsComponent } from '@mui/material';
 import Link from '@mui/material/Link';
-import styles from './Breadcrumb.module.css';
+import styles from './Breadcrumbs.module.css';
 
-export default interface Breadcrumbs {
+export default interface BreadcrumbsItem {
   title: string;
   link: string;
 }
 
 interface BreadcrumbsProps {
-  data: Breadcrumbs[];
+  data: BreadcrumbsItem[];
 }
 
-export const Breadcrumb: React.FC<BreadcrumbsProps> = ({ data }) => (
+export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ data }) => (
   <div className={styles.breadcrumbs}>
-    <Breadcrumbs aria-label="breadcrumb">
+    <BreadcrumbsComponent aria-label="breadcrumb">
       {data.map(({ title, link }, index) => [
         index === data.length - 1 ? (
           <span className={styles.breadcrumbText} key={index}>
@@ -26,6 +26,6 @@ export const Breadcrumb: React.FC<BreadcrumbsProps> = ({ data }) => (
           </Link>
         ),
       ])}
-    </Breadcrumbs>
+    </BreadcrumbsComponent>
   </div>
 );

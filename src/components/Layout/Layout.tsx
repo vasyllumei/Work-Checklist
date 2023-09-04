@@ -13,8 +13,8 @@ interface LayoutProps {
   children: ReactNode;
   headTitle?: string;
   breadcrumbs?: Breadcrumb[];
-  handleSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  searchText: string;
+  handleSearch?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  searchText?: any;
 }
 
 export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, handleSearch }) => {

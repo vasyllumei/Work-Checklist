@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import styles from '@/components/Header/UserMenu/UserMenu.module.css';
 import { useRouter } from 'next/router';
+import { LOCAL_STORAGE_TOKEN } from '@/constants';
 
 export const UserMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -18,7 +19,7 @@ export const UserMenu = () => {
   const router = useRouter();
   const handleLogout = () => {
     localStorage.removeItem('userid');
-    localStorage.removeItem('token');
+    localStorage.removeItem(LOCAL_STORAGE_TOKEN);
     router.push('/login');
   };
 
