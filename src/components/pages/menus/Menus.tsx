@@ -10,7 +10,6 @@ interface MenusProps {
 
 export const Menus = ({ handleSearch }: MenusProps) => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
-  const [filteredMenus, setFilteredMenus] = useState<MenuDocumentType[]>([]);
   const [searchText, setSearchText] = useState('');
 
   const columns: GridColDef[] = [
@@ -76,10 +75,11 @@ export const Menus = ({ handleSearch }: MenusProps) => {
     fetchMenus();
   }, [searchText]);
 
-  useEffect(() => {
-    const filtered = menus.filter(menu => menu.name.toLowerCase().includes(searchText.toLowerCase()));
-    setFilteredMenus(filtered);
-  }, [menus, searchText]);
+  const filteredMenu = menus.filter(
+    menu =>
+      menu.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      menu.link.toLowerCase().includes(searchText.toLowerCase()),
+  );
 
   return (
     <Layout
@@ -102,7 +102,7 @@ export const Menus = ({ handleSearch }: MenusProps) => {
         }}
       >
         <DataGrid
-          rows={filteredMenus}
+          rows={filteredMenu}
           columns={columns}
           initialState={{
             pagination: {
