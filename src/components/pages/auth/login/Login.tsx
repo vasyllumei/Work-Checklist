@@ -58,9 +58,10 @@ export const Login: FC = () => {
   const handleLogin = async () => {
     try {
       await login({ email: value.email, password: value.password });
-      localStorage.setItem('userid', value.userid);
-      localStorage.setItem(LOCAL_STORAGE_TOKEN, value.token);
-
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userid', value.userid);
+        localStorage.setItem(LOCAL_STORAGE_TOKEN, value.token);
+      }
       await router.push('/');
     } catch (error: any) {
       if (error.response.data.message) {
