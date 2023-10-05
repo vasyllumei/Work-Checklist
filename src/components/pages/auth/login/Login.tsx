@@ -6,6 +6,7 @@ import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
 import { login } from '@/services/auth';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
+import Cookies from 'js-cookie';
 
 interface ErrorType {
   [key: string]: string;
@@ -57,10 +58,14 @@ export const Login: FC = () => {
   const router = useRouter();
   const handleLogin = async () => {
     try {
-      await login({ email: value.email, password: value.password });
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('userid', value.userid);
-        localStorage.setItem(LOCAL_STORAGE_TOKEN, value.token);
+      const response = await login({ email: value.email, password: value.password });
+
+      if (response.token && response.userId) {
+        const { token, userId } = response;
+        if (typeof window !== 'undefined') {
+          Cookies.set('userid', userId, { expires: 7, secure: true });
+          Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
+        }
       }
       await router.push('/');
     } catch (error: any) {
