@@ -52,24 +52,28 @@ export const Login: FC = () => {
   };
 
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRememberMe(e.target.checked);
+    const isChecked = e.target.checked;
+    setRememberMe(isChecked);
+    if (isChecked) {
+      Cookies.set('isUserAuthenticated', 'true', { expires: 7, secure: true });
+    } else {
+      Cookies.remove('isUserAuthenticated');
+    }
   };
-
   const router = useRouter();
   const handleLogin = async () => {
     try {
       const response = await login({ email: value.email, password: value.password });
 
-      if (response.token && response.userId) {
-        const { token, userId } = response;
+      if (response && response.token) {
+        const token = response.token;
         if (typeof window !== 'undefined') {
-          Cookies.set('userid', userId, { expires: 7, secure: true });
           Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
+          await router.push('/');
         }
       }
-      await router.push('/');
     } catch (error: any) {
-      if (error.response.data.message) {
+      if (error.response && error.response.data && error.response.data.message) {
         setLoginError(error.response.data.message);
       }
     }
