@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Card.module.css';
 import EditIcon from '@mui/icons-material/Edit';
 export default interface CardsProps {
+  cards?: any;
   title: string;
   content: string;
   buttonState: 'Pending' | 'Updates' | 'Errors' | 'Done';

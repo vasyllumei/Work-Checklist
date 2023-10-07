@@ -14,7 +14,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
   };
 
   const handleSearchButtonClick = () => {
-    if (searchText !== undefined) {
+    if (searchText) {
       handleSearch(searchText);
     }
   };

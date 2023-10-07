@@ -78,7 +78,6 @@ export const Kanban = () => {
   return (
     <Layout
       setSearchText={() => ''}
-      handleSearch={() => ''}
       searchText={''}
       headTitle="Kanban"
       breadcrumbs={[

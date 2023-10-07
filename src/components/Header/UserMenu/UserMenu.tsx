@@ -19,7 +19,6 @@ export const UserMenu = () => {
 
   const router = useRouter();
   const handleLogout = () => {
-    Cookies.remove('userid');
     Cookies.remove(LOCAL_STORAGE_TOKEN);
     router.push('/login');
   };
