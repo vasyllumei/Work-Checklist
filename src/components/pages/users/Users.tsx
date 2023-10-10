@@ -220,11 +220,6 @@ export const Users: FC = () => {
     }
     return undefined;
   };
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchText = event.target.value;
-    setSearchText(searchText);
-  };
-
   const fetchUsers = async () => {
     try {
       const fetchedUsersData = await getUsers();
@@ -247,7 +242,6 @@ export const Users: FC = () => {
 
   return (
     <Layout
-      handleSearch={() => handleSearch}
       setSearchText={setSearchText}
       headTitle="Users"
       breadcrumbs={[

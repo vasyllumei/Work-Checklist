@@ -1,27 +1,30 @@
 import React from 'react';
 import styles from './Column.module.css';
-import CardsProps, { Card } from './../Card/Card';
 import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
+import Card, { CardItem } from '../Card/Card';
 
-interface ColumnProps {
+export interface ColumnProps {
+  id: number;
   title: string;
-  cards: CardsProps[];
+  items: CardItem[];
 }
 
-export const Column: React.FC<ColumnProps> = ({ title, cards }) => {
+const Column: React.FC<ColumnProps> = ({ title, items }) => {
   return (
     <div className={styles.column}>
       <div className={styles.titleColumn}>
         <h2 className={styles.title}>{title}</h2>
         <button className={styles.addButton}>
-          <AddIcon></AddIcon>
+          <AddIcon />
         </button>
       </div>
       <div className={styles.cardsContainer}>
-        {cards.map(card => (
-          <Card key={card.title} {...card} />
+        {items.map(item => (
+          <Card key={item.id} item={item} />
         ))}
       </div>
     </div>
   );
 };
+
+export default Column;

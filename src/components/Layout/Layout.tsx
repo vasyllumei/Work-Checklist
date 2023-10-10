@@ -15,7 +15,6 @@ interface LayoutProps {
   breadcrumbs?: Breadcrumb[];
   searchText?: string | undefined;
   setSearchText: (text: string) => void;
-  handleSearch: (text: string) => void;
 }
 
 export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, setSearchText }) => {
@@ -33,9 +32,7 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, sear
       </StyledLayout.Menu>
 
       <StyledLayout.Content>
-        {breadcrumbs && (
-          <Header searchText={searchText} handleSearch={text => handleSearch(text)} breadcrumbData={breadcrumbs} />
-        )}
+        {breadcrumbs && <Header searchText={searchText} handleSearch={handleSearch} breadcrumbData={breadcrumbs} />}
         {children}
         <Footer />
       </StyledLayout.Content>
