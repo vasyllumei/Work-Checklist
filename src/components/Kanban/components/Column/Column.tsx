@@ -86,5 +86,3 @@ const Column: React.FC<ColumnProps> = ({ title, items }) => {
     </div>
   );
 };
-
-export default Column;

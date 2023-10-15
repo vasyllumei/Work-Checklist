@@ -69,7 +69,7 @@ export const Login: FC = () => {
         const token = response.token;
         if (typeof window !== 'undefined') {
           Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
-          await router.push('/');
+          router.push('/');
         }
       }
     } catch (error: any) {
