@@ -5,7 +5,7 @@ import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
   handleSearch: (text: string) => void;
-  searchText: string;
+  searchText?: string | undefined;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
@@ -14,7 +14,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
   };
 
   const handleSearchButtonClick = () => {
-    handleSearch(searchText);
+    if (searchText !== undefined) {
+      handleSearch(searchText);
+    }
   };
 
   return (

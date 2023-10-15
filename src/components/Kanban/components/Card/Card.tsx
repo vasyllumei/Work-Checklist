@@ -1,55 +1,64 @@
 import React from 'react';
 import styles from './Card.module.css';
 import EditIcon from '@mui/icons-material/Edit';
-export default interface CardsProps {
+
+export interface CardItem {
+  id: number;
   title: string;
   content: string;
-  buttonState: 'Pending' | 'Updates' | 'Errors' | 'Done';
+  buttonState: string;
   image?: string;
   avatars?: string[];
 }
 
-export const Card: React.FC<CardsProps> = ({ title, content, buttonState, image, avatars }) => {
+interface CardProps {
+  item: CardItem;
+}
+
+const Card: React.FC<CardProps> = ({ item }) => {
   let buttonColor;
 
-  if (buttonState === 'Pending') {
+  if (item.buttonState === 'Pending') {
     buttonColor = 'yellow';
-  } else if (buttonState === 'Updates') {
+  } else if (item.buttonState === 'Updates') {
     buttonColor = 'blue';
-  } else if (buttonState === 'Errors') {
+  } else if (item.buttonState === 'Errors') {
     buttonColor = 'red';
-  } else if (buttonState === 'Done') {
+  } else if (item.buttonState === 'Done') {
     buttonColor = 'green';
   }
 
   const buttonClassName = `${styles.buttonAction} ${styles[buttonColor as keyof typeof styles]}`;
+
   return (
     <div className={styles.card}>
       <div className={styles.titleContainer}>
-        <h2 className={styles.title}>{title}</h2>
+        <h2 className={styles.title}>{item.title}</h2>
         <div>
           <EditIcon className={styles.editIcon} />
         </div>
       </div>
       <div className={styles.contentContainer}>
-        {image && (
+        {item.image && (
           <div className={styles.imageContainer}>
-            <img src={image} alt={title} className={styles.cardImage} />
+            <img src={item.image} alt={item.title} className={styles.cardImage} />
           </div>
         )}
-        <p>{content}</p>
+        <p>{item.content}</p>
       </div>
       <div className={styles.actionContainer}>
         <div className={styles.iconContainer}>
-          {avatars &&
-            avatars.map((avatar, index) => (
+          {item.avatars &&
+            item.avatars.map((avatar, index) => (
               <div key={index} className={styles.avatar}>
-                <img src={avatar} alt={`Avatar ${index + 1}`} />
+                <img src={avatar} alt={`Avatar ${item.id}`} />
               </div>
             ))}
         </div>
-        <button className={buttonClassName}>{buttonState}</button>
+        <button className={buttonClassName}>{item.buttonState}</button>
       </div>
     </div>
   );
 };
+
+export default Card;

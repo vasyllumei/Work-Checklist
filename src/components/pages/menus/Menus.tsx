@@ -7,6 +7,8 @@ import { Box } from '@mui/material';
 
 export const Menus = () => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
+  const [searchText, setSearchText] = useState('');
+
   const columns: GridColDef[] = [
     {
       field: 'name',
@@ -56,11 +58,7 @@ export const Menus = () => {
       editable: false,
     },*/
   ];
-  useEffect(() => {
-    fetchedMenus();
-  }, []);
-
-  const fetchedMenus = async () => {
+  const fetchMenus = async () => {
     try {
       const fetchedMenusData = await getAllMenus();
       const fetchedMenus: MenuDocumentType[] = fetchedMenusData.data;
@@ -70,8 +68,19 @@ export const Menus = () => {
     }
   };
 
+  useEffect(() => {
+    fetchMenus();
+  }, [searchText]);
+
+  const filteredMenu = menus.filter(
+    menu =>
+      menu.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      menu.link.toLowerCase().includes(searchText.toLowerCase()),
+  );
+
   return (
     <Layout
+      setSearchText={setSearchText}
       headTitle="Menus"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -89,7 +98,7 @@ export const Menus = () => {
         }}
       >
         <DataGrid
-          rows={menus}
+          rows={filteredMenu}
           columns={columns}
           initialState={{
             pagination: {

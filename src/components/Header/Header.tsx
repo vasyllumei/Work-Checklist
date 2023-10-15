@@ -9,7 +9,7 @@ import { UserMenu } from '@/components/Header/UserMenu/UserMenu';
 
 interface HeaderProps {
   breadcrumbData: BreadcrumbsItem[];
-  searchText: string;
+  searchText?: string | undefined;
   handleSearch: (text: string) => void;
 }
 
