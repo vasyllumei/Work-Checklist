@@ -222,7 +222,8 @@ export const Users: FC = () => {
   };
   const fetchUsers = async () => {
     try {
-      const fetchedUsers: UserType[] = (await getUsers()).data;
+      const fetchedUsersData = await getUsers();
+      const fetchedUsers: UserType[] = fetchedUsersData.data;
       setUsers(fetchedUsers);
     } catch (error) {
       console.error('Error retrieving the list of users:', error);
@@ -230,13 +231,18 @@ export const Users: FC = () => {
   };
   useEffect(() => {
     fetchUsers();
-  }, []);
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(event.target.value);
-  };
+  }, [searchText]);
+
+  const filteredUsers = users.filter(
+    user =>
+      user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchText.toLowerCase()),
+  );
+
   return (
     <Layout
-      handleSearch={handleSearch}
+      setSearchText={setSearchText}
       headTitle="Users"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -254,12 +260,7 @@ export const Users: FC = () => {
         }}
       >
         <DataGrid
-          rows={users.filter(
-            user =>
-              user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
-              user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
-              user.email.toLowerCase().includes(searchText.toLowerCase()),
-          )}
+          rows={filteredUsers}
           columns={columns}
           initialState={{
             pagination: {

@@ -13,11 +13,14 @@ interface LayoutProps {
   children: ReactNode;
   headTitle?: string;
   breadcrumbs?: Breadcrumb[];
-  handleSearch?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  searchText?: any;
+  searchText?: string | undefined;
+  setSearchText?: (text: string) => void;
 }
 
-export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, handleSearch }) => {
+export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, setSearchText }) => {
+  const handleSearch = (text: string) => {
+    setSearchText && setSearchText(text);
+  };
   return (
     <StyledLayout.Container>
       <Head>
@@ -29,9 +32,7 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, sear
       </StyledLayout.Menu>
 
       <StyledLayout.Content>
-        {breadcrumbs && (
-          <Header searchText={searchText} handleSearch={() => handleSearch} breadcrumbData={breadcrumbs} />
-        )}
+        {breadcrumbs && <Header searchText={searchText} handleSearch={handleSearch} breadcrumbData={breadcrumbs} />}
         {children}
         <Footer />
       </StyledLayout.Content>
