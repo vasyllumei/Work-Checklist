@@ -14,12 +14,12 @@ interface LayoutProps {
   headTitle?: string;
   breadcrumbs?: Breadcrumb[];
   searchText?: string | undefined;
-  setSearchText: (text: string) => void;
+  setSearchText?: (text: string) => void;
 }
 
 export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, setSearchText }) => {
   const handleSearch = (text: string) => {
-    setSearchText(text);
+    setSearchText && setSearchText(text);
   };
   return (
     <StyledLayout.Container>

@@ -4,11 +4,8 @@ import { MenuDocumentType } from '@/models/Menu';
 import { getAllMenus } from '@/services/menu/menuService';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
-interface MenusProps {
-  handleSearch?: (text: string) => void;
-}
 
-export const Menus = ({ handleSearch }: MenusProps) => {
+export const Menus = () => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
   const [searchText, setSearchText] = useState('');
 
@@ -83,7 +80,6 @@ export const Menus = ({ handleSearch }: MenusProps) => {
 
   return (
     <Layout
-      handleSearch={() => handleSearch}
       setSearchText={setSearchText}
       headTitle="Menus"
       breadcrumbs={[
