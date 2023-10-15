@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column, ColumnProps } from './components/Column/Column';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext } from 'react-beautiful-dnd';
 import { data } from './KanbanData';
+import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
 
 export const Kanban = () => {
   const [columns, setColumns] = useState<ColumnProps[]>(data);
@@ -50,13 +51,14 @@ export const Kanban = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.mainContainer}>
           {columns.map(column => (
-            <Droppable key={column.title} droppableId={column.title}>
+            <StrictModeDroppable key={column.title} droppableId={column.title}>
               {provided => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
                   <Column title={column.title} items={column.items} />
+                  {provided.placeholder}
                 </div>
               )}
-            </Droppable>
+            </StrictModeDroppable>
           ))}
         </div>
       </DragDropContext>
