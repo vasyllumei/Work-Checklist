@@ -1,11 +1,12 @@
+import React, { useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import Column from './components/Column/Column';
+import Column, { ColumnProps } from './components/Column/Column';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 export const Kanban = () => {
-  const columnCards = [
+  const initialColumns: ColumnProps[] = [
     {
-      id: 1,
       title: 'To Do',
       items: [
         {
@@ -35,7 +36,6 @@ export const Kanban = () => {
       ],
     },
     {
-      id: 2,
       title: 'In Progress',
       items: [
         {
@@ -66,7 +66,6 @@ export const Kanban = () => {
       ],
     },
     {
-      id: 3,
       title: 'Done',
       items: [
         {
@@ -95,6 +94,38 @@ export const Kanban = () => {
       ],
     },
   ];
+
+  const [columns, setColumns] = useState<ColumnProps[]>(initialColumns);
+
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const source = result.source;
+    const destination = result.destination;
+
+    if (source.droppableId === destination.droppableId) {
+      const columnId = source.droppableId;
+      const updatedColumns = [...columns];
+      const column = updatedColumns.find(c => c.title === columnId);
+      if (column) {
+        const [movedItem] = column.items.splice(source.index, 1);
+        column.items.splice(destination.index, 0, movedItem);
+        setColumns(updatedColumns);
+      }
+    } else {
+      const sourceColumnTitle = source.droppableId;
+      const destinationColumnTitle = destination.droppableId;
+      const updatedColumns = [...columns];
+      const sourceColumn = updatedColumns.find(c => c.title === sourceColumnTitle);
+      const destinationColumn = updatedColumns.find(c => c.title === destinationColumnTitle);
+      if (sourceColumn && destinationColumn) {
+        const [movedItem] = sourceColumn.items.splice(source.index, 1);
+        destinationColumn.items.splice(destination.index, 0, movedItem);
+        setColumns(updatedColumns);
+      }
+    }
+  };
+
   return (
     <Layout
       setSearchText={() => ''}
@@ -105,11 +136,19 @@ export const Kanban = () => {
         { title: 'Kanban', link: '/kanban' },
       ]}
     >
-      <div className={styles.mainContainer}>
-        {columnCards.map(column => (
-          <Column id={column.id} key={column.id} title={column.title} items={column.items} />
-        ))}
-      </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className={styles.mainContainer}>
+          {columns.map(column => (
+            <Droppable key={column.title} droppableId={column.title}>
+              {provided => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  <Column title={column.title} items={column.items} />
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
+      </DragDropContext>
     </Layout>
   );
 };
