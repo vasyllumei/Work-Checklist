@@ -18,7 +18,7 @@ interface CardItem {
   avatars?: string[];
 }
 
-const Column: React.FC<ColumnProps> = ({ title, items }) => {
+export const Column: React.FC<ColumnProps> = ({ title, items }) => {
   const buttonColor = (buttonState: string) => {
     if (buttonState === 'Pending') {
       return 'yellow';

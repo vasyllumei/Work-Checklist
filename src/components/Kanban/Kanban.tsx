@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import Column, { ColumnProps } from './components/Column/Column';
+import { Column, ColumnProps } from './components/Column/Column';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 export const Kanban = () => {
