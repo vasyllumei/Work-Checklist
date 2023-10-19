@@ -1,15 +1,18 @@
-import React from 'react';
 import styles from './Column.module.css';
 import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
 import EditIcon from '@mui/icons-material/Edit';
 import { Draggable } from 'react-beautiful-dnd';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CardDocumentType } from '@/models/Card';
+import { getAllCards } from '@/services/card/cardService';
 
 export interface ColumnProps {
   title: string;
   items: CardItem[];
 }
 
-interface CardItem {
+export interface CardItem {
   id: number;
   title: string;
   content: string;
@@ -19,6 +22,22 @@ interface CardItem {
 }
 
 export const Column: React.FC<ColumnProps> = ({ title, items }) => {
+  const [cards, setCards] = useState<CardDocumentType[]>([]);
+  const [editCard, setEditCard] = useState<number | null>(null);
+  const fetchCards = async () => {
+    try {
+      const fetchedCardsData = await getAllCards();
+      const fetchedCards: CardDocumentType[] = fetchedCardsData.data;
+      setCards(fetchedCards);
+    } catch (error) {
+      console.error('Error retrieving the list of cards:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCards();
+  }, [cards]);
+
   const buttonColor = (buttonState: string) => {
     if (buttonState === 'Pending') {
       return 'yellow';
@@ -31,6 +50,12 @@ export const Column: React.FC<ColumnProps> = ({ title, items }) => {
     }
   };
 
+  const isCardExpanded = (itemId: number) => editCard === itemId;
+
+  const handleEditing = (itemId: number) => {
+    setEditCard(itemId === editCard ? null : itemId);
+  };
+
   return (
     <div className={styles.column}>
       <div className={styles.titleColumn}>
@@ -41,28 +66,38 @@ export const Column: React.FC<ColumnProps> = ({ title, items }) => {
       </div>
       {items.map((item, index) => (
         <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-          {provided => (
-            <div
-              ref={provided.innerRef}
-              {...provided.draggableProps}
-              {...provided.dragHandleProps}
-              className={styles.cardsContainer}
-            >
-              <div className={styles.card}>
+          {(provided, snapshot) => (
+            <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
+              <motion.div className={styles.card} initial={false} layout>
                 <div className={styles.titleContainer}>
-                  <h2 className={styles.title}>{item.title}</h2>
-                  <div>
-                    <EditIcon className={styles.editIcon} />
-                  </div>
+                  <h2 className={styles.title} {...provided.dragHandleProps}>
+                    {item.title}
+                  </h2>
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
+                    <EditIcon onClick={() => handleEditing(item.id)} className={styles.editIcon} />
+                  </motion.div>
                 </div>
-                <div className={styles.contentContainer}>
-                  {item.image && (
-                    <div className={styles.imageContainer}>
-                      <img src={item.image} alt={item.title} className={styles.cardImage} />
-                    </div>
+                <AnimatePresence>
+                  {isCardExpanded(item.id) ? (
+                    <motion.fieldset key="expandedContent" className={styles.editingContent}>
+                      {item.image && (
+                        <div className={styles.imageContainer}>
+                          <img src={item.image} alt={item.title} className={styles.cardImage} />
+                        </div>
+                      )}
+                      <p>{item.content}</p>
+                    </motion.fieldset>
+                  ) : (
+                    <motion.div key="content" className={styles.contentContainer}>
+                      {item.image && (
+                        <div className={styles.imageContainer}>
+                          <img src={item.image} alt={item.title} className={styles.cardImage} />
+                        </div>
+                      )}
+                      <p>{item.content}</p>
+                    </motion.div>
                   )}
-                  <p>{item.content}</p>
-                </div>
+                </AnimatePresence>
                 <div className={styles.actionContainer}>
                   <div className={styles.iconContainer}>
                     {item.avatars &&
@@ -78,7 +113,7 @@ export const Column: React.FC<ColumnProps> = ({ title, items }) => {
                     {item.buttonState}
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
           )}
         </Draggable>

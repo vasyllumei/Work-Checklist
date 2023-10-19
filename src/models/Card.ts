@@ -1,39 +1,40 @@
 import { Schema, model, Document } from 'mongoose';
 
 enum TaskStatus {
-  TODO = 'todo',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
+  TODO = 'To Do',
+  IN_PROGRESS = 'In Progress',
+  COMPLETED = 'Done',
 }
 
-interface ITask {
-  userId: string;
-  assignedTo: string;
+export type CardDocumentType = Document & {
+  items: string;
   title: string;
-  description: string;
+  content: string;
+  buttonState: string;
+  avatars: string[];
   status: TaskStatus;
-}
+};
 
-export interface ITaskDocument extends ITask, Document {}
-
-const TaskSchema = new Schema<ITaskDocument>(
+const CardSchema = new Schema<CardDocumentType>(
   {
-    userId: {
+    items: {
       type: String,
-      ref: 'User',
-      required: true,
-    },
-    assignedTo: {
-      type: String,
-      ref: 'User',
       required: true,
     },
     title: {
       type: String,
       required: true,
     },
-    description: {
+    content: {
       type: String,
+      required: true,
+    },
+    buttonState: {
+      type: String,
+      required: true,
+    },
+    avatars: {
+      type: [String],
       required: true,
     },
     status: {
@@ -44,7 +45,6 @@ const TaskSchema = new Schema<ITaskDocument>(
   },
   { timestamps: true },
 );
+const Card = model<CardDocumentType>('Card', CardSchema);
 
-const Task = model<ITaskDocument>('Task', TaskSchema);
-
-export default Task;
+export default Card;

@@ -3,11 +3,10 @@ import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column, ColumnProps } from './components/Column/Column';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { data } from './KanbanData';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
 
 export const Kanban = () => {
-  const [columns, setColumns] = useState<ColumnProps[]>(data);
+  const [columns, setColumns] = useState<ColumnProps[]>([]);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
