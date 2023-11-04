@@ -9,7 +9,7 @@ import { getAllCards } from '@/services/card/cardService';
 
 export interface ColumnProps {
   title: string;
-  items: CardItem[];
+  order: any;
 }
 
 export interface CardItem {
@@ -21,7 +21,7 @@ export interface CardItem {
   avatars?: string[];
 }
 
-export const Column: React.FC<ColumnProps> = ({ title, items }) => {
+export const Column: React.FC<ColumnProps> = ({ title, order }) => {
   const [cards, setCards] = useState<CardDocumentType[]>([]);
   const [editCard, setEditCard] = useState<number | null>(null);
   const fetchCards = async () => {
@@ -64,9 +64,9 @@ export const Column: React.FC<ColumnProps> = ({ title, items }) => {
           <AddIcon />
         </button>
       </div>
-      {items.map((item, index) => (
+      {order.map((item: any, index: any) => (
         <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-          {(provided, snapshot) => (
+          {provided => (
             <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
               <motion.div className={styles.card} initial={false} layout>
                 <div className={styles.titleContainer}>
@@ -101,7 +101,7 @@ export const Column: React.FC<ColumnProps> = ({ title, items }) => {
                 <div className={styles.actionContainer}>
                   <div className={styles.iconContainer}>
                     {item.avatars &&
-                      item.avatars.map((avatar, index) => (
+                      item.avatars.map((avatar: any, index: any) => (
                         <div key={index} className={styles.avatar}>
                           <img src={avatar} alt={`Avatar ${item.id}`} />
                         </div>

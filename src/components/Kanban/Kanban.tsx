@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column, ColumnProps } from './components/Column/Column';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
+import { createStatus, getAllStatus } from '@/services/status/statusService';
+import { StatusDocumentType } from '@/types/Status';
 
 export const Kanban = () => {
   const [columns, setColumns] = useState<ColumnProps[]>([]);
-
+  const [newStatus, setNewStatus] = useState({ title: '', order: 0 });
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
@@ -19,8 +21,8 @@ export const Kanban = () => {
       const updatedColumns = [...columns];
       const column = updatedColumns.find(c => c.title === columnId);
       if (column) {
-        const [movedItem] = column.items.splice(source.index, 1);
-        column.items.splice(destination.index, 0, movedItem);
+        const [movedItem] = column.order.splice(source.index, 1);
+        column.order.splice(destination.index, 0, movedItem);
         setColumns(updatedColumns);
       }
     } else {
@@ -30,30 +32,49 @@ export const Kanban = () => {
       const sourceColumn = updatedColumns.find(c => c.title === sourceColumnTitle);
       const destinationColumn = updatedColumns.find(c => c.title === destinationColumnTitle);
       if (sourceColumn && destinationColumn) {
-        const [movedItem] = sourceColumn.items.splice(source.index, 1);
-        destinationColumn.items.splice(destination.index, 0, movedItem);
+        const [movedItem] = sourceColumn.order.splice(source.index, 1);
+        destinationColumn.order.splice(destination.index, 0, movedItem);
         setColumns(updatedColumns);
       }
     }
   };
+  const loadColumns = async () => {
+    try {
+      const response = await getAllStatus();
+      const fetchedStatusData: StatusDocumentType[] = response.data;
+      const formattedColumns = fetchedStatusData.map(column => ({
+        title: column.title,
+        order: column.order,
+      }));
+      setColumns(formattedColumns);
+    } catch (error) {
+      console.error('Error loading columns:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadColumns();
+  }, []);
+
+  const createNewStatus = async () => {
+    try {
+      const response = await createStatus({ title: newStatus.title, order: newStatus.order.toString() });
+      setColumns([...columns, response.data]);
+      setNewStatus({ title: '', order: 0 });
+    } catch (error) {
+      console.error('Error creating status:', error);
+    }
+  };
 
   return (
-    <Layout
-      setSearchText={() => ''}
-      searchText={''}
-      headTitle="Kanban"
-      breadcrumbs={[
-        { title: 'Dashboard', link: '/' },
-        { title: 'Kanban', link: '/kanban' },
-      ]}
-    >
+    <Layout>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.mainContainer}>
           {columns.map(column => (
             <StrictModeDroppable key={column.title} droppableId={column.title}>
               {provided => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
-                  <Column title={column.title} items={column.items} />
+                  <Column title={column.title} order={[]} />
                   {provided.placeholder}
                 </div>
               )}
@@ -61,6 +82,21 @@ export const Kanban = () => {
           ))}
         </div>
       </DragDropContext>
+      <div>
+        <input
+          type="text"
+          value={newStatus.title}
+          onChange={e => setNewStatus({ ...newStatus, title: e.target.value })}
+          placeholder="New Status"
+        />
+        <input
+          type="number"
+          value={newStatus.order}
+          onChange={e => setNewStatus({ ...newStatus, order: parseInt(e.target.value) })}
+          placeholder="Order"
+        />
+        <button onClick={createNewStatus}>Add Status</button>
+      </div>
     </Layout>
   );
 };
