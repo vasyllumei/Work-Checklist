@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
-import Status, { IStatusDocument } from '@/models/Status';
+import Status, { StatusDocumentType } from '@/models/Status';
 
 const handleCreateStatus = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
@@ -13,7 +13,7 @@ const handleCreateStatus = async (req: NextApiRequest, res: NextApiResponse): Pr
   const { title, order } = req.body;
 
   try {
-    const newStatus: IStatusDocument = new Status({
+    const newStatus: StatusDocumentType = new Status({
       title,
       order,
     });

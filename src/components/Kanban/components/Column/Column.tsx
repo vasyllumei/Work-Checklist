@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Draggable } from 'react-beautiful-dnd';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CardDocumentType } from '@/models/Card';
+import { CardDocumentType } from '@/models/Task';
 import { getAllCards } from '@/services/card/cardService';
 
 export interface ColumnProps {
@@ -30,7 +30,7 @@ export const Column: React.FC<ColumnProps> = ({ title, order }) => {
       const fetchedCards: CardDocumentType[] = fetchedCardsData.data;
       setCards(fetchedCards);
     } catch (error) {
-      console.error('Error retrieving the list of cards:', error);
+      console.error('Error retrieving the list of tasks:', error);
     }
   };
 

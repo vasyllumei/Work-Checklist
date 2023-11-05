@@ -1,22 +1,22 @@
-import { Schema, model, Document } from 'mongoose';
-import { StatusDocumentType } from '@/types/Status';
+import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IStatusDocument extends StatusDocumentType, Document {}
+export type StatusDocumentType = Document & {
+  title: string;
+  order: number;
+};
 
-const StatusSchema = new Schema<IStatusDocument>(
+const StatusSchema = new Schema<StatusDocumentType>(
   {
     title: {
       type: String,
       required: true,
     },
     order: {
-      type: String,
+      type: Number,
       required: true,
     },
   },
   { timestamps: true },
 );
 
-const Status = model<IStatusDocument>('Status', StatusSchema);
-
-export default Status;
+export default mongoose.models.Status || mongoose.model<StatusDocumentType>('Status', StatusSchema);

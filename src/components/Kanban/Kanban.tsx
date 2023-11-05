@@ -5,7 +5,7 @@ import { Column, ColumnProps } from './components/Column/Column';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
 import { createStatus, getAllStatus } from '@/services/status/statusService';
-import { StatusDocumentType } from '@/types/Status';
+import { StatusDocumentType } from '@/types/Column';
 
 export const Kanban = () => {
   const [columns, setColumns] = useState<ColumnProps[]>([]);
@@ -62,7 +62,7 @@ export const Kanban = () => {
       setColumns([...columns, response.data]);
       setNewStatus({ title: '', order: 0 });
     } catch (error) {
-      console.error('Error creating status:', error);
+      console.error('Error creating statuses:', error);
     }
   };
 

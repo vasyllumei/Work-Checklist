@@ -1,5 +1,5 @@
 import { api, ResponseType } from '@/services/apiService';
-import { StatusDocumentType } from '@/types/Status';
+import { StatusDocumentType } from '@/types/Column';
 
 export const getAllStatus = async (): Promise<ResponseType<StatusDocumentType[]>> =>
   await api.get<ResponseType<StatusDocumentType[]>>('/status/getAllStatus').then(resolve => resolve.data);

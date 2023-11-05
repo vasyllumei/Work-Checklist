@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
-import Status, { IStatusDocument } from '@/models/Status';
+import Status, { StatusDocumentType } from '@/models/Status';
 
-export default async function getAllStatus(req: NextApiRequest, res: NextApiResponse) {
+export default async function getAllStatuses(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -10,8 +10,9 @@ export default async function getAllStatus(req: NextApiRequest, res: NextApiResp
   try {
     await dbConnect();
 
-    const status: IStatusDocument[] = await Status.find();
-    const data = status.map((status: IStatusDocument) => {
+    const status: StatusDocumentType[] = await Status.find();
+    console.log('Status', status);
+    const data = status.map((status: StatusDocumentType) => {
       const { _id, title, order } = status;
       return { id: _id, title, order };
     });
