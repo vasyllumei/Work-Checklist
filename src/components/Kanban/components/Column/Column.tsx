@@ -4,30 +4,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Draggable } from 'react-beautiful-dnd';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CardDocumentType } from '@/models/Task';
-import { getAllCards } from '@/services/card/cardService';
+import { TaskType } from '@/types/Task';
+import { ColumnType } from '@/types/Column';
+import { getAllTasks } from '@/services/task/taskService';
 
-export interface ColumnProps {
-  title: string;
-  order: any;
-}
-
-export interface CardItem {
-  id: number;
-  title: string;
-  content: string;
-  buttonState: string;
-  image?: string;
-  avatars?: string[];
-}
-
-export const Column: React.FC<ColumnProps> = ({ title, order }) => {
-  const [cards, setCards] = useState<CardDocumentType[]>([]);
+export const Column: React.FC<ColumnType> = ({ title }) => {
+  const [cards, setCards] = useState<TaskType[]>([]);
   const [editCard, setEditCard] = useState<number | null>(null);
   const fetchCards = async () => {
     try {
-      const fetchedCardsData = await getAllCards();
-      const fetchedCards: CardDocumentType[] = fetchedCardsData.data;
+      const fetchedCardsData = await getAllTasks();
+      const fetchedCards: TaskType[] = fetchedCardsData.data;
       setCards(fetchedCards);
     } catch (error) {
       console.error('Error retrieving the list of tasks:', error);
@@ -64,7 +51,7 @@ export const Column: React.FC<ColumnProps> = ({ title, order }) => {
           <AddIcon />
         </button>
       </div>
-      {order.map((item: any, index: any) => (
+      {cards.map((item: any, index: any) => (
         <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
           {provided => (
             <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>

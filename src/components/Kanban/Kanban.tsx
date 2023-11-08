@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import { Column, ColumnProps } from './components/Column/Column';
+import { Column } from './components/Column/Column';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
 import { createStatus, getAllStatus } from '@/services/status/statusService';
-import { StatusDocumentType } from '@/types/Column';
+import { ColumnType } from '@/types/Column';
 
 export const Kanban = () => {
-  const [columns, setColumns] = useState<ColumnProps[]>([]);
-  const [newStatus, setNewStatus] = useState({ title: '', order: 0 });
+  const [columns, setColumns] = useState<ColumnType[]>([]);
+  const [newStatus, setNewStatus] = useState({ title: '', order: 0 } as ColumnType);
+
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
@@ -41,7 +42,7 @@ export const Kanban = () => {
   const loadColumns = async () => {
     try {
       const response = await getAllStatus();
-      const fetchedStatusData: StatusDocumentType[] = response.data;
+      const fetchedStatusData: ColumnType[] = response.data;
       const formattedColumns = fetchedStatusData.map(column => ({
         title: column.title,
         order: column.order,
@@ -58,7 +59,10 @@ export const Kanban = () => {
 
   const createNewStatus = async () => {
     try {
-      const response = await createStatus({ title: newStatus.title, order: newStatus.order.toString() });
+      const response = await createStatus({
+        title: newStatus.title,
+        order: newStatus.order.toString(),
+      });
       setColumns([...columns, response.data]);
       setNewStatus({ title: '', order: 0 });
     } catch (error) {
@@ -70,16 +74,20 @@ export const Kanban = () => {
     <Layout>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.mainContainer}>
-          {columns.map(column => (
-            <StrictModeDroppable key={column.title} droppableId={column.title}>
-              {provided => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
-                  <Column title={column.title} order={[]} />
-                  {provided.placeholder}
-                </div>
-              )}
-            </StrictModeDroppable>
-          ))}
+          <div className={styles.mainContainer}>
+            <DragDropContext onDragEnd={onDragEnd}>
+              {columns.map((column, index) => (
+                <StrictModeDroppable key={index} droppableId={index.toString()}>
+                  {provided => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      <Column title={column.title} order={column.order} />
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </StrictModeDroppable>
+              ))}
+            </DragDropContext>
+          </div>
         </div>
       </DragDropContext>
       <div>

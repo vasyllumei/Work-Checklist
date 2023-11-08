@@ -13,8 +13,8 @@ export default async function getAllTasks(req: NextApiRequest, res: NextApiRespo
     const tasks: TaskDocumentType[] = await Task.find();
     console.log(tasks);
     const data = tasks.map((task: TaskDocumentType) => {
-      const { _id, userId, assignedTo, description, title, status } = task;
-      return { id: _id, userId, assignedTo, status, title, description };
+      const { _id, userId, assignedTo, description, title, statusId } = task;
+      return { id: _id, userId, assignedTo, statusId, title, description };
     });
 
     res.status(200).json({ data });
