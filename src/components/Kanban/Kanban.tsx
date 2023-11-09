@@ -14,27 +14,29 @@ export const Kanban = () => {
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
-    const source = result.source;
-    const destination = result.destination;
+    const sourceColumnId = result.source.droppableId;
+    const destinationColumnId = result.destination.droppableId;
 
-    if (source.droppableId === destination.droppableId) {
-      const columnId = source.droppableId;
+    if (sourceColumnId === destinationColumnId) {
+      const columnId = sourceColumnId;
       const updatedColumns = [...columns];
       const column = updatedColumns.find(c => c.title === columnId);
+
       if (column) {
-        const [movedItem] = column.order.splice(source.index, 1);
-        column.order.splice(destination.index, 0, movedItem);
+        const [movedItem] = column.task.splice(result.source.index, 1);
+        column.task.splice(result.destination.index, 0, movedItem);
         setColumns(updatedColumns);
       }
     } else {
-      const sourceColumnTitle = source.droppableId;
-      const destinationColumnTitle = destination.droppableId;
+      const sourceColumnTitle = sourceColumnId;
+      const destinationColumnTitle = destinationColumnId;
       const updatedColumns = [...columns];
       const sourceColumn = updatedColumns.find(c => c.title === sourceColumnTitle);
       const destinationColumn = updatedColumns.find(c => c.title === destinationColumnTitle);
+
       if (sourceColumn && destinationColumn) {
-        const [movedItem] = sourceColumn.order.splice(source.index, 1);
-        destinationColumn.order.splice(destination.index, 0, movedItem);
+        const [movedItem] = sourceColumn.task.splice(result.source.index, 1);
+        destinationColumn.task.splice(result.destination.index, 0, movedItem);
         setColumns(updatedColumns);
       }
     }
@@ -61,7 +63,7 @@ export const Kanban = () => {
     try {
       const response = await createStatus({
         title: newStatus.title,
-        order: newStatus.order.toString(),
+        order: newStatus.order,
       });
       setColumns([...columns, response.data]);
       setNewStatus({ title: '', order: 0 });
@@ -72,6 +74,21 @@ export const Kanban = () => {
 
   return (
     <Layout>
+      <div>
+        <input
+          type="text"
+          value={newStatus.title}
+          onChange={e => setNewStatus({ ...newStatus, title: e.target.value })}
+          placeholder="New Status"
+        />
+        <input
+          type="number"
+          value={newStatus.order}
+          onChange={e => setNewStatus({ ...newStatus, order: parseInt(e.target.value) })}
+          placeholder="Order"
+        />
+        <button onClick={createNewStatus}>Add Status</button>
+      </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.mainContainer}>
           <div className={styles.mainContainer}>
@@ -90,21 +107,6 @@ export const Kanban = () => {
           </div>
         </div>
       </DragDropContext>
-      <div>
-        <input
-          type="text"
-          value={newStatus.title}
-          onChange={e => setNewStatus({ ...newStatus, title: e.target.value })}
-          placeholder="New Status"
-        />
-        <input
-          type="number"
-          value={newStatus.order}
-          onChange={e => setNewStatus({ ...newStatus, order: parseInt(e.target.value) })}
-          placeholder="Order"
-        />
-        <button onClick={createNewStatus}>Add Status</button>
-      </div>
     </Layout>
   );
 };
