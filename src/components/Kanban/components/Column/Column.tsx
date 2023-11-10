@@ -19,22 +19,22 @@ const initialCardForm = {
   image: '',
 };
 
-export const Column: React.FC<ColumnType> = ({ title }) => {
+export const Column: React.FC<ColumnType> = ({ title, currentUser }) => {
   const [cards, setCards] = useState<TaskType[]>([]);
   const [editCard, setEditCard] = useState<string | null>(null);
   const [errorExist, setErrorExist] = useState<string>('');
+
+  const userId = currentUser?.id;
 
   const formik = useFormik({
     initialValues: initialCardForm,
     onSubmit: async () => {
       try {
-        if (formik.values.id) {
-        } else {
-          await handleCardsCreate();
+        if (formik.values.title) {
+          await handleCardCreate();
         }
 
         if (errorExist) {
-          // Handle errors
         }
       } catch (error) {
         console.error('Error submitting form:', error);
@@ -53,21 +53,38 @@ export const Column: React.FC<ColumnType> = ({ title }) => {
   };
 
   useEffect(() => {
-    fetchCards();
+    const fetchData = async () => {
+      try {
+        await fetchCards();
+      } catch (error) {
+        console.error('Error retrieving the list of tasks:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const handleCardsCreate = async () => {
+  const handleCardCreate = async () => {
     try {
-      if (formik.isValid) {
-        await createTask(formik.values);
+      if (formik.isValid && currentUser && currentUser.id) {
+        const newTask = {
+          userId: userId || '',
+          assignedTo: currentUser.id,
+          title: formik.values.title || '',
+          description: formik.values.description || '',
+          statusId: formik.values.statusId || '', // Теперь берем значение из формы
+          buttonState: buttonColor(formik.values.statusId || ''), // Теперь берем значение из формы
+        };
+
+        const response = await createTask(newTask);
+
+        console.log(response);
         await fetchCards();
+        formik.resetForm();
       }
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.message) {
-        // Handle specific error
-      } else {
-        console.error('Error creating the user:', error);
-      }
+      console.error('Error creating the task:', error);
+      setErrorExist(error.message);
     }
   };
 
@@ -91,26 +108,6 @@ export const Column: React.FC<ColumnType> = ({ title }) => {
     setEditCard(itemId === editCard ? null : itemId);
   };
 
-  const handleOpenDeleteModal = (userId: string) => {
-    // Implement the delete modal logic here
-  };
-
-  const handleCloseDeleteModal = () => {
-    // Implement the close delete modal logic here
-  };
-
-  const handleDialogOpen = () => {
-    setErrorExist('');
-    formik.setValues(initialCardForm);
-    // Implement the open dialog logic here
-  };
-
-  const handleDialogClose = () => {
-    setErrorExist('');
-    formik.resetForm();
-    // Implement the close dialog logic here
-  };
-
   const getError = (fieldName: string): string | undefined => {
     const touchedField = formik.touched[fieldName as keyof typeof formik.touched];
     const errorField = formik.errors[fieldName as keyof typeof formik.errors];
@@ -129,8 +126,8 @@ export const Column: React.FC<ColumnType> = ({ title }) => {
           value={formik.values.title}
           onChange={formik.handleChange('title')}
           placeholder="New Task Title"
-          error={getError('text')}
         />
+        {getError('title') && <div className={styles.error}>{getError('title')}</div>}
         <input
           type="text"
           value={formik.values.description}
@@ -149,10 +146,16 @@ export const Column: React.FC<ColumnType> = ({ title }) => {
           onChange={formik.handleChange('image')}
           placeholder="Image URL"
         />
+        <select value={formik.values.statusId} onChange={formik.handleChange('statusId')}>
+          <option value="Pending">Pending</option>
+          <option value="Updates">Updates</option>
+          <option value="Errors">Errors</option>
+          <option value="Done">Done</option>
+        </select>
       </div>
       <div className={styles.titleColumn}>
         <h2 className={styles.title}>{title}</h2>
-        <button onClick={handleCardsCreate} className={styles.addButton}>
+        <button onClick={handleCardCreate} className={styles.addButton}>
           <AddIcon />
         </button>
       </div>
@@ -200,9 +203,11 @@ export const Column: React.FC<ColumnType> = ({ title }) => {
                       ))}
                   </div>
                   <button
-                    className={`${styles.buttonAction} ${styles[buttonColor(item.statusId) as keyof typeof styles]}`}
+                    className={`${styles.buttonAction} ${
+                      item.buttonState ? styles[buttonColor(item.buttonState) as keyof typeof styles] : ''
+                    }`}
                   >
-                    {item.statusId}
+                    {item.buttonState}
                   </button>
                 </div>
               </motion.div>

@@ -1,9 +1,9 @@
 export type TaskType = {
+  taskId?: string;
   userId: string;
-  assignedTo: string;
+  assignedTo?: string;
   title: string;
   description: string;
-  statusId: string;
-  avatar?: any;
-  image?: string;
+  statusId?: string;
+  buttonState: string;
 };
