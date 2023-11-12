@@ -11,10 +11,10 @@ export default async function getAllTasks(req: NextApiRequest, res: NextApiRespo
     await dbConnect();
 
     const tasks: TaskDocumentType[] = await Task.find();
-    console.log(tasks);
+
     const data = tasks.map((task: TaskDocumentType) => {
-      const { _id, userId, assignedTo, description, title, statusId } = task;
-      return { id: _id, userId, assignedTo, statusId, title, description };
+      const { _id, userId, assignedTo, description, title, statusId, buttonState } = task;
+      return { id: _id, userId, assignedTo, statusId, title, description, buttonState };
     });
 
     res.status(200).json({ data });

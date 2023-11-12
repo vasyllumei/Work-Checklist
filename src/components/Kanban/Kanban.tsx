@@ -4,12 +4,12 @@ import { Layout } from '@/components/Layout/Layout';
 import { Column } from './components/Column/Column';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
-import { createStatus, getAllStatus } from '@/services/status/statusService';
-import { ColumnType } from '@/types/Column';
+import { createStatus, deleteStatus, getAllStatuses /* updateStatus */ } from '@/services/status/statusService';
+import { StatusType } from '@/types/Column';
 
 export const Kanban = () => {
-  const [columns, setColumns] = useState<ColumnType[]>([]);
-  const [newStatus, setNewStatus] = useState({ title: '', order: 0 } as ColumnType);
+  const [columns, setColumns] = useState<StatusType[]>([]);
+  const [newStatus, setNewStatus] = useState({ title: '', order: 0 } as StatusType);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -41,13 +41,14 @@ export const Kanban = () => {
       }
     }
   };
-  const loadColumns = async () => {
+  const fetchColumn = async () => {
     try {
-      const response = await getAllStatus();
-      const fetchedStatusData: ColumnType[] = response.data;
+      const response = await getAllStatuses();
+      const fetchedStatusData: StatusType[] = response.data;
       const formattedColumns = fetchedStatusData.map(column => ({
         title: column.title,
         order: column.order,
+        id: column.id,
       }));
       setColumns(formattedColumns);
     } catch (error) {
@@ -56,7 +57,7 @@ export const Kanban = () => {
   };
 
   useEffect(() => {
-    loadColumns();
+    fetchColumn();
   }, []);
 
   const createNewStatus = async () => {
@@ -64,14 +65,22 @@ export const Kanban = () => {
       const response = await createStatus({
         title: newStatus.title,
         order: newStatus.order,
+        id: newStatus.id,
       });
       setColumns([...columns, response.data]);
-      setNewStatus({ title: '', order: 0 });
+      setNewStatus({ title: '', order: 0, id: '' });
     } catch (error) {
       console.error('Error creating statuses:', error);
     }
   };
-
+  const handleStatusDelete = async (statusId: string): Promise<void> => {
+    try {
+      await deleteStatus(statusId);
+      await fetchColumn();
+    } catch (error) {
+      console.error('Error deleting the user:', error);
+    }
+  };
   return (
     <Layout>
       <div>
@@ -97,8 +106,9 @@ export const Kanban = () => {
                 <StrictModeDroppable key={index} droppableId={index.toString()}>
                   {provided => (
                     <div ref={provided.innerRef} {...provided.droppableProps}>
-                      <Column title={column.title} order={column.order} />
+                      <Column title={column.title} order={column.order} id={column.id} />
                       {provided.placeholder}
+                      <button onClick={() => handleStatusDelete(column.id)}>Delete Status</button>
                     </div>
                   )}
                 </StrictModeDroppable>

@@ -10,9 +10,8 @@ export default async function getAllStatuses(req: NextApiRequest, res: NextApiRe
   try {
     await dbConnect();
 
-    const status: StatusDocumentType[] = await Status.find();
-    console.log('Status', status);
-    const data = status.map((status: StatusDocumentType) => {
+    const statuses: StatusDocumentType[] = await Status.find();
+    const data = statuses.map((status: StatusDocumentType) => {
       const { _id, title, order } = status;
       return { id: _id, title, order };
     });

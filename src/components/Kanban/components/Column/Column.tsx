@@ -3,13 +3,16 @@ import { Draggable } from 'react-beautiful-dnd';
 import { AnimatePresence, motion } from 'framer-motion';
 import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
 import EditIcon from '@mui/icons-material/Edit';
-import { TaskType } from '@/types/Task';
-import { ColumnType } from '@/types/Column';
-import { createTask, getAllTasks } from '@/services/task/taskService';
+import { ButtonStateType, TaskType } from '@/types/Task';
+import { StatusType } from '@/types/Column';
+import { createTask, deleteTask, getAllTasks } from '@/services/task/taskService';
 import styles from './Column.module.css';
 import { useFormik } from 'formik';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Cookies from 'js-cookie';
 
 const initialCardForm = {
+  id: '',
   userId: '',
   assignedTo: '',
   title: '',
@@ -17,20 +20,23 @@ const initialCardForm = {
   statusId: '',
   avatar: '',
   image: '',
+  buttonState: ButtonStateType.Pending,
 };
 
-export const Column: React.FC<ColumnType> = ({ title, currentUser }) => {
+export const Column: React.FC<StatusType> = ({ title }) => {
   const [cards, setCards] = useState<TaskType[]>([]);
   const [editCard, setEditCard] = useState<string | null>(null);
   const [errorExist, setErrorExist] = useState<string>('');
+  const [currentColumnTitle, setCurrentColumnTitle] = useState<string>('');
 
-  const userId = currentUser?.id;
+  const userId = Cookies.get('userId');
+  const assignedTo = Cookies.get('assignedTo');
 
   const formik = useFormik({
     initialValues: initialCardForm,
     onSubmit: async () => {
       try {
-        if (formik.values.title) {
+        if (formik.values && formik.values.description && formik.values.buttonState) {
           await handleCardCreate();
         }
 
@@ -41,53 +47,48 @@ export const Column: React.FC<ColumnType> = ({ title, currentUser }) => {
       }
     },
   });
-
-  const fetchCards = async () => {
+  const fetchTask = async () => {
     try {
-      const fetchedCardsData = await getAllTasks();
-      const fetchedCards: TaskType[] = fetchedCardsData.data;
-      setCards(fetchedCards);
+      const fetchedTaskData = await getAllTasks();
+      const fetchedTask: TaskType[] = fetchedTaskData.data;
+      setCards(fetchedTask);
     } catch (error) {
       console.error('Error retrieving the list of tasks:', error);
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await fetchCards();
-      } catch (error) {
-        console.error('Error retrieving the list of tasks:', error);
-      }
-    };
-
-    fetchData();
+    fetchTask();
   }, []);
 
   const handleCardCreate = async () => {
     try {
-      if (formik.isValid && currentUser && currentUser.id) {
-        const newTask = {
+      if (formik.isValid) {
+        const taskData = {
+          ...formik.values,
+          statusId: currentColumnTitle,
           userId: userId || '',
-          assignedTo: currentUser.id,
-          title: formik.values.title || '',
-          description: formik.values.description || '',
-          statusId: formik.values.statusId || '', // Теперь берем значение из формы
-          buttonState: buttonColor(formik.values.statusId || ''), // Теперь берем значение из формы
+          assignedTo: assignedTo || '',
         };
-
-        const response = await createTask(newTask);
-
-        console.log(response);
-        await fetchCards();
-        formik.resetForm();
+        await createTask(taskData);
+        await fetchTask();
       }
     } catch (error: any) {
-      console.error('Error creating the task:', error);
-      setErrorExist(error.message);
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorExist(error.response.data.message);
+      } else {
+        console.error('Error creating the card:', error);
+      }
     }
   };
-
+  const handleTaskDelete = async (taskId: string): Promise<void> => {
+    try {
+      await deleteTask(taskId);
+      await fetchTask();
+    } catch (error) {
+      console.error('Error deleting the user:', error);
+    }
+  };
   const buttonColor = (buttonState: string) => {
     if (buttonState === 'Pending') {
       return 'yellow';
@@ -155,59 +156,66 @@ export const Column: React.FC<ColumnType> = ({ title, currentUser }) => {
       </div>
       <div className={styles.titleColumn}>
         <h2 className={styles.title}>{title}</h2>
-        <button onClick={handleCardCreate} className={styles.addButton}>
+        <button
+          onClick={() => {
+            handleCardCreate();
+            setCurrentColumnTitle(title);
+          }}
+          className={styles.addButton}
+        >
           <AddIcon />
         </button>
       </div>
-      {cards.map((item: TaskType, index: number) => (
-        <Draggable key={item.userId} draggableId={item.userId} index={index}>
+      {cards.map((task: TaskType, index: number) => (
+        <Draggable key={task.id} draggableId={task.id} index={index}>
           {provided => (
             <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
               <motion.div className={styles.card} initial={false} layout>
                 <div className={styles.titleContainer}>
                   <h2 className={styles.title} {...provided.dragHandleProps}>
-                    {item.title}
+                    {task.title}
                   </h2>
                   <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
-                    <EditIcon onClick={() => handleEditing(item.userId)} className={styles.editIcon} />
+                    <EditIcon onClick={() => handleEditing(task.userId)} className={styles.editIcon} />
+                    <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
                   </motion.div>
                 </div>
                 <AnimatePresence>
-                  {isCardExpanded(item.userId) ? (
+                  {isCardExpanded(task.userId) ? (
                     <motion.fieldset key="expandedContent" className={styles.editingContent}>
-                      {item.image && (
+                      {task.image && (
                         <div className={styles.imageContainer}>
-                          <img src={item.image} alt={item.title} className={styles.cardImage} />
+                          <img src={task.image} alt={task.title} className={styles.cardImage} />
                         </div>
                       )}
-                      <p>{item.description}</p>
+                      <p>{task.description}</p>
                     </motion.fieldset>
                   ) : (
                     <motion.div key="content" className={styles.contentContainer}>
-                      {item.image && (
+                      {task.image && (
                         <div className={styles.imageContainer}>
-                          <img src={item.image} alt={item.title} className={styles.cardImage} />
+                          <img src={task.image} alt={task.title} className={styles.cardImage} />
                         </div>
                       )}
-                      <p>{item.description}</p>
+                      <p>{task.description}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
                 <div className={styles.actionContainer}>
                   <div className={styles.iconContainer}>
-                    {item.avatar &&
-                      item.avatar.map((avatar: string, index: number) => (
+                    {task.avatar &&
+                      task.avatar.map((avatar: string, index: number) => (
                         <div key={index} className={styles.avatar}>
-                          <img src={avatar} alt={`Avatar ${item.userId}`} />
+                          <img src={avatar} alt={`Avatar ${task.userId}`} />
                         </div>
                       ))}
                   </div>
                   <button
                     className={`${styles.buttonAction} ${
-                      item.buttonState ? styles[buttonColor(item.buttonState) as keyof typeof styles] : ''
+                      task.buttonState ? styles[buttonColor(task.buttonState) as keyof typeof styles] : ''
                     }`}
                   >
-                    {item.buttonState}
+                    {task.buttonState}
                   </button>
                 </div>
               </motion.div>

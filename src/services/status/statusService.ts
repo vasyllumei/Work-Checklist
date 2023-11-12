@@ -1,10 +1,10 @@
 import { api, ResponseType } from '@/services/apiService';
-import { ColumnType } from '@/types/Column';
+import { StatusType } from '@/types/Column';
 
-export const getAllStatus = async (): Promise<ResponseType<ColumnType[]>> =>
-  await api.get<ResponseType<ColumnType[]>>('/statuses/getAllStatuses').then(resolve => resolve.data);
-export const createStatus = async (statusData: ColumnType): Promise<ResponseType<ColumnType>> =>
-  await api.post<ResponseType<ColumnType>>('/statuses/createStatus', statusData).then(resolve => resolve.data);
+export const getAllStatuses = async (): Promise<ResponseType<StatusType[]>> =>
+  await api.get<ResponseType<StatusType[]>>('/statuses/getAllStatuses').then(resolve => resolve.data);
+export const createStatus = async (statusData: StatusType): Promise<ResponseType<StatusType>> =>
+  await api.post<ResponseType<StatusType>>('/statuses/createStatus', statusData).then(resolve => resolve.data);
 
 export const deleteStatus = async (statusId: string): Promise<{ success: boolean }> => {
   try {
@@ -16,5 +16,5 @@ export const deleteStatus = async (statusId: string): Promise<{ success: boolean
   }
 };
 
-export const updateTask = async (statusId: string, statusData: ColumnType): Promise<ColumnType> =>
-  await api.put<ColumnType>(`/statuses/updateStatus?id=${statusId}`, statusData).then(resolve => resolve.data);
+export const updateStatus = async (statusId: string, statusData: StatusType): Promise<StatusType> =>
+  await api.put<StatusType>(`/statuses/updateStatus?id=${statusId}`, statusData).then(resolve => resolve.data);

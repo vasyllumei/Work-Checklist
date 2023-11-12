@@ -10,7 +10,7 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
 
   await dbConnect();
 
-  const { userId, assignedTo, title, description, statusId } = req.body;
+  const { userId, assignedTo, title, description, statusId, buttonState } = req.body;
 
   try {
     const newTask: TaskDocumentType = new Task({
@@ -19,6 +19,7 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
       title,
       description,
       statusId,
+      buttonState,
     });
 
     const savedTask = await newTask.save();

@@ -1,8 +1,5 @@
-import { UserType } from '@/types/User';
-
-export type ColumnType = {
+export type StatusType = {
   title: string;
   order: number;
-  currentUser?: UserType;
-  task?: any;
+  id: string;
 };
