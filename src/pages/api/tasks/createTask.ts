@@ -11,6 +11,7 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
   await dbConnect();
 
   const { userId, assignedTo, title, description, statusId, buttonState } = req.body;
+  console.log('Received data:', userId, assignedTo, title, description, statusId, buttonState);
 
   try {
     const newTask: TaskDocumentType = new Task({
@@ -22,7 +23,10 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
       buttonState,
     });
 
+    console.log('New task object:', newTask);
+
     const savedTask = await newTask.save();
+    console.log('Saved task:', savedTask);
     res.status(201).json({ task: savedTask });
   } catch (error) {
     console.error(error);

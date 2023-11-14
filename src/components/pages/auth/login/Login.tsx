@@ -60,6 +60,10 @@ export const Login: FC = () => {
       Cookies.remove('isUserAuthenticated');
     }
   };
+  const user = {
+    userId: 'userId',
+    assignedTo: 'assignedTo',
+  };
   const router = useRouter();
   const handleLogin = async () => {
     try {
@@ -69,6 +73,8 @@ export const Login: FC = () => {
         const token = response.token;
         if (typeof window !== 'undefined') {
           Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
+          localStorage.setItem('userId', user.userId);
+          localStorage.setItem('assignedTo', user.assignedTo);
           await router.push('/');
         }
       }

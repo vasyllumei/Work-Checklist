@@ -9,7 +9,6 @@ import { createTask, deleteTask, getAllTasks } from '@/services/task/taskService
 import styles from './Column.module.css';
 import { useFormik } from 'formik';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Cookies from 'js-cookie';
 
 const initialCardForm = {
   id: '',
@@ -29,14 +28,14 @@ export const Column: React.FC<StatusType> = ({ title }) => {
   const [errorExist, setErrorExist] = useState<string>('');
   const [currentColumnTitle, setCurrentColumnTitle] = useState<string>('');
 
-  const userId = Cookies.get('userId');
-  const assignedTo = Cookies.get('assignedTo');
+  const userId = localStorage.getItem('userId');
+  const assignedTo = localStorage.getItem('assignedTo');
 
   const formik = useFormik({
     initialValues: initialCardForm,
     onSubmit: async () => {
       try {
-        if (formik.values && formik.values.description && formik.values.buttonState) {
+        if (formik.values.description && formik.values.buttonState) {
           await handleCardCreate();
         }
 
@@ -103,10 +102,10 @@ export const Column: React.FC<StatusType> = ({ title }) => {
     }
   };
 
-  const isCardExpanded = (itemId: string) => editCard === itemId;
+  const isCardExpanded = (taskId: string) => editCard === taskId;
 
-  const handleEditing = (itemId: string) => {
-    setEditCard(itemId === editCard ? null : itemId);
+  const handleEditing = (taskId: string) => {
+    setEditCard(taskId === editCard ? null : taskId);
   };
 
   const getError = (fieldName: string): string | undefined => {
