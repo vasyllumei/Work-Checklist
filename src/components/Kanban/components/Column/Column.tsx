@@ -22,11 +22,10 @@ const initialCardForm = {
   buttonState: ButtonStateType.Pending,
 };
 
-export const Column: React.FC<StatusType> = ({ title }) => {
+export const Column: React.FC<StatusType> = ({ title, id }) => {
   const [cards, setCards] = useState<TaskType[]>([]);
   const [editCard, setEditCard] = useState<string | null>(null);
   const [errorExist, setErrorExist] = useState<string>('');
-  const [currentColumnTitle, setCurrentColumnTitle] = useState<string>('');
 
   const userId = localStorage.getItem('userId');
   const assignedTo = localStorage.getItem('assignedTo');
@@ -65,7 +64,7 @@ export const Column: React.FC<StatusType> = ({ title }) => {
       if (formik.isValid) {
         const taskData = {
           ...formik.values,
-          statusId: currentColumnTitle,
+          statusId: id,
           userId: userId || '',
           assignedTo: assignedTo || '',
         };
@@ -158,7 +157,6 @@ export const Column: React.FC<StatusType> = ({ title }) => {
         <button
           onClick={() => {
             handleCardCreate();
-            setCurrentColumnTitle(title);
           }}
           className={styles.addButton}
         >
