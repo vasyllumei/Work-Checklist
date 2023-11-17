@@ -4,12 +4,14 @@ import { Layout } from '@/components/Layout/Layout';
 import { Column } from './components/Column/Column';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
-import { createStatus, deleteStatus, getAllStatuses /* updateStatus */ } from '@/services/status/statusService';
+import { createStatus, deleteStatus, getAllStatuses } from '@/services/status/statusService';
 import { StatusType } from '@/types/Column';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 export const Kanban = () => {
   const [columns, setColumns] = useState<StatusType[]>([]);
   const [newStatus, setNewStatus] = useState({ title: '', order: 0 } as StatusType);
+  const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -41,7 +43,8 @@ export const Kanban = () => {
       }
     }
   };
-  const fetchColumn = async () => {
+
+  const fetchColumns = async () => {
     try {
       const response = await getAllStatuses();
       const fetchedStatusData: StatusType[] = response.data;
@@ -57,7 +60,7 @@ export const Kanban = () => {
   };
 
   useEffect(() => {
-    fetchColumn();
+    fetchColumns();
   }, []);
 
   const createNewStatus = async () => {
@@ -69,35 +72,47 @@ export const Kanban = () => {
       });
       setColumns([...columns, response.data]);
       setNewStatus({ title: '', order: 0, id: '' });
+      setIsAddStatusModalOpen(false); // Close the modal after creating a status
     } catch (error) {
-      console.error('Error creating statuses:', error);
+      console.error('Error creating status:', error);
     }
   };
+
   const handleStatusDelete = async (statusId: string): Promise<void> => {
     try {
       await deleteStatus(statusId);
-      await fetchColumn();
+      await fetchColumns();
     } catch (error) {
-      console.error('Error deleting the user:', error);
+      console.error('Error deleting status:', error);
     }
   };
+
   return (
     <Layout>
-      <div>
-        <input
-          type="text"
-          value={newStatus.title}
-          onChange={e => setNewStatus({ ...newStatus, title: e.target.value })}
-          placeholder="New Status"
-        />
-        <input
-          type="number"
-          value={newStatus.order}
-          onChange={e => setNewStatus({ ...newStatus, order: parseInt(e.target.value) })}
-          placeholder="Order"
-        />
-        <button onClick={createNewStatus}>Add Status</button>
-      </div>
+      <Dialog open={isAddStatusModalOpen} onClose={() => setIsAddStatusModalOpen(false)}>
+        <DialogTitle>Add New Status</DialogTitle>
+        <DialogContent>
+          <div>
+            <input
+              type="text"
+              value={newStatus.title}
+              onChange={e => setNewStatus({ ...newStatus, title: e.target.value })}
+              placeholder="New Status"
+            />
+            <input
+              type="number"
+              value={newStatus.order}
+              onChange={e => setNewStatus({ ...newStatus, order: parseInt(e.target.value) })}
+              placeholder="Order"
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsAddStatusModalOpen(false)}>Cancel</Button>
+          <Button onClick={createNewStatus}>Add Status</Button>
+        </DialogActions>
+      </Dialog>
+
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.mainContainer}>
           <div className={styles.mainContainer}>
@@ -117,6 +132,10 @@ export const Kanban = () => {
           </div>
         </div>
       </DragDropContext>
+
+      <div>
+        <button onClick={() => setIsAddStatusModalOpen(true)}>Add Status</button>
+      </div>
     </Layout>
   );
 };

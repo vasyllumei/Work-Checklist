@@ -9,6 +9,7 @@ import { createTask, deleteTask, getAllTasks } from '@/services/task/taskService
 import styles from './Column.module.css';
 import { useFormik } from 'formik';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 const initialCardForm = {
   id: '',
@@ -26,6 +27,7 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
   const [cards, setCards] = useState<TaskType[]>([]);
   const [editCard, setEditCard] = useState<string | null>(null);
   const [errorExist, setErrorExist] = useState<string>('');
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
 
   const userId = localStorage.getItem('userId');
   const assignedTo = localStorage.getItem('assignedTo');
@@ -45,6 +47,7 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
       }
     },
   });
+
   const fetchTask = async () => {
     try {
       const fetchedTaskData = await getAllTasks();
@@ -70,6 +73,7 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
         };
         await createTask(taskData);
         await fetchTask();
+        setIsAddTaskModalOpen(false); // Close the modal after creating a task
       }
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
@@ -79,6 +83,7 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
       }
     }
   };
+
   const handleTaskDelete = async (taskId: string): Promise<void> => {
     try {
       await deleteTask(taskId);
@@ -87,6 +92,7 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
       console.error('Error deleting the user:', error);
     }
   };
+
   const buttonColor = (buttonState: string) => {
     if (buttonState === 'Pending') {
       return 'yellow';
@@ -119,44 +125,53 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
 
   return (
     <div className={styles.column}>
-      <div>
-        <input
-          type="text"
-          value={formik.values.title}
-          onChange={formik.handleChange('title')}
-          placeholder="New Task Title"
-        />
-        {getError('title') && <div className={styles.error}>{getError('title')}</div>}
-        <input
-          type="text"
-          value={formik.values.description}
-          onChange={formik.handleChange('description')}
-          placeholder="New Task Description"
-        />
-        <input
-          type="text"
-          value={formik.values.avatar}
-          onChange={formik.handleChange('avatar')}
-          placeholder="Avatar URL"
-        />
-        <input
-          type="text"
-          value={formik.values.image}
-          onChange={formik.handleChange('image')}
-          placeholder="Image URL"
-        />
-        <select value={formik.values.statusId} onChange={formik.handleChange('statusId')}>
-          <option value="Pending">Pending</option>
-          <option value="Updates">Updates</option>
-          <option value="Errors">Errors</option>
-          <option value="Done">Done</option>
-        </select>
-      </div>
+      <Dialog open={isAddTaskModalOpen} onClose={() => setIsAddTaskModalOpen(false)}>
+        <DialogTitle>Add New Task</DialogTitle>
+        <DialogContent>
+          <div>
+            <input
+              type="text"
+              value={formik.values.title}
+              onChange={formik.handleChange('title')}
+              placeholder="New Task Title"
+            />
+            {getError('title') && <div className={styles.error}>{getError('title')}</div>}
+            <input
+              type="text"
+              value={formik.values.description}
+              onChange={formik.handleChange('description')}
+              placeholder="New Task Description"
+            />
+            <input
+              type="text"
+              value={formik.values.avatar}
+              onChange={formik.handleChange('avatar')}
+              placeholder="Avatar URL"
+            />
+            <input
+              type="text"
+              value={formik.values.image}
+              onChange={formik.handleChange('image')}
+              placeholder="Image URL"
+            />
+            <select value={formik.values.statusId} onChange={formik.handleChange('statusId')}>
+              <option value="Pending">Pending</option>
+              <option value="Updates">Updates</option>
+              <option value="Errors">Errors</option>
+              <option value="Done">Done</option>
+            </select>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsAddTaskModalOpen(false)}>Cancel</Button>
+          <Button onClick={handleCardCreate}>Add Task</Button>
+        </DialogActions>
+      </Dialog>
       <div className={styles.titleColumn}>
         <h2 className={styles.title}>{title}</h2>
         <button
           onClick={() => {
-            handleCardCreate();
+            setIsAddTaskModalOpen(true);
           }}
           className={styles.addButton}
         >
@@ -173,19 +188,19 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
                     {task.title}
                   </h2>
                   <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
-                    <EditIcon onClick={() => handleEditing(task.userId)} className={styles.editIcon} />
+                    <EditIcon onClick={() => handleEditing(task.id)} className={styles.editIcon} />
                     <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
                   </motion.div>
                 </div>
                 <AnimatePresence>
-                  {isCardExpanded(task.userId) ? (
+                  {isCardExpanded(task.id) ? (
                     <motion.fieldset key="expandedContent" className={styles.editingContent}>
                       {task.image && (
                         <div className={styles.imageContainer}>
                           <img src={task.image} alt={task.title} className={styles.cardImage} />
                         </div>
                       )}
-                      <p>{task.description}</p>
+                      <p className={styles.p}>{task.description}</p>
                     </motion.fieldset>
                   ) : (
                     <motion.div key="content" className={styles.contentContainer}>
