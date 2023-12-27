@@ -5,11 +5,12 @@ import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
 import EditIcon from '@mui/icons-material/Edit';
 import { ButtonStateType, TaskType } from '@/types/Task';
 import { StatusType } from '@/types/Column';
-import { createTask, deleteTask, getAllTasks } from '@/services/task/taskService';
+import { createTask, deleteTask } from '@/services/task/taskService';
 import styles from './Column.module.css';
 import { useFormik } from 'formik';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { TextInput } from '@/components/TextInput';
 
 const initialCardForm = {
   id: '',
@@ -21,16 +22,14 @@ const initialCardForm = {
   avatar: '',
   image: '',
   buttonState: ButtonStateType.Pending,
+  editMode: false,
 };
 
-export const Column: React.FC<StatusType> = ({ title, id }) => {
+export const Column: React.FC<StatusType & { allTasks: TaskType[] }> = ({ title, id, allTasks }) => {
   const [cards, setCards] = useState<TaskType[]>([]);
   const [editCard, setEditCard] = useState<string | null>(null);
   const [errorExist, setErrorExist] = useState<string>('');
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
-
-  const userId = localStorage.getItem('userId');
-  const assignedTo = localStorage.getItem('assignedTo');
 
   const formik = useFormik({
     initialValues: initialCardForm,
@@ -47,20 +46,16 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
       }
     },
   });
+  const isEditMode = formik.values.editMode;
 
-  const fetchTask = async () => {
-    try {
-      const fetchedTaskData = await getAllTasks();
-      const fetchedTask: TaskType[] = fetchedTaskData.data;
-      setCards(fetchedTask);
-    } catch (error) {
-      console.error('Error retrieving the list of tasks:', error);
-    }
+  const fetchTask = () => {
+    const filteredTasks = allTasks.filter(task => task.statusId === id);
+    setCards(filteredTasks);
   };
 
   useEffect(() => {
     fetchTask();
-  }, []);
+  }, [allTasks, id]);
 
   const handleCardCreate = async () => {
     try {
@@ -68,12 +63,13 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
         const taskData = {
           ...formik.values,
           statusId: id,
-          userId: userId || '',
-          assignedTo: assignedTo || '',
+          userId: localStorage.getItem('userId') || '',
+          assignedTo: '64db26458eb8527007b38e10',
         };
         await createTask(taskData);
         await fetchTask();
-        setIsAddTaskModalOpen(false); // Close the modal after creating a task
+        formik.resetForm();
+        setIsAddTaskModalOpen(false);
       }
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
@@ -94,23 +90,35 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
   };
 
   const buttonColor = (buttonState: string) => {
-    if (buttonState === 'Pending') {
-      return 'yellow';
-    } else if (buttonState === 'Updates') {
-      return 'blue';
-    } else if (buttonState === 'Errors') {
-      return 'red';
-    } else if (buttonState === 'Done') {
-      return 'green';
-    } else {
-      return '';
+    switch (buttonState) {
+      case 'Pending':
+        return styles.selectAction;
+      case 'Updates':
+        return `${styles.selectAction} ${styles.blue}`;
+      case 'Errors':
+        return `${styles.selectAction} ${styles.red}`;
+      case 'Done':
+        return `${styles.selectAction} ${styles.green}`;
+      default:
+        return styles.selectAction;
     }
   };
 
   const isCardExpanded = (taskId: string) => editCard === taskId;
 
-  const handleEditing = (taskId: string) => {
-    setEditCard(taskId === editCard ? null : taskId);
+  const handleTaskEdit = (taskId: string) => {
+    try {
+      const cardData = cards.find(card => card.id === taskId);
+      if (cardData) {
+        formik.setValues({
+          ...initialCardForm,
+          ...cardData,
+          editMode: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating the user', error);
+    }
   };
 
   const getError = (fieldName: string): string | undefined => {
@@ -128,43 +136,67 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
       <Dialog open={isAddTaskModalOpen} onClose={() => setIsAddTaskModalOpen(false)}>
         <DialogTitle>Add New Task</DialogTitle>
         <DialogContent>
-          <div>
-            <input
+          <div className={styles.taskForm}>
+            <TextInput
+              label="Title"
+              name="title"
               type="text"
-              value={formik.values.title}
-              onChange={formik.handleChange('title')}
+              value={formik.values.title || ''}
+              onChange={value => formik.setFieldValue('title', value)}
               placeholder="New Task Title"
+              error={getError('title')}
             />
             {getError('title') && <div className={styles.error}>{getError('title')}</div>}
-            <input
+            <div className={styles.textAreaContainer}>
+              <label htmlFor="description" className={styles.label}>
+                Description
+              </label>
+              <textarea
+                id="description"
+                maxLength={150}
+                minLength={5}
+                required
+                className={styles.textArea}
+                value={formik.values.description}
+                onChange={formik.handleChange('description')}
+                placeholder="Write description here"
+              />
+            </div>
+            <TextInput
+              label="Avatar"
+              name="avatar"
               type="text"
-              value={formik.values.description}
-              onChange={formik.handleChange('description')}
-              placeholder="New Task Description"
+              value={formik.values.avatar || ''}
+              onChange={value => formik.setFieldValue('avatar', value)}
+              placeholder="New avatar"
+              error={getError('avatar')}
             />
-            <input
+            <TextInput
+              label="Image"
+              name="image"
               type="text"
-              value={formik.values.avatar}
-              onChange={formik.handleChange('avatar')}
-              placeholder="Avatar URL"
-            />
-            <input
-              type="text"
-              value={formik.values.image}
-              onChange={formik.handleChange('image')}
+              value={formik.values.image || ''}
+              onChange={value => formik.setFieldValue('image', value)}
               placeholder="Image URL"
+              error={getError('image')}
             />
-            <select value={formik.values.statusId} onChange={formik.handleChange('statusId')}>
-              <option value="Pending">Pending</option>
-              <option value="Updates">Updates</option>
-              <option value="Errors">Errors</option>
-              <option value="Done">Done</option>
-            </select>
+            <div className={styles.selectContainer}>
+              <select
+                value={formik.values.statusId}
+                onChange={formik.handleChange('statusId')}
+                className={buttonColor(formik.values.statusId)}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Updates">Updates</option>
+                <option value="Errors">Errors</option>
+                <option value="Done">Done</option>
+              </select>
+            </div>
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsAddTaskModalOpen(false)}>Cancel</Button>
-          <Button onClick={handleCardCreate}>Add Task</Button>
+          <Button onClick={() => handleCardCreate()}>Add Task</Button>
         </DialogActions>
       </Dialog>
       <div className={styles.titleColumn}>
@@ -172,6 +204,7 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
         <button
           onClick={() => {
             setIsAddTaskModalOpen(true);
+            formik.setValues({ ...initialCardForm, statusId: id });
           }}
           className={styles.addButton}
         >
@@ -188,12 +221,12 @@ export const Column: React.FC<StatusType> = ({ title, id }) => {
                     {task.title}
                   </h2>
                   <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
-                    <EditIcon onClick={() => handleEditing(task.id)} className={styles.editIcon} />
+                    <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
                     <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
                   </motion.div>
                 </div>
                 <AnimatePresence>
-                  {isCardExpanded(task.id) ? (
+                  {isCardExpanded(task.id) && isEditMode ? (
                     <motion.fieldset key="expandedContent" className={styles.editingContent}>
                       {task.image && (
                         <div className={styles.imageContainer}>

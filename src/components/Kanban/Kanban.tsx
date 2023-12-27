@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import { Column } from './components/Column/Column';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictModeDroppable';
 import { createStatus, deleteStatus, getAllStatuses } from '@/services/status/statusService';
 import { StatusType } from '@/types/Column';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Column } from '@/components/Kanban/components/Column';
+import { Button } from '@/components/Button';
+import { getAllTasks } from '@/services/task/taskService';
+import { TaskType } from '@/types/Task';
 
 export const Kanban = () => {
   const [columns, setColumns] = useState<StatusType[]>([]);
-  const [newStatus, setNewStatus] = useState({ title: '', order: 0 } as StatusType);
+  const [newStatus, setNewStatus] = useState({ title: '', order: 0, id: '', task: [] } as StatusType);
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
+  const [allTasks, setAllTasks] = useState<TaskType[]>([]);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -25,8 +29,8 @@ export const Kanban = () => {
       const column = updatedColumns.find(c => c.title === columnId);
 
       if (column) {
-        const [movedItem] = column.task.splice(result.source.index, 1);
-        column.task.splice(result.destination.index, 0, movedItem);
+        const [movedItem] = column.id.splice(result.source.index, 1);
+        column.id.splice(result.destination.index, 0, movedItem);
         setColumns(updatedColumns);
       }
     } else {
@@ -37,31 +41,39 @@ export const Kanban = () => {
       const destinationColumn = updatedColumns.find(c => c.title === destinationColumnTitle);
 
       if (sourceColumn && destinationColumn) {
-        const [movedItem] = sourceColumn.task.splice(result.source.index, 1);
-        destinationColumn.task.splice(result.destination.index, 0, movedItem);
+        const [movedItem] = sourceColumn.id.splice(result.source.index, 1);
+        destinationColumn.id.splice(result.destination.index, 0, movedItem);
         setColumns(updatedColumns);
       }
     }
   };
 
-  const fetchColumns = async () => {
+  const getData = async () => {
     try {
-      const response = await getAllStatuses();
-      const fetchedStatusData: StatusType[] = response.data;
-      const formattedColumns = fetchedStatusData.map(column => ({
-        title: column.title,
-        order: column.order,
-        id: column.id,
+      const statusesResponse = await getAllStatuses();
+      const tasksResponse = await getAllTasks();
+
+      const statuses: StatusType[] = statusesResponse.data;
+      const tasksData: TaskType[] = tasksResponse.data;
+
+      setAllTasks(tasksData);
+
+      const data: StatusType[] = statuses.map(status => ({
+        order: status.order,
+        title: status.title,
+        id: status.id,
+        task: tasksData.filter(task => task.statusId === status.id),
       }));
-      setColumns(formattedColumns);
+
+      setColumns(data);
     } catch (error) {
       console.error('Error loading columns:', error);
     }
   };
 
   useEffect(() => {
-    fetchColumns();
-  }, []);
+    getData();
+  }, [allTasks]);
 
   const createNewStatus = async () => {
     try {
@@ -69,22 +81,33 @@ export const Kanban = () => {
         title: newStatus.title,
         order: newStatus.order,
         id: newStatus.id,
+        task: newStatus.task,
       });
-      setColumns([...columns, response.data]);
-      setNewStatus({ title: '', order: 0, id: '' });
-      setIsAddStatusModalOpen(false); // Close the modal after creating a status
+
+      const newStatusData: StatusType = {
+        title: response.data.title,
+        id: response.data.id,
+        order: response.data.order,
+        task: [],
+      };
+
+      setColumns([...columns, newStatusData]);
+      setNewStatus({ title: '', order: 0, id: '', task: [] });
+      setIsAddStatusModalOpen(false);
     } catch (error) {
       console.error('Error creating status:', error);
     }
   };
-
   const handleStatusDelete = async (statusId: string): Promise<void> => {
     try {
       await deleteStatus(statusId);
-      await fetchColumns();
+      await getData();
     } catch (error) {
       console.error('Error deleting status:', error);
     }
+  };
+  const addStatusModalOpen = () => {
+    setIsAddStatusModalOpen(false);
   };
 
   return (
@@ -108,8 +131,8 @@ export const Kanban = () => {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsAddStatusModalOpen(false)}>Cancel</Button>
-          <Button onClick={createNewStatus}>Add Status</Button>
+          <Button text="Cancel" onClick={addStatusModalOpen} />
+          <Button text="Add Status" onClick={createNewStatus} />
         </DialogActions>
       </Dialog>
 
@@ -121,9 +144,15 @@ export const Kanban = () => {
                 <StrictModeDroppable key={index} droppableId={index.toString()}>
                   {provided => (
                     <div ref={provided.innerRef} {...provided.droppableProps}>
-                      <Column title={column.title} order={column.order} id={column.id} />
+                      <Column
+                        title={column.title}
+                        order={column.order}
+                        id={column.id}
+                        task={column.task}
+                        allTasks={allTasks}
+                      />
                       {provided.placeholder}
-                      <button onClick={() => handleStatusDelete(column.id)}>Delete Status</button>
+                      <Button text="Delete Status" onClick={() => handleStatusDelete(column.id)} />
                     </div>
                   )}
                 </StrictModeDroppable>
@@ -133,9 +162,7 @@ export const Kanban = () => {
         </div>
       </DragDropContext>
 
-      <div>
-        <button onClick={() => setIsAddStatusModalOpen(true)}>Add Status</button>
-      </div>
+      <Button text="Add Status" onClick={() => setIsAddStatusModalOpen(true)} />
     </Layout>
   );
 };

@@ -48,7 +48,7 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.status(200).json({ token, refreshToken });
+    res.status(200).json({ token, refreshToken, userId: user._id });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Internal server error' });

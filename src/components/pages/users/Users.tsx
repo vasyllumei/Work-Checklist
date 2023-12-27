@@ -271,7 +271,7 @@ export const Users: FC = () => {
           }}
           pageSizeOptions={[5]}
           disableRowSelectionOnClick
-          getRowId={row => row.userId}
+          getRowId={row => row.id}
         />
         <Grid container justifyContent="left">
           <Button onClick={handleDialogOpen} text="Add User" />

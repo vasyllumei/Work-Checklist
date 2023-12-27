@@ -27,7 +27,17 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
 
     const savedTask = await newTask.save();
     console.log('Saved task:', savedTask);
-    res.status(201).json({ task: savedTask });
+    res.status(201).json({
+      task: {
+        id: savedTask._id,
+        userId: savedTask.userId,
+        assignedTo: savedTask.assignedTo,
+        description: savedTask.description,
+        title: savedTask.title,
+        statusId: savedTask.statusId,
+        buttonState: savedTask.buttonState,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });

@@ -4,10 +4,10 @@ export type TaskType = {
   assignedTo?: string;
   title: string;
   description: string;
-  statusId?: string;
+  statusId: string;
   buttonState: ButtonStateType;
   image?: string;
-  avatar?: string;
+  avatar?: any;
 };
 
 export enum ButtonStateType {
