@@ -1,6 +1,5 @@
 export type StatusType = {
   title: string;
-  order: number;
+  order: string;
   id: string;
-  task: any;
 };

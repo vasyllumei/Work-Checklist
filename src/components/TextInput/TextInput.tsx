@@ -7,7 +7,7 @@ interface TextInputProps {
   name: string;
   type?: string;
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: any) => void;
   placeholder: string;
   error: string | undefined;
   disabled?: boolean;

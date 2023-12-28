@@ -10,41 +10,53 @@ import { Column } from '@/components/Kanban/components/Column';
 import { Button } from '@/components/Button';
 import { getAllTasks } from '@/services/task/taskService';
 import { TaskType } from '@/types/Task';
+import { TextInput } from '@/components/TextInput';
 
 export const Kanban = () => {
   const [columns, setColumns] = useState<StatusType[]>([]);
-  const [newStatus, setNewStatus] = useState({ title: '', order: 0, id: '', task: [] } as StatusType);
+  const [newStatus, setNewStatus] = useState({ title: '', order: '', id: '' } as StatusType);
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
   const [allTasks, setAllTasks] = useState<TaskType[]>([]);
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
-    const sourceColumnId = result.source.droppableId;
-    const destinationColumnId = result.destination.droppableId;
+    const source = result.source;
+    const destination = result.destination;
 
-    if (sourceColumnId === destinationColumnId) {
-      const columnId = sourceColumnId;
-      const updatedColumns = [...columns];
-      const column = updatedColumns.find(c => c.title === columnId);
+    if (source.droppableId === destination.droppableId) {
+      const sourceStatusId = source.droppableId;
+      setAllTasks(prevTasks => {
+        const updatedTasks = prevTasks.map(task => ({ ...task }));
+        const tasksInSourceStatus = updatedTasks.filter(task => task.statusId === sourceStatusId);
 
-      if (column) {
-        const [movedItem] = column.id.splice(result.source.index, 1);
-        column.id.splice(result.destination.index, 0, movedItem);
-        setColumns(updatedColumns);
-      }
+        const [movedTask] = tasksInSourceStatus.splice(source.index, 1);
+        tasksInSourceStatus.splice(destination.index, 0, movedTask);
+
+        return updatedTasks.map(task =>
+          task.statusId === sourceStatusId ? tasksInSourceStatus.shift() || task : task,
+        );
+      });
     } else {
-      const sourceColumnTitle = sourceColumnId;
-      const destinationColumnTitle = destinationColumnId;
-      const updatedColumns = [...columns];
-      const sourceColumn = updatedColumns.find(c => c.title === sourceColumnTitle);
-      const destinationColumn = updatedColumns.find(c => c.title === destinationColumnTitle);
+      const sourceStatusId = source.droppableId;
+      const destinationStatusId = destination.droppableId;
 
-      if (sourceColumn && destinationColumn) {
-        const [movedItem] = sourceColumn.id.splice(result.source.index, 1);
-        destinationColumn.id.splice(result.destination.index, 0, movedItem);
-        setColumns(updatedColumns);
-      }
+      setAllTasks(prevTasks => {
+        const updatedTasks = prevTasks.map(task => ({ ...task }));
+        const tasksInSourceStatus = updatedTasks.filter(task => task.statusId === sourceStatusId);
+        const tasksInDestinationStatus = updatedTasks.filter(task => task.statusId === destinationStatusId);
+
+        const [movedTask] = tasksInSourceStatus.splice(source.index, 1);
+        tasksInDestinationStatus.splice(destination.index, 0, movedTask);
+
+        return updatedTasks.map(task =>
+          task.statusId === sourceStatusId
+            ? tasksInSourceStatus.shift() || task
+            : task.statusId === destinationStatusId
+            ? tasksInDestinationStatus.shift() || task
+            : task,
+        );
+      });
     }
   };
 
@@ -62,7 +74,6 @@ export const Kanban = () => {
         order: status.order,
         title: status.title,
         id: status.id,
-        task: tasksData.filter(task => task.statusId === status.id),
       }));
 
       setColumns(data);
@@ -73,7 +84,7 @@ export const Kanban = () => {
 
   useEffect(() => {
     getData();
-  }, [allTasks]);
+  }, []);
 
   const createNewStatus = async () => {
     try {
@@ -81,18 +92,16 @@ export const Kanban = () => {
         title: newStatus.title,
         order: newStatus.order,
         id: newStatus.id,
-        task: newStatus.task,
       });
 
       const newStatusData: StatusType = {
         title: response.data.title,
         id: response.data.id,
         order: response.data.order,
-        task: [],
       };
 
       setColumns([...columns, newStatusData]);
-      setNewStatus({ title: '', order: 0, id: '', task: [] });
+      setNewStatus({ title: '', order: '', id: '' });
       setIsAddStatusModalOpen(false);
     } catch (error) {
       console.error('Error creating status:', error);
@@ -109,6 +118,10 @@ export const Kanban = () => {
   const addStatusModalOpen = () => {
     setIsAddStatusModalOpen(false);
   };
+  const addStatusModalClose = () => {
+    createNewStatus();
+    setIsAddStatusModalOpen(false);
+  };
 
   return (
     <Layout>
@@ -116,23 +129,29 @@ export const Kanban = () => {
         <DialogTitle>Add New Status</DialogTitle>
         <DialogContent>
           <div>
-            <input
+            <TextInput
+              label="Title"
+              error=""
+              name="title"
               type="text"
               value={newStatus.title}
-              onChange={e => setNewStatus({ ...newStatus, title: e.target.value })}
-              placeholder="New Status"
+              onChange={value => setNewStatus({ ...newStatus, title: value })}
+              placeholder="Add title"
             />
-            <input
+            <TextInput
+              label="Order"
+              error=""
+              name="order"
               type="number"
-              value={newStatus.order}
-              onChange={e => setNewStatus({ ...newStatus, order: parseInt(e.target.value) })}
-              placeholder="Order"
+              value={newStatus.order || ''}
+              onChange={value => setNewStatus({ ...newStatus, order: value })}
+              placeholder="Add order"
             />
           </div>
         </DialogContent>
         <DialogActions>
           <Button text="Cancel" onClick={addStatusModalOpen} />
-          <Button text="Add Status" onClick={createNewStatus} />
+          <Button text="Add Status" onClick={addStatusModalClose} />
         </DialogActions>
       </Dialog>
 
@@ -141,16 +160,10 @@ export const Kanban = () => {
           <div className={styles.mainContainer}>
             <DragDropContext onDragEnd={onDragEnd}>
               {columns.map((column, index) => (
-                <StrictModeDroppable key={index} droppableId={index.toString()}>
+                <StrictModeDroppable key={index} droppableId={column.id}>
                   {provided => (
                     <div ref={provided.innerRef} {...provided.droppableProps}>
-                      <Column
-                        title={column.title}
-                        order={column.order}
-                        id={column.id}
-                        task={column.task}
-                        allTasks={allTasks}
-                      />
+                      <Column title={column.title} order={column.order} id={column.id} allTasks={allTasks} />
                       {provided.placeholder}
                       <Button text="Delete Status" onClick={() => handleStatusDelete(column.id)} />
                     </div>

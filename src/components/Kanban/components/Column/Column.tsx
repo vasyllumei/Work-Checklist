@@ -49,10 +49,9 @@ export const Column: React.FC<StatusType & { allTasks: TaskType[] }> = ({ title,
   const isEditMode = formik.values.editMode;
 
   const fetchTask = () => {
-    const filteredTasks = allTasks.filter(task => task.statusId === id);
+    const filteredTasks = allTasks.filter(task => task && task.statusId === id);
     setCards(filteredTasks);
   };
-
   useEffect(() => {
     fetchTask();
   }, [allTasks, id]);
@@ -91,14 +90,13 @@ export const Column: React.FC<StatusType & { allTasks: TaskType[] }> = ({ title,
 
   const buttonColor = (buttonState: string) => {
     switch (buttonState) {
-      case 'Pending':
-        return styles.selectAction;
       case 'Updates':
         return `${styles.selectAction} ${styles.blue}`;
       case 'Errors':
         return `${styles.selectAction} ${styles.red}`;
       case 'Done':
         return `${styles.selectAction} ${styles.green}`;
+      case 'Pending':
       default:
         return styles.selectAction;
     }
@@ -117,7 +115,7 @@ export const Column: React.FC<StatusType & { allTasks: TaskType[] }> = ({ title,
         });
       }
     } catch (error) {
-      console.error('Error updating the user', error);
+      console.error('Error updating the task', error);
     }
   };
 
@@ -182,9 +180,9 @@ export const Column: React.FC<StatusType & { allTasks: TaskType[] }> = ({ title,
             />
             <div className={styles.selectContainer}>
               <select
-                value={formik.values.statusId}
-                onChange={formik.handleChange('statusId')}
-                className={buttonColor(formik.values.statusId)}
+                value={formik.values.buttonState}
+                onChange={formik.handleChange('buttonState')}
+                className={buttonColor(formik.values.buttonState)}
               >
                 <option value="Pending">Pending</option>
                 <option value="Updates">Updates</option>
@@ -255,11 +253,7 @@ export const Column: React.FC<StatusType & { allTasks: TaskType[] }> = ({ title,
                         </div>
                       ))}
                   </div>
-                  <button
-                    className={`${styles.buttonAction} ${
-                      task.buttonState ? styles[buttonColor(task.buttonState) as keyof typeof styles] : ''
-                    }`}
-                  >
+                  <button className={`${styles.buttonAction} ${buttonColor(task.buttonState)}`}>
                     {task.buttonState}
                   </button>
                 </div>
