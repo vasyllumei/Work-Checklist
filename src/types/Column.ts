@@ -1,4 +1,4 @@
-export type StatusType = {
+export type ColumnType = {
   title: string;
   order: string;
   id: string;
