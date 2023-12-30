@@ -1,22 +1,16 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
+import { ButtonStateType } from '@/types/Task';
 
-enum TaskStatus {
-  TODO = 'todo',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-}
-
-interface ITask {
+export type TaskDocumentType = Document & {
   userId: string;
   assignedTo: string;
   title: string;
   description: string;
-  status: TaskStatus;
-}
+  statusId: string;
+  buttonState: ButtonStateType;
+};
 
-export interface ITaskDocument extends ITask, Document {}
-
-const TaskSchema = new Schema<ITaskDocument>(
+const TaskSchema = new Schema<TaskDocumentType>(
   {
     userId: {
       type: String,
@@ -36,15 +30,18 @@ const TaskSchema = new Schema<ITaskDocument>(
       type: String,
       required: true,
     },
-    status: {
+    statusId: {
       type: String,
-      enum: Object.values(TaskStatus),
-      default: TaskStatus.TODO,
+      ref: 'Status',
+      required: true,
+    },
+    buttonState: {
+      type: String,
+      enum: [ButtonStateType.Pending, ButtonStateType.Updates, ButtonStateType.Done, ButtonStateType.Errors],
+      default: ButtonStateType.Pending,
     },
   },
   { timestamps: true },
 );
 
-const Task = model<ITaskDocument>('Task', TaskSchema);
-
-export default Task;
+export default mongoose.models.Task || mongoose.model<TaskDocumentType>('Task', TaskSchema);

@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
-import Task, { ITaskDocument } from '@/models/Task';
+import Task, { TaskDocumentType } from '@/models/Task';
 
-export default async function getAllMenus(req: NextApiRequest, res: NextApiResponse) {
+export default async function getAllTasks(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -10,11 +10,11 @@ export default async function getAllMenus(req: NextApiRequest, res: NextApiRespo
   try {
     await dbConnect();
 
-    const tasks: ITaskDocument[] = await Task.find();
+    const tasks: TaskDocumentType[] = await Task.find();
 
-    const data = tasks.map((user: ITaskDocument) => {
-      const { _id, userId, status, assignedTo, title, description } = user;
-      return { id: _id, userId, status, assignedTo, title, description };
+    const data = tasks.map((task: TaskDocumentType) => {
+      const { _id, userId, assignedTo, description, title, statusId, buttonState } = task;
+      return { id: _id, userId, assignedTo, statusId, title, description, buttonState };
     });
 
     res.status(200).json({ data });

@@ -21,7 +21,6 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
   try {
     await dbConnect();
 
-    // Check if user exists
     const user: UserDocumentType | null = await User.findOne({ email });
 
     if (!user) {
@@ -30,7 +29,6 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
       return;
     }
 
-    // Check if password is correct
     const passwordMatches = await compare(password, user.password);
     if (!passwordMatches) {
       res.status(401).json({ message: 'Incorrect password' });
@@ -38,23 +36,19 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
       return;
     }
 
-    // Generate auth token
     const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET!, {
       expiresIn: '1h',
     });
 
-    // Generate refresh token
     const refreshToken = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_REFRESH_SECRET!, {
       expiresIn: '7d',
     });
 
-    // Save tokens to user document
     user.token = token;
     user.refreshToken = refreshToken;
     await user.save();
 
-    // Send tokens in response
-    res.status(200).json({ token, refreshToken });
+    res.status(200).json({ token, refreshToken, userId: user._id });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Internal server error' });

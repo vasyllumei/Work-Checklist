@@ -17,9 +17,9 @@ import { TextInput } from '../../TextInput';
 import { Button } from '@/components/Button';
 import { Layout } from '@/components/Layout/Layout';
 import { UserType, UserRoleType } from '@/types/User';
-import { getUsers, createUser, deleteUser, updateUser } from '@/services/user/userService';
+import { createUser, deleteUser, updateUser, getAllUsers } from '@/services/user/userService';
 import { useFormik } from 'formik';
-import { UserActionsCell } from '@/components/pages/users/UserActionsCell';
+import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
 import styles from './Users.module.css';
 
 const initialUserForm = {
@@ -222,7 +222,7 @@ export const Users: FC = () => {
   };
   const fetchUsers = async () => {
     try {
-      const fetchedUsersData = await getUsers();
+      const fetchedUsersData = await getAllUsers();
       const fetchedUsers: UserType[] = fetchedUsersData.data;
       setUsers(fetchedUsers);
     } catch (error) {
@@ -271,6 +271,7 @@ export const Users: FC = () => {
           }}
           pageSizeOptions={[5]}
           disableRowSelectionOnClick
+          getRowId={row => row.id}
         />
         <Grid container justifyContent="left">
           <Button onClick={handleDialogOpen} text="Add User" />

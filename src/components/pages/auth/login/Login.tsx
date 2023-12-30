@@ -69,6 +69,9 @@ export const Login: FC = () => {
         const token = response.token;
         if (typeof window !== 'undefined') {
           Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
+          const { userId } = response;
+          localStorage.setItem('userId', userId);
+          console.log('userId', userId);
           await router.push('/');
         }
       }

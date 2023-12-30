@@ -2,11 +2,12 @@ import React from 'react';
 import { Grid, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { DeleteModal } from '@/components/Modal/DeleteModal';
+import { DeleteModal } from '@/components/pages/users/components/Modal/DeleteModal';
 import { GridRowParams } from '@mui/x-data-grid';
+import { UserType } from '@/types/User';
 
 interface UserActionsCellProps {
-  row: GridRowParams;
+  row: GridRowParams<UserType>;
   handleUserEdit: (userId: string) => void;
   handleOpenDeleteModal: (userId: string) => void;
   handleCloseDeleteModal: () => void;
@@ -27,7 +28,12 @@ export const UserActionsCell: React.FC<UserActionsCellProps> = ({
   <Grid container justifyContent="center" spacing={2}>
     <>
       <Grid item>
-        <IconButton onClick={() => handleUserEdit(String(row.id))}>
+        <IconButton
+          onClick={() => {
+            handleUserEdit(String(row.id));
+            console.log('row', row);
+          }}
+        >
           <EditIcon />
         </IconButton>
       </Grid>

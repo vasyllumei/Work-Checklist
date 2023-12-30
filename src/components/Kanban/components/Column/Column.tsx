@@ -1,30 +1,114 @@
 import React from 'react';
-import styles from './Column.module.css';
+import { Draggable } from 'react-beautiful-dnd';
+import { AnimatePresence, motion } from 'framer-motion';
 import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
-import Card, { CardItem } from '../Card/Card';
+import EditIcon from '@mui/icons-material/Edit';
+import { TaskType } from '@/types/Task';
+import { ColumnType } from '@/types/Column';
+import styles from './Column.module.css';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { TaskEditor } from '@/components/Kanban/components/TaskEditor/TaskEditor';
 
-export interface ColumnProps {
-  id: number;
-  title: string;
-  items: CardItem[];
-}
-
-const Column: React.FC<ColumnProps> = ({ title, items }) => {
+type ColumnPropsType = {
+  tasks: TaskType[];
+  column: ColumnType;
+  fetchData: () => void;
+  isEditMode: boolean;
+  handleTaskEdit: (taskId: string) => void;
+  handleTaskDelete: (taskId: string) => void;
+  isCardExpanded: (taskId: string) => boolean;
+  isAddTaskModalOpen: boolean;
+  buttonColorClassName: (buttonState: string) => string;
+  onAddNewTask: (columnId: string) => void;
+  startEditingTask: (taskId: string) => void;
+  formik: any;
+  getFieldError: (fieldName: string) => string | undefined;
+  handleSaveUpdatedTask: () => void;
+  stopEditingTask: () => void;
+};
+export const Column: React.FC<ColumnPropsType> = ({
+  column,
+  tasks,
+  handleTaskEdit,
+  handleTaskDelete,
+  onAddNewTask,
+  buttonColorClassName,
+  formik,
+  getFieldError,
+  handleSaveUpdatedTask,
+  stopEditingTask,
+  isEditMode,
+}) => {
   return (
     <div className={styles.column}>
       <div className={styles.titleColumn}>
-        <h2 className={styles.title}>{title}</h2>
-        <button className={styles.addButton}>
+        <h2 className={styles.title}>{column.title}</h2>
+        <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>
           <AddIcon />
         </button>
       </div>
-      <div className={styles.cardsContainer}>
-        {items.map(item => (
-          <Card key={item.id} item={item} />
-        ))}
-      </div>
+      {tasks.map((task: TaskType, index: number) => (
+        <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={isEditMode}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              className={styles.cardsContainer}
+              style={{
+                ...provided.draggableProps.style,
+                boxShadow: snapshot.isDragging ? '0 4px 8px rgba(0, 0, 0, 0.1)' : 'none',
+              }}
+            >
+              <motion.div className={styles.card} initial={false} layout>
+                <AnimatePresence>
+                  {isEditMode && formik.values.id === task.id ? (
+                    <motion.div key="expandedContent">
+                      <TaskEditor
+                        formik={formik}
+                        getFieldError={getFieldError}
+                        buttonColorClassName={buttonColorClassName}
+                        handleSaveUpdatedTask={handleSaveUpdatedTask}
+                        stopEditingTask={stopEditingTask}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div key="content" className={styles.contentContainer}>
+                      <div className={styles.titleContainer} {...provided.dragHandleProps}>
+                        <h2 className={styles.title}>{task.title}</h2>
+                        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
+                          <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
+                          <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
+                        </motion.div>
+                      </div>
+                      {task.image && (
+                        <div className={styles.imageContainer}>
+                          <img src={task.image} alt={task.title} className={styles.cardImage} />
+                        </div>
+                      )}
+                      <p>{task.description}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <div className={styles.actionContainer}>
+                  <div className={styles.iconContainer}>
+                    {task.avatar &&
+                      task.avatar.map((avatar: string, index: number) => (
+                        <div key={index} className={styles.avatar}>
+                          <img src={avatar} alt={`Avatar ${task.userId}`} />
+                        </div>
+                      ))}
+                  </div>
+                  {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
+                    <button className={`${styles.buttonAction} ${buttonColorClassName(task.buttonState)}`}>
+                      {task.buttonState}
+                    </button>
+                  ) : null}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </Draggable>
+      ))}
     </div>
   );
 };
-
-export default Column;
