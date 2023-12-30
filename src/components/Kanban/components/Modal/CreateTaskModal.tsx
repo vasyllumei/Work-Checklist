@@ -3,13 +3,16 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/Kanban.module.css';
+
 interface CreateStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onChange: any;
+  onChange: () => void;
   formik: any;
   getFieldError: any;
-  buttonColorClassName: any;
+  buttonColorClassName: (buttonState: string) => string;
+  task: any;
+  stopEditingTask: any;
 }
 
 export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
@@ -19,6 +22,8 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
   formik,
   getFieldError,
   buttonColorClassName,
+  task,
+  stopEditingTask,
 }) => {
   const handleCreateTask = async () => {
     await onChange();
@@ -45,18 +50,17 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
           />
           {getFieldError('title') && <div className={styles.error}>{getFieldError('title')}</div>}
           <div className={styles.textAreaContainer}>
-            <label htmlFor="description" className={styles.label}>
-              Description
-            </label>
-            <textarea
-              id="description"
-              maxLength={150}
-              minLength={5}
-              required
-              className={styles.textArea}
-              value={formik.values.description}
-              onChange={formik.handleChange('description')}
-              placeholder="Write description here"
+            <TextInput
+              name={`description-${task.id}`}
+              value={formik.values.description || ''}
+              onChange={value => {
+                formik.setFieldValue('description', value);
+              }}
+              placeholder="New task description"
+              error={getFieldError('description')}
+              label="Description"
+              isEditing={true}
+              onBlur={stopEditingTask}
             />
           </div>
           <TextInput
@@ -92,7 +96,7 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
         </div>
       </DialogContent>
       <DialogActions>
-        <Button text="Cancel" onClick={() => handleCancelTask} />
+        <Button text="Cancel" onClick={handleCancelTask} />
         <Button text="Add Task" onClick={() => handleCreateTask()} />
       </DialogActions>
     </Dialog>

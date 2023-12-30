@@ -7,76 +7,79 @@ import { TaskType } from '@/types/Task';
 import { ColumnType } from '@/types/Column';
 import styles from './Column.module.css';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { TaskEditor } from '@/components/Kanban/components/TaskEditor/TaskEditor';
 
 type ColumnPropsType = {
   tasks: TaskType[];
   column: ColumnType;
   fetchData: () => void;
-  children: React.ReactNode;
   isEditMode: boolean;
   handleTaskEdit: (taskId: string) => void;
   handleTaskDelete: (taskId: string) => void;
   isCardExpanded: (taskId: string) => boolean;
-  setIsAddTaskModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  initialTaskForm: any;
-  formik: any;
   isAddTaskModalOpen: boolean;
-  buttonColorClassName: any;
+  buttonColorClassName: (buttonState: string) => string;
+  onAddNewTask: (columnId: string) => void;
+  startEditingTask: (taskId: string) => void;
+  formik: any;
+  getFieldError: (fieldName: string) => string | undefined;
+  handleSaveUpdatedTask: () => void;
+  stopEditingTask: () => void;
 };
 export const Column: React.FC<ColumnPropsType> = ({
   column,
   tasks,
-  children,
-  isEditMode,
   handleTaskEdit,
   handleTaskDelete,
-  isCardExpanded,
-  setIsAddTaskModalOpen,
-  initialTaskForm,
-  formik,
+  onAddNewTask,
   buttonColorClassName,
+  formik,
+  getFieldError,
+  handleSaveUpdatedTask,
+  stopEditingTask,
+  isEditMode,
 }) => {
   return (
     <div className={styles.column}>
-      {children}
       <div className={styles.titleColumn}>
         <h2 className={styles.title}>{column.title}</h2>
-        <button
-          onClick={() => {
-            setIsAddTaskModalOpen(true);
-            formik.setValues({ ...initialTaskForm, statusId: column.id });
-          }}
-          className={styles.addButton}
-        >
+        <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>
           <AddIcon />
         </button>
       </div>
       {tasks.map((task: TaskType, index: number) => (
-        <Draggable key={task.id} draggableId={task.id} index={index}>
-          {provided => (
-            <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
+        <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={isEditMode}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              className={styles.cardsContainer}
+              style={{
+                ...provided.draggableProps.style,
+                boxShadow: snapshot.isDragging ? '0 4px 8px rgba(0, 0, 0, 0.1)' : 'none',
+              }}
+            >
               <motion.div className={styles.card} initial={false} layout>
-                <div className={styles.titleContainer}>
-                  <h2 className={styles.title} {...provided.dragHandleProps}>
-                    {task.title}
-                  </h2>
-                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
-                    <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
-                    <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
-                  </motion.div>
-                </div>
                 <AnimatePresence>
-                  {isCardExpanded(task.id) && isEditMode ? (
-                    <motion.fieldset key="expandedContent" className={styles.editingContent}>
-                      {task.image && (
-                        <div className={styles.imageContainer}>
-                          <img src={task.image} alt={task.title} className={styles.cardImage} />
-                        </div>
-                      )}
-                      <p className={styles.p}>{task.description}</p>
-                    </motion.fieldset>
+                  {isEditMode && formik.values.id === task.id ? (
+                    <motion.div key="expandedContent">
+                      <TaskEditor
+                        formik={formik}
+                        getFieldError={getFieldError}
+                        buttonColorClassName={buttonColorClassName}
+                        handleSaveUpdatedTask={handleSaveUpdatedTask}
+                        stopEditingTask={stopEditingTask}
+                      />
+                    </motion.div>
                   ) : (
                     <motion.div key="content" className={styles.contentContainer}>
+                      <div className={styles.titleContainer} {...provided.dragHandleProps}>
+                        <h2 className={styles.title}>{task.title}</h2>
+                        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
+                          <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
+                          <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
+                        </motion.div>
+                      </div>
                       {task.image && (
                         <div className={styles.imageContainer}>
                           <img src={task.image} alt={task.title} className={styles.cardImage} />
@@ -95,9 +98,11 @@ export const Column: React.FC<ColumnPropsType> = ({
                         </div>
                       ))}
                   </div>
-                  <button className={`${styles.buttonAction} ${buttonColorClassName(task.buttonState)}`}>
-                    {task.buttonState}
-                  </button>
+                  {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
+                    <button className={`${styles.buttonAction} ${buttonColorClassName(task.buttonState)}`}>
+                      {task.buttonState}
+                    </button>
+                  ) : null}
                 </div>
               </motion.div>
             </div>

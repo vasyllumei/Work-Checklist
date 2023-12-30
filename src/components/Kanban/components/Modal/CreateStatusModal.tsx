@@ -5,7 +5,7 @@ import { TextInput } from '@/components/TextInput';
 interface CreateStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onChange: any;
+  onChange: () => void;
   newColumn: {
     title: string;
     order: string;

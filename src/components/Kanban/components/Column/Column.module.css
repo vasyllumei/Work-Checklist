@@ -101,17 +101,7 @@ cursor: pointer;
     color: #2B3674;
     outline: none;
 }
-.editingContent {
-    height: 150%;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 26px;
-    letter-spacing: -0.019em;
-    color: #A3AED0;
-    margin-top: 20px;
-    margin-bottom: 12px;
-}
+
 
 .editIcon {
     width: 17px;

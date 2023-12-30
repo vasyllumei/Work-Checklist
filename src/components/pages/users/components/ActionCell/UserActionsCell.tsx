@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { DeleteModal } from '@/components/Modal/DeleteModal';
+import { DeleteModal } from '@/components/pages/users/components/Modal/DeleteModal';
 import { GridRowParams } from '@mui/x-data-grid';
 import { UserType } from '@/types/User';
 

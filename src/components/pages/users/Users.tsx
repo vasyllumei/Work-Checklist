@@ -19,7 +19,7 @@ import { Layout } from '@/components/Layout/Layout';
 import { UserType, UserRoleType } from '@/types/User';
 import { createUser, deleteUser, updateUser, getAllUsers } from '@/services/user/userService';
 import { useFormik } from 'formik';
-import { UserActionsCell } from '@/components/pages/users/UserActionsCell';
+import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
 import styles from './Users.module.css';
 
 const initialUserForm = {

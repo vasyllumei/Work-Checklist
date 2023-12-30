@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import styles from './TextInput.module.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import classNames from 'classnames';
+import { motion } from 'framer-motion';
 
 interface TextInputProps {
   name: string;
   type?: string;
   value: string;
-  onChange: (value: any) => void;
+  onChange: (value: string) => void;
   placeholder: string;
   error: string | undefined;
   disabled?: boolean;
   onBlur?: () => void;
   label: string;
+  isEditing?: boolean;
 }
 
 export function TextInput({
@@ -23,8 +25,8 @@ export function TextInput({
   placeholder,
   error,
   disabled,
-  onBlur,
   label,
+  isEditing = false,
 }: TextInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [inputType, setInputType] = useState(type);
@@ -42,16 +44,26 @@ export function TextInput({
         </div>
       )}
       {label && <label className={styles.inputLabel}>{label}</label>}
-      <input
-        className={classNames(styles.input, { [styles.inputError]: error })}
-        name={name}
-        value={value}
-        onChange={event => onChange(event.target.value)}
-        placeholder={placeholder}
-        type={inputType}
-        disabled={disabled}
-        onBlur={onBlur}
-      />
+      {isEditing ? (
+        <motion.textarea
+          className={classNames(styles.textArea, { [styles.inputError]: error })}
+          name={name}
+          value={value}
+          onChange={event => onChange(event.target.value)}
+          placeholder={placeholder}
+          disabled={disabled}
+        />
+      ) : (
+        <input
+          className={classNames(styles.input, { [styles.inputError]: error })}
+          name={name}
+          value={value}
+          onChange={event => onChange(event.target.value)}
+          placeholder={placeholder}
+          type={inputType}
+          disabled={disabled}
+        />
+      )}
       {error && <span className={styles.error}>{error}</span>}
     </div>
   );

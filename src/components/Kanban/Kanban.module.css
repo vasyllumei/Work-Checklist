@@ -40,13 +40,6 @@
      min-width: 490px;
  }
 
-.textArea::placeholder {
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 100%;
-    letter-spacing: -0.02em;
-    color: #A3AED0;
-}
 .selectAction {
     width: 50%;
     height: 30px;
