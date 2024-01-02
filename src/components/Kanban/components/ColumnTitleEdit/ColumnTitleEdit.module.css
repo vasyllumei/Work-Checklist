@@ -1,0 +1,22 @@
+
+.columnTitle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 200px;
+}
+
+.editWindow {
+    margin-left: 8px;
+}
+
+.editButton {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+.editInput {
+max-width: 100%;
+}

@@ -6,21 +6,10 @@ interface CreateStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
   onChange: () => void;
-  newColumn: {
-    title: string;
-    order: string;
-    id?: string;
-  };
-  setNewColumn: any;
+  formik: any;
 }
 
-export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({
-  isOpen,
-  onClose,
-  onChange,
-  newColumn,
-  setNewColumn,
-}) => {
+export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({ isOpen, onClose, onChange, formik }) => {
   const handleCreateStatus = async () => {
     await onChange();
     onClose();
@@ -40,8 +29,8 @@ export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({
             error=""
             name="title"
             type="text"
-            value={newColumn.title}
-            onChange={value => setNewColumn({ ...newColumn, title: value })}
+            value={formik.values.title || ''}
+            onChange={value => formik.setFieldValue('title', value)}
             placeholder="Add title"
           />
           <TextInput
@@ -49,8 +38,8 @@ export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({
             error=""
             name="order"
             type="number"
-            value={newColumn.order || ''}
-            onChange={value => setNewColumn({ ...newColumn, order: value })}
+            value={formik.values.order || ''}
+            onChange={value => formik.setFieldValue('order', value)}
             placeholder="Add order"
           />
         </div>

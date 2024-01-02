@@ -5,15 +5,15 @@ import classNames from 'classnames';
 import { motion } from 'framer-motion';
 
 interface TextInputProps {
-  name: string;
+  name?: string;
   type?: string;
   value: string;
   onChange: (value: string) => void;
-  placeholder: string;
-  error: string | undefined;
+  placeholder?: string;
+  error?: string | undefined;
   disabled?: boolean;
   onBlur?: () => void;
-  label: string;
+  label?: string;
   isEditing?: boolean;
 }
 

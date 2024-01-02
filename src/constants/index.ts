@@ -1,9 +1,7 @@
-import styles from '@/components/Kanban/Kanban.module.css';
-
 export const LOCAL_STORAGE_TOKEN = 'token';
-export const BUTTON_STATE_CLASSES = {
-  Updates: styles.blue,
-  Errors: styles.red,
-  Done: styles.green,
-  Pending: '',
+export const BUTTON_STATE_COLORS = {
+  Updates: '#3965FF',
+  Errors: '#E31A1A',
+  Done: '#01B574',
+  Pending: '#FFB547',
 };

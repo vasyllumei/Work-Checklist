@@ -45,23 +45,11 @@
     height: 30px;
     cursor: pointer;
     border-radius: 10px;
-    background-color: #FFB547;
     color: white;
     text-align: center;
     border:none;
 }
 
-.selectAction.blue {
-    background-color: #3965FF;
-}
-
-.selectAction.red {
-    background-color: #E31A1A;
-}
-
-.selectAction.green {
-    background-color: #01B574;
-}
 .selectContainer {
     margin-top: 10px;
     display: flex;
@@ -75,4 +63,17 @@
      justify-content: space-between;
      width: 500px;
  }
-
+.addButton {
+    cursor: pointer;
+    flex:1;
+    background-color: #F4F7FE;
+    height: 35px;
+    padding: 0 8px 0 8px;
+    border-radius: 12px;
+    margin-right: 2px;
+    margin-top: 4px;
+    border: none;
+}
+.statueCreate{
+    background-color: white;
+}

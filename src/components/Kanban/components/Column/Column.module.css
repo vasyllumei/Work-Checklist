@@ -30,15 +30,16 @@ cursor: pointer;
     align-items: center;
     max-height: 33px;
 }
-
 .title {
+    display: flex;
+    flex-direction: row;
     flex:5;
     font-family: "DM Sans", sans-serif;
     font-style: normal;
     font-weight: 700;
-    font-size: 22px;
-    line-height: 32px;
-    letter-spacing: -0.02em;
+    font-size: 18px;
+    line-height: 28px;
+    letter-spacing: -0.029em;
     color: #2B3674;
     margin-left: -5px;
     margin-bottom: 7px;
@@ -84,14 +85,6 @@ cursor: pointer;
     align-items: center;
 }
 
-.title {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 28px;
-    letter-spacing: -0.029em;
-    color: #2B3674;
-}
 .editingTitle {
     font-style: normal;
     font-weight: 700;
@@ -130,6 +123,13 @@ cursor: pointer;
     width: 100%;
     margin-bottom: 9px;
 }
+.iconContainer {
+    width: 100%;
+    height: 100%;
+    flex: 3;
+    display: flex;
+    align-items: center;
+}
 
 .buttonAction {
     cursor: pointer;
@@ -147,17 +147,6 @@ cursor: pointer;
     align-items: center;
 }
 
-.buttonAction.blue {
-    background-color: #3965FF;
-}
-
-.buttonAction.red {
-    background-color: #E31A1A;
-}
-
-.buttonAction.green {
-    background-color: #01B574;
-}
 
 .imageContainer {
     width: 100%;
@@ -174,13 +163,7 @@ cursor: pointer;
     margin-bottom: 5px;
 }
 
-.iconContainer {
-    width: 100%;
-    height: 100%;
-    flex: 3;
-    display: flex;
-    align-items: center;
-}
+
 
 .avatar {
     align-items: center;

@@ -1,0 +1,11 @@
+.createTaskButton {
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    height: 30px;
+    width: 50%;
+    color: white;
+    text-align: center;
+    line-height: 28px;
+    border:none;
+}
