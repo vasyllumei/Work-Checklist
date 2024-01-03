@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export type StatusDocumentType = Document & {
   title: string;
-  order: number;
+  order: string;
 };
 
 const StatusSchema = new Schema<StatusDocumentType>(
@@ -12,7 +12,7 @@ const StatusSchema = new Schema<StatusDocumentType>(
       required: true,
     },
     order: {
-      type: Number,
+      type: String,
       required: true,
     },
   },

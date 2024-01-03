@@ -26,8 +26,8 @@ type ColumnPropsType = {
   getFieldError: (fieldName: string) => string | undefined;
   handleSaveUpdatedTask: () => void;
   stopEditingTask: () => void;
-  handleColumnEdit: (columnId: string) => void;
   handleSaveUpdatedColumn: () => void;
+  handleColumnEdit: (columnId: string, newTitle: string) => void;
 };
 export const Column: React.FC<ColumnPropsType> = ({
   column,
@@ -48,7 +48,11 @@ export const Column: React.FC<ColumnPropsType> = ({
     <div className={styles.column}>
       <div className={styles.titleColumn}>
         <h2 className={styles.title}>
-          <ColumnTitleEdit column={column} onEdit={handleColumnEdit} onSave={handleSaveUpdatedColumn} />
+          <ColumnTitleEdit
+            column={column}
+            onEditTitle={newTitle => handleColumnEdit(column.id, newTitle)}
+            onSave={handleSaveUpdatedColumn}
+          />
         </h2>
         <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>
           <AddIcon />

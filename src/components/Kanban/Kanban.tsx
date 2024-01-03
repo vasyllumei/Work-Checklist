@@ -9,7 +9,7 @@ import { Column } from '@/components/Kanban/components/Column';
 import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
 import { ButtonStateType, TaskType } from '@/types/Task';
 import { useFormik } from 'formik';
-import { CreateStatusModal } from '@/components/Kanban/components/modals/CreateStatusModal';
+import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal';
 import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal';
 import { BUTTON_STATE_COLORS } from '@/constants';
 import AddIcon from '@/assets/image/menuicon/addIcon.svg';
@@ -27,26 +27,20 @@ const initialTaskForm = {
   buttonState: ButtonStateType.Pending,
   editMode: false,
 };
-const initialColumnForm = {
-  id: '',
-  title: '',
-  order: '',
-  editMode: false,
-};
-
 export const Kanban = () => {
   const [columns, setColumns] = useState<ColumnType[]>([]);
+  const [newColumn, setNewColumn] = useState({ title: '', order: '', id: '' } as ColumnType);
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [errorExist, setErrorExist] = useState<string>('');
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
 
-  const formikTask = useFormik({
+  const formik = useFormik({
     initialValues: initialTaskForm,
     onSubmit: async () => {
       try {
-        if (formikTask.values.description && formikTask.values.buttonState) {
+        if (formik.values.description && formik.values.buttonState) {
           await handleTaskCreate();
         }
 
@@ -54,20 +48,6 @@ export const Kanban = () => {
         }
       } catch (error) {
         console.error('Error submitting form:', error);
-      }
-    },
-  });
-  const formikColumn = useFormik({
-    initialValues: initialColumnForm,
-    onSubmit: async () => {
-      try {
-        if (formikColumn.values.title && formikColumn.values.order) {
-          await handleColumnCreate();
-        }
-        if (errorExist) {
-        }
-      } catch (error) {
-        console.error('Error submitting column form:', error);
       }
     },
   });
@@ -90,69 +70,70 @@ export const Kanban = () => {
 
   const handleColumnCreate = async () => {
     try {
-      if (formikColumn.isValid) {
-        const columnData = {
-          ...formikColumn.values,
-        };
-        await createColumn(columnData);
-        await fetchData();
-        formikColumn.resetForm();
-        setIsAddTaskModalOpen(false);
-      }
-    } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.message) {
-        setErrorExist(error.response.data.message);
-      } else {
-        console.error('Error creating the card:', error);
-      }
+      const response = await createColumn(newColumn);
+      const columnData = response.data;
+      setColumns([...columns, columnData]);
+      setNewColumn({ title: '', order: '', id: '' });
+      await fetchData();
+    } catch (error) {
+      console.error('Error creating status:', error);
     }
   };
 
-  const handleColumnDelete = async (statusId: string) => {
+  const handleColumnDelete = async (statusId: string): Promise<void> => {
     try {
       await deleteColumn(statusId);
       await fetchData();
     } catch (error) {
-      console.error('Error deleting columns:', error);
+      console.error('Error deleting status:', error);
     }
   };
+  const handleColumnEdit = (columnId: string, newTitle: string) => {
+    console.log('Handling column edit for columnId:', columnId);
 
-  const handleColumnEdit = (columnId: string) => {
     try {
       const columnData = columns.find(column => column.id === columnId);
       if (columnData) {
-        formikColumn.setValues({
-          ...initialColumnForm,
-          ...columnData,
-          editMode: true,
-        });
+        setNewColumn(prevColumn => ({
+          ...prevColumn,
+          id: columnData.id || '',
+          title: newTitle,
+          order: columnData.order || '',
+        }));
       }
     } catch (error) {
-      console.error('Error updating the task', error);
+      console.error('Error editing column:', error);
     }
   };
 
   const handleSaveUpdatedColumn = async () => {
     try {
-      await updateColumn(formikColumn.values.id, formikColumn.values);
-      await fetchData();
-      await stopEditingColumn();
+      if (newColumn.id) {
+        await updateColumn(newColumn.id, {
+          id: newColumn.id,
+          title: newColumn.title,
+          order: newColumn.order,
+        });
+
+        await fetchData();
+        setNewColumn({ id: '', title: '', order: '' });
+      }
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.error('Error updating column:', error);
     }
   };
 
   const handleTaskCreate = async () => {
     try {
-      if (formikTask.isValid) {
+      if (formik.isValid) {
         const taskData = {
-          ...formikTask.values,
+          ...formik.values,
           userId: localStorage.getItem('userId') || '',
           assignedTo: '64db26458eb8527007b38e10',
         };
         await createTask(taskData);
         await fetchData();
-        formikTask.resetForm();
+        formik.resetForm();
         setIsAddTaskModalOpen(false);
       }
     } catch (error: any) {
@@ -177,7 +158,7 @@ export const Kanban = () => {
     try {
       const cardData = tasks.find(card => card.id === taskId);
       if (cardData) {
-        formikTask.setValues({
+        formik.setValues({
           ...initialTaskForm,
           ...cardData,
           editMode: true,
@@ -188,27 +169,24 @@ export const Kanban = () => {
       console.error('Error updating the task', error);
     }
   };
-
-  const handleSaveUpdatedTask = async () => {
+  const handleSaveUpdatedTask = async (): Promise<void> => {
     try {
-      await updateTask(formikTask.values.id, formikTask.values);
+      await updateTask(formik.values.id, formik.values);
       await fetchData();
       await stopEditingTask();
     } catch (error) {
       console.error('Error updating task:', error);
     }
   };
-
   const getFieldError = (fieldName: string): string | undefined => {
-    const touchedField = formikTask.touched[fieldName as keyof typeof formikTask.touched];
-    const errorField = formikTask.errors[fieldName as keyof typeof formikTask.errors];
+    const touchedField = formik.touched[fieldName as keyof typeof formik.touched];
+    const errorField = formik.errors[fieldName as keyof typeof formik.errors];
 
     if (touchedField && errorField) {
       return errorField;
     }
     return undefined;
   };
-
   const onDragEndHandler = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -231,7 +209,6 @@ export const Kanban = () => {
       );
     }
   };
-
   const createStatusModal = () => {
     handleColumnCreate();
     setIsAddStatusModalOpen(false);
@@ -240,14 +217,12 @@ export const Kanban = () => {
   const closeAddStatusModal = () => {
     setIsAddStatusModalOpen(false);
   };
-
   const closeAddTaskModal = () => {
     setIsAddTaskModalOpen(false);
   };
-
   const onAddNewTask = (columnId: string) => {
     setIsAddTaskModalOpen(true);
-    formikTask.setValues({ ...initialTaskForm, statusId: columnId });
+    formik.setValues({ ...initialTaskForm, statusId: columnId });
   };
 
   const getButtonStyle = (buttonState: string) => {
@@ -256,21 +231,14 @@ export const Kanban = () => {
       backgroundColor,
     };
   };
-
-  const isEditMode = formikTask.values.editMode;
-
+  const isEditMode = formik.values.editMode;
   const isCardExpanded = (taskId: string) => editingTaskId === taskId;
-
   const startEditingTask = (taskId: string) => {
     setEditingTaskId(taskId);
   };
 
   const stopEditingTask = () => {
-    formikTask.setFieldValue('editMode', false);
-  };
-
-  const stopEditingColumn = () => {
-    formikColumn.setFieldValue('editMode', false);
+    formik.setFieldValue('editMode', false);
   };
 
   return (
@@ -301,7 +269,7 @@ export const Kanban = () => {
                       getButtonStyle={getButtonStyle}
                       onAddNewTask={onAddNewTask}
                       startEditingTask={startEditingTask}
-                      formik={formikTask}
+                      formik={formik}
                       getFieldError={getFieldError}
                       handleSaveUpdatedTask={handleSaveUpdatedTask}
                       stopEditingTask={stopEditingTask}
@@ -316,15 +284,16 @@ export const Kanban = () => {
           )}
         </div>
       </DragDropContext>
-      <CreateStatusModal
-        formik={formikColumn}
+      <CreateColumnModal
+        newColumn={newColumn}
+        setNewColumn={setNewColumn}
         isOpen={isAddStatusModalOpen}
         onClose={closeAddStatusModal}
         onChange={createStatusModal}
       />
       <CreateTaskModal
         onClose={closeAddTaskModal}
-        formik={formikTask}
+        formik={formik}
         onChange={handleTaskCreate}
         isOpen={isAddTaskModalOpen}
         getFieldError={getFieldError}

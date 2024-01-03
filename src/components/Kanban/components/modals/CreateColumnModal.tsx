@@ -2,14 +2,23 @@ import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
-interface CreateStatusModalProps {
+import { ColumnType } from '@/types/Column';
+
+interface CreateColumnModalProps {
   isOpen: boolean;
   onClose: () => void;
   onChange: () => void;
-  formik: any;
+  newColumn: ColumnType;
+  setNewColumn: React.Dispatch<React.SetStateAction<ColumnType>>;
 }
 
-export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({ isOpen, onClose, onChange, formik }) => {
+export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
+  isOpen,
+  onClose,
+  onChange,
+  newColumn,
+  setNewColumn,
+}) => {
   const handleCreateStatus = async () => {
     await onChange();
     onClose();
@@ -29,8 +38,8 @@ export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({ isOpen, on
             error=""
             name="title"
             type="text"
-            value={formik.values.title || ''}
-            onChange={value => formik.setFieldValue('title', value)}
+            value={newColumn.title || ''}
+            onChange={value => setNewColumn({ ...newColumn, title: value })}
             placeholder="Add title"
           />
           <TextInput
@@ -38,8 +47,8 @@ export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({ isOpen, on
             error=""
             name="order"
             type="number"
-            value={formik.values.order || ''}
-            onChange={value => formik.setFieldValue('order', value)}
+            value={newColumn.order || ''}
+            onChange={value => setNewColumn({ ...newColumn, order: value })}
             placeholder="Add order"
           />
         </div>
