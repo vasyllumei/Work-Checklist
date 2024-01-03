@@ -12,8 +12,8 @@ import { useFormik } from 'formik';
 import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal';
 import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal';
 import { BUTTON_STATE_COLORS } from '@/constants';
-import AddIcon from '@/assets/image/menuicon/addIcon.svg';
 import DeleteIcon from './../../assets/image/menuicon/deleteIcon.svg';
+import { Button } from '@/components/Button';
 
 const initialTaskForm = {
   id: '',
@@ -80,7 +80,7 @@ export const Kanban = () => {
     }
   };
 
-  const handleColumnDelete = async (statusId: string): Promise<void> => {
+  const handleColumnDelete = async (statusId: string) => {
     try {
       await deleteColumn(statusId);
       await fetchData();
@@ -145,7 +145,7 @@ export const Kanban = () => {
     }
   };
 
-  const handleTaskDelete = async (taskId: string): Promise<void> => {
+  const handleTaskDelete = async (taskId: string) => {
     try {
       await deleteTask(taskId);
       await fetchData();
@@ -169,7 +169,7 @@ export const Kanban = () => {
       console.error('Error updating the task', error);
     }
   };
-  const handleSaveUpdatedTask = async (): Promise<void> => {
+  const handleSaveUpdatedTask = async () => {
     try {
       await updateTask(formik.values.id, formik.values);
       await fetchData();
@@ -187,28 +187,34 @@ export const Kanban = () => {
     }
     return undefined;
   };
-  const onDragEndHandler = (result: DropResult) => {
+  const onDragEndHandler = async (result: DropResult) => {
     if (!result.destination) return;
 
     const source = result.source;
     const destination = result.destination;
 
     if (source.droppableId === destination.droppableId) {
-      setTasks(prevTasks => {
-        const tasksInSourceStatus = prevTasks.filter(task => task.statusId === source.droppableId);
-        const [movedTask] = tasksInSourceStatus.splice(source.index, 1);
-        tasksInSourceStatus.splice(destination.index, 0, movedTask);
+      const tasksInSourceStatus = tasks.filter(task => task.statusId === source.droppableId);
+      const [movedTask] = tasksInSourceStatus.splice(source.index, 1);
+      tasksInSourceStatus.splice(destination.index, 0, movedTask);
 
-        return prevTasks.map(task =>
-          task.statusId === source.droppableId ? tasksInSourceStatus.shift() || task : task,
-        );
-      });
+      const updatedTasksOrder = tasks.map(task =>
+        task.statusId === source.droppableId ? tasksInSourceStatus.shift() || task : task,
+      );
+
+      await updateTasksOrder(updatedTasksOrder);
+      setTasks(updatedTasksOrder);
     } else {
+      const updatedTask = tasks.find(task => task.id === result.draggableId);
+      if (updatedTask) {
+        await updateTask(updatedTask.id, { ...updatedTask, statusId: destination.droppableId });
+      }
       setTasks(prevTasks =>
         prevTasks.map(task => (task.id === result.draggableId ? { ...task, statusId: destination.droppableId } : task)),
       );
     }
   };
+
   const createStatusModal = () => {
     handleColumnCreate();
     setIsAddStatusModalOpen(false);
@@ -244,9 +250,7 @@ export const Kanban = () => {
   return (
     <Layout>
       <DragDropContext onDragEnd={onDragEndHandler}>
-        <button onClick={() => setIsAddStatusModalOpen(true)} className={styles.addButton}>
-          <AddIcon />
-        </button>
+        <Button text="Add new status" onClick={() => setIsAddStatusModalOpen(true)} className={styles.addButton} />
         <div className={styles.mainContainer}>
           {columns.map((column, index) =>
             column ? (
