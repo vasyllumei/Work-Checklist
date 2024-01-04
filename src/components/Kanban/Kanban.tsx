@@ -3,7 +3,7 @@ import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
-import { createColumn, deleteColumn, getAllColumns, updateColumn } from '@/services/columns/columnService';
+import { createColumn, deleteColumn, getAllColumns } from '@/services/columns/columnService';
 import { ColumnType } from '@/types/Column';
 import { Column } from '@/components/Kanban/components/Column';
 import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
@@ -11,9 +11,9 @@ import { ButtonStateType, TaskType } from '@/types/Task';
 import { useFormik } from 'formik';
 import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal';
 import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal';
-import { BUTTON_STATE_COLORS } from '@/constants';
 import DeleteIcon from './../../assets/image/menuicon/deleteIcon.svg';
 import { Button } from '@/components/Button';
+import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 
 const initialTaskForm = {
   id: '',
@@ -26,6 +26,12 @@ const initialTaskForm = {
   image: '',
   buttonState: ButtonStateType.Pending,
   editMode: false,
+};
+const BUTTON_STATE_COLORS = {
+  Updates: BLUE_COLOR,
+  Errors: RED_COLOR,
+  Done: GREEN_COLOR,
+  Pending: YELLOW_COLOR,
 };
 export const Kanban = () => {
   const [columns, setColumns] = useState<ColumnType[]>([]);
@@ -86,40 +92,6 @@ export const Kanban = () => {
       await fetchData();
     } catch (error) {
       console.error('Error deleting status:', error);
-    }
-  };
-  const handleColumnEdit = (columnId: string, newTitle: string) => {
-    console.log('Handling column edit for columnId:', columnId);
-
-    try {
-      const columnData = columns.find(column => column.id === columnId);
-      if (columnData) {
-        setNewColumn(prevColumn => ({
-          ...prevColumn,
-          id: columnData.id || '',
-          title: newTitle,
-          order: columnData.order || '',
-        }));
-      }
-    } catch (error) {
-      console.error('Error editing column:', error);
-    }
-  };
-
-  const handleSaveUpdatedColumn = async () => {
-    try {
-      if (newColumn.id) {
-        await updateColumn(newColumn.id, {
-          id: newColumn.id,
-          title: newColumn.title,
-          order: newColumn.order,
-        });
-
-        await fetchData();
-        setNewColumn({ id: '', title: '', order: '' });
-      }
-    } catch (error) {
-      console.error('Error updating column:', error);
     }
   };
 
@@ -246,20 +218,25 @@ export const Kanban = () => {
   const stopEditingTask = () => {
     formik.setFieldValue('editMode', false);
   };
-
+  const hasTasksInColumn = (columnId: string) => tasks.some(task => task.statusId === columnId);
   return (
     <Layout>
       <DragDropContext onDragEnd={onDragEndHandler}>
-        <Button text="Add new status" onClick={() => setIsAddStatusModalOpen(true)} className={styles.addButton} />
+        <div className={styles.addStatusButton}>
+          <Button text="Add new status" onClick={() => setIsAddStatusModalOpen(true)} />
+        </div>
+
         <div className={styles.mainContainer}>
           {columns.map((column, index) =>
             column ? (
               <StrictModeDroppable key={index} droppableId={column.id}>
                 {provided => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>
-                    <button onClick={() => handleColumnDelete(column.id)} className={styles.addButton}>
-                      <DeleteIcon />
-                    </button>
+                    {!hasTasksInColumn(column.id) && (
+                      <button onClick={() => handleColumnDelete(column.id)} className={styles.deleteStatusButton}>
+                        <DeleteIcon />
+                      </button>
+                    )}
 
                     <Column
                       column={column}
@@ -277,8 +254,6 @@ export const Kanban = () => {
                       getFieldError={getFieldError}
                       handleSaveUpdatedTask={handleSaveUpdatedTask}
                       stopEditingTask={stopEditingTask}
-                      handleSaveUpdatedColumn={handleSaveUpdatedColumn}
-                      handleColumnEdit={handleColumnEdit}
                     />
                     {provided.placeholder}
                   </div>

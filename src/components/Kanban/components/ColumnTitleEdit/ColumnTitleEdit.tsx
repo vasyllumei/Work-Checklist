@@ -1,29 +1,37 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// ColumnTitleEdit.tsx
+import React, { useState, useRef } from 'react';
 import styles from '@/components/Kanban/components/ColumnTitleEdit/ColumnTitleEdit.module.css';
 import EditIcon from '@mui/icons-material/Edit';
-import { ColumnType } from '@/types/Column';
 import { TextInput } from '@/components/TextInput';
+import { updateColumn } from '@/services/columns/columnService';
+import { ColumnType } from '@/types/Column';
+import useOutsideClick from '@/hooks/useOutsideClick';
 
 type ColumnTitleEditType = {
   column: ColumnType;
-  onEditTitle: (columnId: string) => void;
-  onSave: () => void;
 };
 
-export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column, onEditTitle, onSave }) => {
+export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(column.title);
   const containerRef = useRef<HTMLDivElement>(null);
+  const excludeRefs = [containerRef]; // Добавлен массив исключений
 
-  const handleClickOutside = useCallback(
-    async (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsEditing(false);
-        await onSave();
+  useOutsideClick(
+    () => {
+      if (isEditing) {
+        updateColumn(column.id, { ...column, title: editedTitle })
+          .then(() => {
+            setIsEditing(false);
+          })
+          .catch(error => {
+            console.error('Error updating column:', error);
+          });
       }
     },
-    [onSave],
+    containerRef,
+    excludeRefs,
   );
 
   const handleMouseEnter = () => {
@@ -35,25 +43,12 @@ export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column, onEditT
   };
 
   const handleEditClick = () => {
-    onEditTitle(editedTitle);
     setIsEditing(true);
   };
 
   const handleInputChange = (value: string) => {
     setEditedTitle(value);
   };
-
-  useEffect(() => {
-    if (isEditing) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isEditing, handleClickOutside]);
 
   return (
     <div

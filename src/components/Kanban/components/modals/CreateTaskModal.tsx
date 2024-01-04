@@ -4,6 +4,7 @@ import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/components/modals/CreateTaskModal.module.css';
 import { Select } from './../Select/Select';
+import { BUTTON_STATES } from '@/constants';
 interface CreateStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -82,6 +83,7 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
           <Select
             value={formik.values.buttonState}
             onChange={value => formik.setFieldValue('buttonState', value)}
+            options={BUTTON_STATES}
             style={getButtonStyle(formik.values.buttonState)}
             className={styles.createTaskButton}
           />

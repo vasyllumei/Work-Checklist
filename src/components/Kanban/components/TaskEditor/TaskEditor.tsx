@@ -3,6 +3,7 @@ import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
 import styles from './TaskEditor.module.css';
 import { Select } from '@/components/Kanban/components/Select/Select';
+import { BUTTON_STATES } from '@/constants';
 
 type TaskEditorPropsType = {
   formik: any;
@@ -44,6 +45,7 @@ export const TaskEditor: React.FC<TaskEditorPropsType> = ({
       <Select
         value={formik.values.buttonState}
         onChange={value => formik.setFieldValue('buttonState', value)}
+        options={BUTTON_STATES}
         style={getButtonStyle(formik.values.buttonState)}
         className={styles.editingButtonAction}
       />

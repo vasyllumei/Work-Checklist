@@ -63,7 +63,7 @@
      justify-content: space-between;
      width: 500px;
  }
-.addButton {
+.deleteStatusButton {
     cursor: pointer;
     flex:1;
     background-color: #F4F7FE;
@@ -74,6 +74,7 @@
     margin-top: 4px;
     border: none;
 }
-.statueCreate{
-    background-color: white;
+.addStatusButton{
+    width: 10%;
+    margin-bottom: 20px;
 }

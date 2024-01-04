@@ -1,19 +1,26 @@
 import React from 'react';
 
-interface UniversalSelectProps {
+interface Option {
   value: string;
+  label: string;
+}
+
+interface SelectProps {
+  value: string;
+  options: Option[];
   onChange: (value: string) => void;
   style?: React.CSSProperties;
   className?: string;
 }
 
-export const Select: React.FC<UniversalSelectProps> = ({ value, onChange, style, className }) => {
+export const Select: React.FC<SelectProps> = ({ value, options, onChange, style, className }) => {
   return (
     <select value={value} onChange={e => onChange(e.target.value)} style={style} className={className}>
-      <option value="Pending">Pending</option>
-      <option value="Updates">Updates</option>
-      <option value="Errors">Errors</option>
-      <option value="Done">Done</option>
+      {options.map(option => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
     </select>
   );
 };
