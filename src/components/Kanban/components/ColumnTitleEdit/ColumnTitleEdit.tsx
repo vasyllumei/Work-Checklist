@@ -1,4 +1,3 @@
-// ColumnTitleEdit.tsx
 import React, { useState, useRef } from 'react';
 import styles from '@/components/Kanban/components/ColumnTitleEdit/ColumnTitleEdit.module.css';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,9 +13,9 @@ type ColumnTitleEditType = {
 export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(column.title);
+  const [editedTitle, setEditedTitle] = useState(column.title || '');
   const containerRef = useRef<HTMLDivElement>(null);
-  const excludeRefs = [containerRef]; // Добавлен массив исключений
+  const excludeRefs = [containerRef];
 
   useOutsideClick(
     () => {
@@ -24,6 +23,7 @@ export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
         updateColumn(column.id, { ...column, title: editedTitle })
           .then(() => {
             setIsEditing(false);
+            setEditedTitle(editedTitle);
           })
           .catch(error => {
             console.error('Error updating column:', error);
@@ -63,7 +63,7 @@ export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
         </div>
       ) : (
         <>
-          {column.title}
+          {editedTitle}
           {isEditVisible && (
             <div>
               <button onClick={handleEditClick} className={styles.editButton}>

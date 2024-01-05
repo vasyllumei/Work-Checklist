@@ -47,8 +47,8 @@ export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
             error=""
             name="order"
             type="number"
-            value={newColumn.order || ''}
-            onChange={value => setNewColumn({ ...newColumn, order: value })}
+            value={newColumn.order}
+            onChange={value => setNewColumn({ ...newColumn, order: Number(value) })}
             placeholder="Add order"
           />
         </div>

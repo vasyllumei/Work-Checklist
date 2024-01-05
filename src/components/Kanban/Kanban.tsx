@@ -3,7 +3,7 @@ import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
-import { createColumn, deleteColumn, getAllColumns } from '@/services/columns/columnService';
+import { createColumn, deleteColumn, getAllColumns, updateColumn } from '@/services/columns/columnService';
 import { ColumnType } from '@/types/Column';
 import { Column } from '@/components/Kanban/components/Column';
 import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
@@ -35,7 +35,7 @@ const BUTTON_STATE_COLORS = {
 };
 export const Kanban = () => {
   const [columns, setColumns] = useState<ColumnType[]>([]);
-  const [newColumn, setNewColumn] = useState({ title: '', order: '', id: '' } as ColumnType);
+  const [newColumn, setNewColumn] = useState({ title: '', order: 0, id: '' } as ColumnType);
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export const Kanban = () => {
       const { data: tasksData } = await getAllTasks();
 
       setTasks(tasksData);
-      setColumns(columnsData);
+      setColumns(sortColumnsByOrder(columnsData));
     } catch (error) {
       console.error('Error loading columns:', error);
     }
@@ -78,14 +78,18 @@ export const Kanban = () => {
     try {
       const response = await createColumn(newColumn);
       const columnData = response.data;
-      setColumns([...columns, columnData]);
-      setNewColumn({ title: '', order: '', id: '' });
+
+      setColumns(prevColumns => {
+        const updatedColumns = [...prevColumns, columnData];
+        const sortedColumns = sortColumnsByOrder(updatedColumns);
+        return sortedColumns;
+      });
+      setNewColumn({ title: '', order: 0, id: '' });
       await fetchData();
     } catch (error) {
       console.error('Error creating status:', error);
     }
   };
-
   const handleColumnDelete = async (statusId: string) => {
     try {
       await deleteColumn(statusId);
@@ -150,6 +154,14 @@ export const Kanban = () => {
       console.error('Error updating task:', error);
     }
   };
+  const handleSaveUpdatedColumn = async () => {
+    try {
+      await updateColumn(formik.values.id, formik.values);
+      await fetchData();
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
   const getFieldError = (fieldName: string): string | undefined => {
     const touchedField = formik.touched[fieldName as keyof typeof formik.touched];
     const errorField = formik.errors[fieldName as keyof typeof formik.errors];
@@ -165,25 +177,37 @@ export const Kanban = () => {
     const source = result.source;
     const destination = result.destination;
 
-    if (source.droppableId === destination.droppableId) {
-      const tasksInSourceStatus = tasks.filter(task => task.statusId === source.droppableId);
-      const [movedTask] = tasksInSourceStatus.splice(source.index, 1);
-      tasksInSourceStatus.splice(destination.index, 0, movedTask);
-
-      const updatedTasksOrder = tasks.map(task =>
-        task.statusId === source.droppableId ? tasksInSourceStatus.shift() || task : task,
-      );
-
-      await updateTasksOrder(updatedTasksOrder);
-      setTasks(updatedTasksOrder);
-    } else {
-      const updatedTask = tasks.find(task => task.id === result.draggableId);
-      if (updatedTask) {
-        await updateTask(updatedTask.id, { ...updatedTask, statusId: destination.droppableId });
+    if (result.type === 'TASK') {
+      if (source.droppableId === destination.droppableId) {
+        const updatedTasksOrder = [...tasks];
+        const [movedTask] = updatedTasksOrder.splice(source.index, 1);
+        updatedTasksOrder.splice(destination.index, 0, movedTask);
+        await updateTasksOrder(updatedTasksOrder);
+        setTasks(updatedTasksOrder);
+      } else {
+        const updatedTask = tasks.find(task => task.id === result.draggableId);
+        if (updatedTask) {
+          await updateTask(updatedTask.id, { ...updatedTask, statusId: destination.droppableId });
+        }
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === result.draggableId ? { ...task, statusId: destination.droppableId } : task,
+          ),
+        );
       }
-      setTasks(prevTasks =>
-        prevTasks.map(task => (task.id === result.draggableId ? { ...task, statusId: destination.droppableId } : task)),
-      );
+    } else if (result.type === 'COLUMN') {
+      const updatedColumns = [...columns];
+      const movedColumn = updatedColumns.splice(source.index, 1)[0];
+      updatedColumns.splice(destination.index, 0, movedColumn);
+
+      const updatedColumnsWithOrder = updatedColumns.map((col, index) => ({ ...col, order: index }));
+      await updateColumnsOrder(updatedColumnsWithOrder);
+      setColumns(updatedColumnsWithOrder);
+
+      const updatedColumn = updatedColumnsWithOrder.find(col => col.id === result.draggableId);
+      if (updatedColumn) {
+        await handleSaveUpdatedColumn();
+      }
     }
   };
 
@@ -219,6 +243,9 @@ export const Kanban = () => {
     formik.setFieldValue('editMode', false);
   };
   const hasTasksInColumn = (columnId: string) => tasks.some(task => task.statusId === columnId);
+  const sortColumnsByOrder = (columns: ColumnType[]) => {
+    return columns.sort((a: ColumnType, b: ColumnType) => a.order - b.order);
+  };
   return (
     <Layout>
       <DragDropContext onDragEnd={onDragEndHandler}>
