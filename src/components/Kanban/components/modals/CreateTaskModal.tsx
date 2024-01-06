@@ -8,7 +8,6 @@ import { BUTTON_STATES } from '@/constants';
 interface CreateStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onChange: () => void;
   formik: any;
   getFieldError: (fieldName: string) => string | undefined;
   getButtonStyle: (buttonState: string) => { backgroundColor: string };
@@ -18,17 +17,11 @@ interface CreateStatusModalProps {
 export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
   isOpen,
   onClose,
-  onChange,
   formik,
   getFieldError,
   getButtonStyle,
   stopEditingTask,
 }) => {
-  const handleCreateTask = async () => {
-    await onChange();
-    onClose();
-  };
-
   const handleCancelTask = () => {
     onClose();
   };
@@ -47,7 +40,6 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
             placeholder="New Task Title"
             error={getFieldError('title')}
           />
-          {getFieldError('title') && <div className={styles.error}>{getFieldError('title')}</div>}
           <div className={styles.textAreaContainer}>
             <TextInput
               name={`Description`}
@@ -91,7 +83,7 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button text="Cancel" onClick={handleCancelTask} />
-        <Button text="Add Task" onClick={() => handleCreateTask()} />
+        <Button text="Add Task" onClick={formik.handleSubmit} />
       </DialogActions>
     </Dialog>
   );

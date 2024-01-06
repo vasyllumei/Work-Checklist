@@ -9,7 +9,7 @@ interface TextInputProps {
   value: string | number;
   onChange: (value: string) => void;
   placeholder?: string;
-  error?: string | undefined;
+  error?: string | undefined | boolean;
   disabled?: boolean;
   onBlur?: () => void;
   label?: string;

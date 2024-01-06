@@ -9,3 +9,7 @@
     line-height: 28px;
     border:none;
 }
+
+.errorExist {
+    color: red;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
 import EditIcon from '@mui/icons-material/Edit';
 import { TaskType } from '@/types/Task';
@@ -72,36 +72,32 @@ export const Column: React.FC<ColumnPropsType> = ({
                     boxShadow: snapshot.isDragging ? '0 4px 8px rgba(0, 0, 0, 0.1)' : 'none',
                   }}
                 >
-                  <motion.div className={styles.card} initial={false} layout>
-                    <AnimatePresence>
-                      {isEditMode && formik.values.id === task.id ? (
-                        <motion.div key="expandedContent">
-                          <TaskEditor
-                            formik={formik}
-                            getFieldError={getFieldError}
-                            getButtonStyle={getButtonStyle}
-                            handleSaveUpdatedTask={handleSaveUpdatedTask}
-                            stopEditingTask={stopEditingTask}
-                          />
-                        </motion.div>
-                      ) : (
-                        <motion.div key="content" className={styles.contentContainer}>
-                          <div className={styles.titleContainer} {...provided.dragHandleProps}>
-                            <h2 className={styles.title}>{task.title}</h2>
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
-                              <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
-                              <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
-                            </motion.div>
+                  <div className={styles.card}>
+                    {isEditMode && formik.values.id === task.id ? (
+                      <TaskEditor
+                        formik={formik}
+                        getFieldError={getFieldError}
+                        getButtonStyle={getButtonStyle}
+                        handleSaveUpdatedTask={handleSaveUpdatedTask}
+                        stopEditingTask={stopEditingTask}
+                      />
+                    ) : (
+                      <div className={styles.contentContainer}>
+                        <div className={styles.titleContainer} {...provided.dragHandleProps}>
+                          <h2 className={styles.title}>{task.title}</h2>
+                          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1.1 }}>
+                            <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
+                            <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
+                          </motion.div>
+                        </div>
+                        {task.image && (
+                          <div className={styles.imageContainer}>
+                            <img src={task.image} alt={task.title} className={styles.cardImage} />
                           </div>
-                          {task.image && (
-                            <div className={styles.imageContainer}>
-                              <img src={task.image} alt={task.title} className={styles.cardImage} />
-                            </div>
-                          )}
-                          <p>{task.description}</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                        )}
+                        <p>{task.description}</p>
+                      </div>
+                    )}
                     <div className={styles.actionContainer}>
                       <div className={styles.iconContainer}>
                         {task.avatar &&
@@ -117,7 +113,7 @@ export const Column: React.FC<ColumnPropsType> = ({
                         </button>
                       ) : null}
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               )}
             </Draggable>

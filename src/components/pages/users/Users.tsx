@@ -20,8 +20,6 @@ import { UserType, UserRoleType } from '@/types/User';
 import { createUser, deleteUser, updateUser, getAllUsers } from '@/services/user/userService';
 import { useFormik } from 'formik';
 import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
-import styles from './Users.module.css';
-
 const initialUserForm = {
   firstName: '',
   lastName: '',
@@ -35,7 +33,6 @@ export const Users: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [errorExist, setErrorExist] = useState('');
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
   const [searchText, setSearchText] = useState('');
 
@@ -67,10 +64,6 @@ export const Users: FC = () => {
           await handleSaveUpdatedUser();
         } else {
           await handleUserCreate();
-        }
-
-        if (errorExist) {
-          handleDialogClose();
         }
       } catch (error) {
         console.error('Error submitting form:', error);
@@ -153,8 +146,6 @@ export const Users: FC = () => {
       }
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
-        setErrorExist(error.response.data.message);
-      } else {
         console.error('Error creating the user:', error);
       }
     }
@@ -202,12 +193,10 @@ export const Users: FC = () => {
   };
 
   const handleDialogOpen = () => {
-    setErrorExist('');
     formik.setValues(initialUserForm);
     setIsDialogOpen(true);
   };
   const handleDialogClose = () => {
-    setErrorExist('');
     formik.resetForm();
     setIsDialogOpen(false);
   };
@@ -331,7 +320,6 @@ export const Users: FC = () => {
                 error={getError('password')}
               />
             )}
-            {errorExist && <div className={styles.errorExist}>{errorExist}</div>}
             <FormControl variant="standard" sx={{ m: 2, minWidth: 300 }}>
               <Select
                 value={formik.values?.role || UserRoleType.USER}

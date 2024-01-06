@@ -17,7 +17,6 @@ export const TaskEditor: React.FC<TaskEditorPropsType> = ({
   getFieldError,
   getButtonStyle,
   stopEditingTask,
-  handleSaveUpdatedTask,
 }) => {
   return (
     <div className={styles.editingContent}>
@@ -51,7 +50,7 @@ export const TaskEditor: React.FC<TaskEditorPropsType> = ({
       />
       <div className={styles.taskButtonContainer}>
         <Button text="Cancel" onClick={stopEditingTask} />
-        <Button text="Save" onClick={handleSaveUpdatedTask} />
+        <Button text="Save" onClick={formik.handleSubmit} />
       </div>
     </div>
   );
