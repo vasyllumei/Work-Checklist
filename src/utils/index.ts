@@ -23,3 +23,14 @@ export const validateInput = (value: string, key: string): boolean => {
 
   return true;
 };
+
+export const getRandomColor = (userId: string) => {
+  if (!userId) {
+    return 'defaultColor';
+  }
+  const seed = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hue = ((seed % 360) + 360) % 360;
+  const saturation = Math.floor(Math.random() * 50) + 50; // 50-100
+  const lightness = Math.floor(Math.random() * 30) + 60; // 60-90
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+};

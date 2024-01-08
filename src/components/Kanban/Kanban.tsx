@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
-import { createColumn, deleteColumn, getAllColumns, updateColumn } from '@/services/columns/columnService';
+import { createColumn, deleteColumn, getAllColumns } from '@/services/columns/columnService';
 import { ColumnType } from '@/types/Column';
 import { Column } from '@/components/Kanban/components/Column';
 import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
@@ -11,10 +9,12 @@ import { ButtonStateType, TaskType } from '@/types/Task';
 import { useFormik } from 'formik';
 import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal';
 import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal';
-import DeleteIcon from './../../assets/image/menuicon/deleteIcon.svg';
 import { Button } from '@/components/Button';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import * as Yup from 'yup';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { getAllUsers } from '@/services/user/userService';
+import { UserType } from '@/types/User';
 
 const initialTaskForm = {
   id: '',
@@ -42,6 +42,7 @@ export const Kanban = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
+  const [users, setUsers] = useState<UserType[]>([]);
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -106,21 +107,13 @@ export const Kanban = () => {
       console.error('Error deleting status:', error);
     }
   };
-  const handleSaveUpdatedColumn = async (statusId: string, statusData: ColumnType) => {
-    try {
-      await updateColumn(statusId, statusData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  };
   const handleTaskCreate = async () => {
     try {
       if (formik.isValid) {
         const taskData = {
           ...formik.values,
           userId: localStorage.getItem('userId') || '',
-          assignedTo: '64db26458eb8527007b38e10',
+          assignedTo: formik.values.assignedTo || '',
         };
         await createTask(taskData);
         await fetchData();
@@ -133,7 +126,6 @@ export const Kanban = () => {
       }
     }
   };
-
   const handleTaskDelete = async (taskId: string) => {
     try {
       await deleteTask(taskId);
@@ -179,50 +171,7 @@ export const Kanban = () => {
     }
     return undefined;
   };
-  const onDragEndHandler = async (result: DropResult) => {
-    if (!result.destination) return;
 
-    const source = result.source;
-    const destination = result.destination;
-
-    if (result.type === 'TASK') {
-      if (source.droppableId === destination.droppableId) {
-        const updatedTasksOrder = Array.from(tasks);
-        const [movedTask] = updatedTasksOrder.splice(source.index, 1);
-        updatedTasksOrder.splice(destination.index, 0, movedTask);
-        await updateTasksOrder(updatedTasksOrder);
-        setTasks(updatedTasksOrder);
-      } else {
-        const updatedTask = tasks.find(task => task.id === result.draggableId);
-        if (updatedTask) {
-          await updateTask(updatedTask.id, { ...updatedTask, statusId: destination.droppableId });
-        }
-        setTasks(prevTasks =>
-          prevTasks.map(task =>
-            task.id === result.draggableId ? { ...task, statusId: destination.droppableId } : task,
-          ),
-        );
-      }
-    } else if (result.type === 'COLUMN') {
-      const updatedColumns = Array.from(columns);
-      const movedColumn = updatedColumns.splice(source.index, 1)[0];
-      updatedColumns.splice(destination.index, 0, movedColumn);
-
-      const updatedColumnsWithOrder = updatedColumns.map((col, index) => ({ ...col, order: index }));
-      await updateColumnsOrder(result.draggableId, updatedColumnsWithOrder); // Изменил эту строку
-      setColumns(updatedColumnsWithOrder);
-    }
-  };
-
-  const updateColumnsOrder = (statusId: string, updatedColumnsWithOrder: ColumnType[]) => {
-    updatedColumnsWithOrder.forEach(async updatedColumn => {
-      await handleSaveUpdatedColumn(statusId, updatedColumn);
-    });
-    console.log(updatedColumnsWithOrder);
-  };
-  const updateTasksOrder = (updatedTasksOrder: any) => {
-    console.log(updatedTasksOrder);
-  };
   const createStatusModal = () => {
     handleColumnCreate();
     setIsAddStatusModalOpen(false);
@@ -260,50 +209,61 @@ export const Kanban = () => {
   const sortColumnsByOrder = (columns: ColumnType[]) => {
     return columns.sort((a: ColumnType, b: ColumnType) => a.order - b.order);
   };
+  const fetchUsers = async () => {
+    try {
+      const fetchedUsersData = await getAllUsers();
+      const fetchedUsers: UserType[] = fetchedUsersData.data;
+      setUsers(fetchedUsers);
+    } catch (error) {
+      console.error('Error retrieving the list of users:', error);
+    }
+  };
+  useEffect(() => {
+    fetchUsers();
+  }, []);
   return (
     <Layout>
-      <DragDropContext onDragEnd={onDragEndHandler}>
-        <div className={styles.addStatusButton}>
-          <Button text="Add new status" onClick={() => setIsAddStatusModalOpen(true)} />
-        </div>
+      <div className={styles.addStatusButton}>
+        <Button
+          text="Add new status"
+          onClick={() => setIsAddStatusModalOpen(true)}
+          className={styles.newStatusButton}
+        />
+      </div>
 
-        <div className={styles.mainContainer}>
-          {columns.map((column, index) =>
-            column ? (
-              <StrictModeDroppable key={index} droppableId={column.id} type="COLUMN">
-                {provided => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {!hasTasksInColumn(column.id) && (
-                      <button onClick={() => handleColumnDelete(column.id)} className={styles.deleteStatusButton}>
-                        <DeleteIcon />
-                      </button>
-                    )}
+      <div className={styles.mainContainer}>
+        {columns.map((column, index) =>
+          column ? (
+            <div key={index}>
+              {!hasTasksInColumn(column.id) && (
+                <button onClick={() => handleColumnDelete(column.id)} className={styles.deleteStatusButton}>
+                  <DeleteIcon color="primary" />
+                </button>
+              )}
 
-                    <Column
-                      column={column}
-                      tasks={tasks.filter(task => task?.statusId === column.id)}
-                      fetchData={fetchData}
-                      isEditMode={isEditMode}
-                      handleTaskEdit={handleTaskEdit}
-                      handleTaskDelete={handleTaskDelete}
-                      isCardExpanded={isCardExpanded}
-                      isAddTaskModalOpen={isAddStatusModalOpen}
-                      getButtonStyle={getButtonStyle}
-                      onAddNewTask={onAddNewTask}
-                      startEditingTask={startEditingTask}
-                      formik={formik}
-                      getFieldError={getFieldError}
-                      handleSaveUpdatedTask={handleSaveUpdatedTask}
-                      stopEditingTask={stopEditingTask}
-                    />
-                    {provided.placeholder}
-                  </div>
-                )}
-              </StrictModeDroppable>
-            ) : null,
-          )}
-        </div>
-      </DragDropContext>
+              <Column
+                column={column}
+                tasks={tasks.filter(task => task?.statusId === column.id)}
+                fetchData={fetchData}
+                isEditMode={isEditMode}
+                handleTaskEdit={handleTaskEdit}
+                handleTaskDelete={handleTaskDelete}
+                isCardExpanded={isCardExpanded}
+                isAddTaskModalOpen={isAddStatusModalOpen}
+                getButtonStyle={getButtonStyle}
+                onAddNewTask={onAddNewTask}
+                startEditingTask={startEditingTask}
+                formik={formik}
+                getFieldError={getFieldError}
+                handleSaveUpdatedTask={handleSaveUpdatedTask}
+                stopEditingTask={stopEditingTask}
+                users={users}
+              />
+            </div>
+          ) : null,
+        )}
+      </div>
+
       <CreateColumnModal
         newColumn={newColumn}
         setNewColumn={setNewColumn}
@@ -318,6 +278,7 @@ export const Kanban = () => {
         getFieldError={getFieldError}
         getButtonStyle={getButtonStyle}
         stopEditingTask={stopEditingTask}
+        users={users}
       />
     </Layout>
   );

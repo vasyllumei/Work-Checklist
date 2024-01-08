@@ -5,6 +5,7 @@ import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/components/modals/CreateTaskModal.module.css';
 import { Select } from './../Select/Select';
 import { BUTTON_STATES } from '@/constants';
+import { UserType } from '@/types/User';
 interface CreateStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -12,6 +13,7 @@ interface CreateStatusModalProps {
   getFieldError: (fieldName: string) => string | undefined;
   getButtonStyle: (buttonState: string) => { backgroundColor: string };
   stopEditingTask: () => void;
+  users: UserType[];
 }
 
 export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
@@ -21,11 +23,15 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
   getFieldError,
   getButtonStyle,
   stopEditingTask,
+  users,
 }) => {
   const handleCancelTask = () => {
     onClose();
   };
-
+  const usersList = users.map(user => ({
+    value: user.id ? user.id.toString() : '',
+    label: `${user.firstName} ${user.lastName}`,
+  }));
   return (
     <Dialog open={isOpen} onClose={handleCancelTask}>
       <DialogTitle>Add New Task</DialogTitle>
@@ -54,25 +60,15 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
               onBlur={stopEditingTask}
             />
           </div>
-          <TextInput
-            label="Avatar"
-            name="avatar"
-            type="text"
-            value={formik.values.avatar || ''}
-            onChange={value => formik.setFieldValue('avatar', value)}
-            placeholder="New avatar"
-            error={getFieldError('avatar')}
-          />
-          <TextInput
-            label="Image"
-            name="image"
-            type="text"
-            value={formik.values.image || ''}
-            onChange={value => formik.setFieldValue('image', value)}
-            placeholder="Image URL"
-            error={getFieldError('image')}
+          <Select
+            label="Select assigned  user"
+            value={formik.values.assignedTo}
+            onChange={value => formik.setFieldValue('assignedTo', value)}
+            options={usersList}
+            className={styles.userList}
           />
           <Select
+            label="Select a task stage"
             value={formik.values.buttonState}
             onChange={value => formik.setFieldValue('buttonState', value)}
             options={BUTTON_STATES}
@@ -81,9 +77,9 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
           />
         </div>
       </DialogContent>
-      <DialogActions>
-        <Button text="Cancel" onClick={handleCancelTask} />
-        <Button text="Add Task" onClick={formik.handleSubmit} />
+      <DialogActions className={styles.buttonsContainer}>
+        <Button text="Cancel" onClick={handleCancelTask} className={styles.modalTaskCancel} />
+        <Button text="Add Task" onClick={formik.handleSubmit} className={styles.modalTaskAdd} />
       </DialogActions>
     </Dialog>
   );

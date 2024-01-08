@@ -27,6 +27,7 @@ const initialUserForm = {
   password: '',
   role: UserRoleType.USER,
   id: '',
+  iconColor: '',
   editMode: false,
 };
 export const Users: FC = () => {
@@ -224,9 +225,9 @@ export const Users: FC = () => {
 
   const filteredUsers = users.filter(
     user =>
-      user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchText.toLowerCase()),
+      user.firstName?.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.lastName?.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchText.toLowerCase()),
   );
 
   return (

@@ -42,6 +42,7 @@ export const TaskEditor: React.FC<TaskEditorPropsType> = ({
         isEditing={formik.values.editMode}
       />
       <Select
+        label="Edit task stage"
         value={formik.values.buttonState}
         onChange={value => formik.setFieldValue('buttonState', value)}
         options={BUTTON_STATES}

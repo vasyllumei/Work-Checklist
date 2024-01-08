@@ -56,7 +56,7 @@ export function TextInput({
         <input
           className={classNames(styles.input, { [styles.inputError]: error })}
           name={name}
-          value={value}
+          value={value || ''}
           onChange={event => onChange(event.target.value)}
           placeholder={placeholder}
           type={inputType}

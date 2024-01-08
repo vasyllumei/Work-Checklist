@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './Select.module.css';
 
 interface Option {
   value: string;
@@ -11,16 +12,20 @@ interface SelectProps {
   onChange: (value: string) => void;
   style?: React.CSSProperties;
   className?: string;
+  label: string;
 }
 
-export const Select: React.FC<SelectProps> = ({ value, options, onChange, style, className }) => {
+export const Select: React.FC<SelectProps> = ({ value, options, onChange, style, className, label }) => {
   return (
-    <select value={value} onChange={e => onChange(e.target.value)} style={style} className={className}>
-      {options.map(option => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div>
+      <label className={styles.selectLabel}>{label}</label>
+      <select value={value} onChange={e => onChange(e.target.value)} style={style} className={className}>
+        {options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 };

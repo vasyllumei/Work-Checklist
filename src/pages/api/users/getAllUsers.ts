@@ -14,8 +14,8 @@ async function getAllUsers(req: NextApiRequest, res: NextApiResponse) {
     const users: UserDocumentType[] = await User.find({}, '-password -__v');
 
     const data = users.map((user: UserDocumentType) => {
-      const { _id, firstName, lastName, email, role } = user;
-      return { id: _id, firstName, lastName, email, role };
+      const { _id, firstName, lastName, email, role, iconColor } = user;
+      return { id: _id, firstName, lastName, email, role, iconColor };
     });
 
     res.status(200).json({ data });

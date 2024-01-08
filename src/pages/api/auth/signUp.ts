@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import User, { UserDocumentType } from '@/models/User';
 import { hash } from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
+import { getRandomColor } from '@/utils';
 
 interface ISignUpRequestBody {
   email: string;
@@ -13,7 +14,6 @@ interface ISignUpRequestBody {
 const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed' });
-
     return;
   }
 
@@ -22,28 +22,27 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
   try {
     await dbConnect();
 
-    // Check if user already exists
     const existingUser: UserDocumentType | null = await User.findOne({ email });
 
     if (existingUser) {
       res.status(409).json({ message: 'User already exists' });
-
       return;
     }
 
-    // Hash the password
     const saltRounds = 10;
     const hashedPassword = await hash(password, saltRounds);
-    // Create new user
-    const newUser = new User({ email, password: hashedPassword, firstName, lastName });
+
+    const iconColor = getRandomColor(email);
+    const newUser = new User({ email, password: hashedPassword, firstName, lastName, iconColor });
     const savedUser: UserDocumentType = await newUser.save();
 
     res.status(201).json({
       message: 'User created successfully',
       data: { userId: savedUser._id },
     });
-  } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
+  } catch (error: any) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Something went wrong', error: error.message });
   }
 };
 

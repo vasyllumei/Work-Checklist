@@ -1,5 +1,5 @@
 .createTaskButton {
-    margin-top: 20px;
+    display: flex;
     cursor: pointer;
     border-radius: 10px;
     height: 30px;
@@ -9,7 +9,30 @@
     line-height: 28px;
     border:none;
 }
-
-.errorExist {
-    color: red;
+.userList{
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    border-radius: 16px;
+    border: 1px solid rgba(224, 229, 242, 1);
+    padding: 10px 15px;
+    font-family: "DM Sans", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 14px;
+    letter-spacing: -0.02em;
+    color: #2B3674;
+}
+.buttonsContainer{
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+.modalTaskCancel{
+    width: 40%;
+    height: 30%;
+}
+.modalTaskAdd {
+    width: 40%;
+    height: 30%;
 }
