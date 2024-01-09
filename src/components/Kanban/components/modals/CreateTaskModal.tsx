@@ -3,7 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/components/modals/CreateTaskModal.module.css';
-import { Select } from './../Select/Select';
+import { Select } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 import { UserType } from '@/types/User';
 interface CreateStatusModalProps {

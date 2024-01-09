@@ -2,7 +2,7 @@ import React from 'react';
 import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
 import styles from './TaskEditor.module.css';
-import { Select } from '@/components/Kanban/components/Select/Select';
+import { Select } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 
 type TaskEditorPropsType = {

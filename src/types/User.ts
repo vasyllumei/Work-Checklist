@@ -1,9 +1,9 @@
 export type UserType = {
   firstName?: string;
   lastName?: string;
-  email?: string;
+  email: string;
   password?: string;
-  role?: UserRoleType;
+  role: UserRoleType;
   id?: string;
   iconColor?: string;
 };

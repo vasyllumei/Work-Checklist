@@ -6,7 +6,7 @@ export type UserDocumentType = Document & {
   lastName: string;
   email: string;
   password: string;
-  role?: UserRoleType;
+  role: UserRoleType;
   iconColor?: string;
   token: string;
   refreshToken: string;

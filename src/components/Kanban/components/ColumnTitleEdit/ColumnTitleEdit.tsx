@@ -11,36 +11,25 @@ type ColumnTitleEditType = {
 };
 
 export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
-  const [isEditVisible, setIsEditVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(column.title || '');
   const containerRef = useRef<HTMLDivElement>(null);
   const excludeRefs = [containerRef];
 
-  useOutsideClick(
-    () => {
-      if (isEditing) {
-        updateColumn(column.id, { ...column, title: editedTitle })
-          .then(() => {
-            setIsEditing(false);
-            setEditedTitle(editedTitle);
-          })
-          .catch(error => {
-            console.error('Error updating column:', error);
-          });
+  const handleOutsideClick = async () => {
+    if (isEditing) {
+      try {
+        await updateColumn(column.id, { ...column, title: editedTitle });
+        setIsEditing(false);
+        setEditedTitle(editedTitle);
+      } catch (error) {
+        console.error('Error updating column:', error);
       }
-    },
-    containerRef,
-    excludeRefs,
-  );
-
-  const handleMouseEnter = () => {
-    setIsEditVisible(true);
+    }
   };
 
-  const handleMouseLeave = () => {
-    setIsEditVisible(false);
-  };
+  useOutsideClick(handleOutsideClick, containerRef, excludeRefs);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -53,8 +42,8 @@ export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
   return (
     <div
       className={styles.columnTitle}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       ref={containerRef}
     >
       {isEditing ? (
@@ -64,7 +53,7 @@ export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
       ) : (
         <>
           {editedTitle}
-          {isEditVisible && (
+          {isHovered && (
             <div>
               <button onClick={handleEditClick} className={styles.editButton}>
                 <EditIcon fontSize="small" color="primary" />
