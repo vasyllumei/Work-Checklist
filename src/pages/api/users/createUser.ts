@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User, { UserDocumentType } from '@/models/User';
+import { getRandomColor } from '@/utils';
 
 const handleCreateUser = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
@@ -22,12 +23,14 @@ const handleCreateUser = async (req: NextApiRequest, res: NextApiResponse): Prom
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const iconColor = getRandomColor(email);
     const newUser: UserDocumentType = new User({
       firstName,
       lastName,
       email,
       password: hashedPassword,
       role,
+      iconColor,
     });
 
     const savedUser = await newUser.save();

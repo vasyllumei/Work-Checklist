@@ -30,15 +30,16 @@ cursor: pointer;
     align-items: center;
     max-height: 33px;
 }
-
 .title {
+    display: flex;
+    flex-direction: row;
     flex:5;
     font-family: "DM Sans", sans-serif;
     font-style: normal;
     font-weight: 700;
-    font-size: 22px;
-    line-height: 32px;
-    letter-spacing: -0.02em;
+    font-size: 18px;
+    line-height: 28px;
+    letter-spacing: -0.029em;
     color: #2B3674;
     margin-left: -5px;
     margin-bottom: 7px;
@@ -65,14 +66,6 @@ cursor: pointer;
     padding: 1px 22px 8px 22px;
     cursor: auto;
 }
-.editingCard {
-    display: flex;
-    flex-direction: column;
-    background: #FFFFFF;
-    box-shadow: 0 18px 40px rgba(112, 144, 176, 0.12);
-    border-radius: 15px;
-    padding: 1px 22px 8px 22px;
-}
 
 .card:not(:last-child) {
     margin-bottom: 24px;
@@ -82,24 +75,6 @@ cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.title {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 28px;
-    letter-spacing: -0.029em;
-    color: #2B3674;
-}
-.editingTitle {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 28px;
-    letter-spacing: -0.029em;
-    color: #2B3674;
-    outline: none;
 }
 
 
@@ -130,10 +105,20 @@ cursor: pointer;
     width: 100%;
     margin-bottom: 9px;
 }
-
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    width: 30px;
+    border-radius: 100px;
+    color: white;
+    background-color: blue;
+    cursor: default;
+}
 .buttonAction {
-    cursor: pointer;
-    flex: 1;
+    width:40%;
+    cursor: default;
     margin-left: 68px;
     border-radius: 10px;
     background-color: #FFB547;
@@ -147,54 +132,3 @@ cursor: pointer;
     align-items: center;
 }
 
-.buttonAction.blue {
-    background-color: #3965FF;
-}
-
-.buttonAction.red {
-    background-color: #E31A1A;
-}
-
-.buttonAction.green {
-    background-color: #01B574;
-}
-
-.imageContainer {
-    width: 100%;
-    height: 100%;
-    margin-top: 27px;
-    display: flex;
-    justify-content: center;
-    margin-right: 3px;
-}
-
-.cardImage {
-    width: 100%;
-    max-height: 284px;
-    margin-bottom: 5px;
-}
-
-.iconContainer {
-    width: 100%;
-    height: 100%;
-    flex: 3;
-    display: flex;
-    align-items: center;
-}
-
-.avatar {
-    align-items: center;
-    max-height: 27px;
-    max-width: 25px;
-    height: 100%;
-}
-
-.avatar img {
-    border-radius: 50%;
-    border: 2px solid #FFFFFF;
-    max-height: 25px;
-}
-
-.avatar:not(:first-child){
-    margin-left: -10px;
-}

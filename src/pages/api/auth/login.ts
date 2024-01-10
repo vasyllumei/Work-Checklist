@@ -12,7 +12,6 @@ interface ILoginRequestBody {
 const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed' });
-
     return;
   }
 
@@ -25,14 +24,12 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
 
     if (!user) {
       res.status(401).json({ message: 'Incorrect email' });
-
       return;
     }
 
     const passwordMatches = await compare(password, user.password);
     if (!passwordMatches) {
       res.status(401).json({ message: 'Incorrect password' });
-
       return;
     }
 
@@ -49,9 +46,9 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
     await user.save();
 
     res.status(200).json({ token, refreshToken, userId: user._id });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (error: any) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
 

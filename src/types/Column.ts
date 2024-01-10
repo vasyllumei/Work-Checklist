@@ -1,5 +1,5 @@
 export type ColumnType = {
   title: string;
-  order: string;
+  order: number;
   id: string;
 };

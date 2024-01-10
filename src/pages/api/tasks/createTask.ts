@@ -10,7 +10,7 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
 
   await dbConnect();
 
-  const { userId, assignedTo, title, description, statusId, buttonState } = req.body;
+  const { userId, assignedTo, title, description, statusId, buttonState, order } = req.body;
   console.log('Received data:', userId, assignedTo, title, description, statusId, buttonState);
 
   try {
@@ -21,6 +21,7 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
       description,
       statusId,
       buttonState,
+      order,
     });
 
     console.log('New task object:', newTask);
@@ -36,6 +37,7 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
         title: savedTask.title,
         statusId: savedTask.statusId,
         buttonState: savedTask.buttonState,
+        order: savedTask.order,
       },
     });
   } catch (error) {

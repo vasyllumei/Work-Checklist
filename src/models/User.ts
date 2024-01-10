@@ -6,7 +6,8 @@ export type UserDocumentType = Document & {
   lastName: string;
   email: string;
   password: string;
-  role?: UserRoleType;
+  role: UserRoleType;
+  iconColor?: string;
   token: string;
   refreshToken: string;
   comparePassword: (candidatePassword: string) => Promise<boolean>;
@@ -37,6 +38,10 @@ const UserSchema = new Schema<UserDocumentType>(
       type: String,
       enum: [UserRoleType.ADMIN, UserRoleType.USER],
       default: UserRoleType.USER,
+    },
+    iconColor: {
+      type: String,
+      default: '',
     },
     token: {
       type: String,

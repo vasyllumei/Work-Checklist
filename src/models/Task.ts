@@ -8,6 +8,7 @@ export type TaskDocumentType = Document & {
   description: string;
   statusId: string;
   buttonState: ButtonStateType;
+  order: number;
 };
 
 const TaskSchema = new Schema<TaskDocumentType>(
@@ -39,6 +40,10 @@ const TaskSchema = new Schema<TaskDocumentType>(
       type: String,
       enum: [ButtonStateType.Pending, ButtonStateType.Updates, ButtonStateType.Done, ButtonStateType.Errors],
       default: ButtonStateType.Pending,
+    },
+    order: {
+      type: Number,
+      required: true,
     },
   },
   { timestamps: true },

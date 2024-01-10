@@ -10,11 +10,11 @@ interface ButtonPropsType {
   className?: string;
 }
 
-export const Button: FC<ButtonPropsType> = ({ text, onClick, disabled, type = 'button' }) => {
+export const Button: FC<ButtonPropsType> = ({ text, onClick, disabled, type = 'button', className }) => {
   return (
     <button
       type={type}
-      className={classNames(styles.button, { [styles.buttonDisabled]: disabled })}
+      className={classNames(styles.button, { [styles.buttonDisabled]: disabled }, className)}
       onClick={onClick}
       disabled={disabled}
     >

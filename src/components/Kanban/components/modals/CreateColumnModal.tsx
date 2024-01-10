@@ -2,19 +2,17 @@ import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
-interface CreateStatusModalProps {
+import { ColumnType } from '@/types/Column';
+
+interface CreateColumnModalProps {
   isOpen: boolean;
   onClose: () => void;
   onChange: () => void;
-  newColumn: {
-    title: string;
-    order: string;
-    id?: string;
-  };
-  setNewColumn: any;
+  newColumn: ColumnType;
+  setNewColumn: React.Dispatch<React.SetStateAction<ColumnType>>;
 }
 
-export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({
+export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
   isOpen,
   onClose,
   onChange,
@@ -40,7 +38,7 @@ export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({
             error=""
             name="title"
             type="text"
-            value={newColumn.title}
+            value={newColumn.title || ''}
             onChange={value => setNewColumn({ ...newColumn, title: value })}
             placeholder="Add title"
           />
@@ -49,8 +47,8 @@ export const CreateStatusModal: React.FC<CreateStatusModalProps> = ({
             error=""
             name="order"
             type="number"
-            value={newColumn.order || ''}
-            onChange={value => setNewColumn({ ...newColumn, order: value })}
+            value={newColumn.order !== undefined ? String(newColumn.order) : ''}
+            onChange={value => setNewColumn({ ...newColumn, order: Number(value) })}
             placeholder="Add order"
           />
         </div>

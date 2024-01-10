@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import styles from './TextInput.module.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import classNames from 'classnames';
-import { motion } from 'framer-motion';
 
 interface TextInputProps {
-  name: string;
+  name?: string;
   type?: string;
-  value: string;
+  value: string | number;
   onChange: (value: string) => void;
-  placeholder: string;
-  error: string | undefined;
+  placeholder?: string;
+  error?: string | undefined | boolean;
   disabled?: boolean;
   onBlur?: () => void;
-  label: string;
+  label?: string;
   isEditing?: boolean;
 }
 
@@ -45,7 +44,7 @@ export function TextInput({
       )}
       {label && <label className={styles.inputLabel}>{label}</label>}
       {isEditing ? (
-        <motion.textarea
+        <textarea
           className={classNames(styles.textArea, { [styles.inputError]: error })}
           name={name}
           value={value}
@@ -57,7 +56,7 @@ export function TextInput({
         <input
           className={classNames(styles.input, { [styles.inputError]: error })}
           name={name}
-          value={value}
+          value={value || ''}
           onChange={event => onChange(event.target.value)}
           placeholder={placeholder}
           type={inputType}

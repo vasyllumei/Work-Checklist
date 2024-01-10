@@ -8,6 +8,7 @@ export type TaskType = {
   buttonState: ButtonStateType;
   image?: string;
   avatar?: any;
+  order?: number;
 };
 
 export enum ButtonStateType {

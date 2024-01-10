@@ -5,7 +5,7 @@ import User, { UserDocumentType } from '@/models/User';
 const handlerUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
     const { id } = req.query;
-    const { firstName, lastName, role, password } = req.body;
+    const { firstName, lastName, role, password, iconColor } = req.body;
 
     try {
       await dbConnect();
@@ -20,6 +20,7 @@ const handlerUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
       user.lastName = lastName || user.lastName;
       user.password = password || user.password;
       user.role = role || user.role;
+      user.iconColor = iconColor || user.iconColor;
 
       const updatedUser = await user.save();
 
@@ -29,6 +30,7 @@ const handlerUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
           lastName: updatedUser.lastName,
           role: updatedUser.role,
           password: updatedUser.password,
+          iconColor: updatedUser.iconColor,
         },
       });
     } catch (error) {
