@@ -20,6 +20,7 @@ import { UserType, UserRoleType } from '@/types/User';
 import { createUser, deleteUser, updateUser, getAllUsers } from '@/services/user/userService';
 import { useFormik } from 'formik';
 import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
+import styles from './Users.module.css';
 const initialUserForm = {
   firstName: '',
   lastName: '',
@@ -264,7 +265,7 @@ export const Users: FC = () => {
           getRowId={row => row.id}
         />
         <Grid container justifyContent="left">
-          <Button onClick={handleDialogOpen} text="Add User" />
+          <Button onClick={handleDialogOpen} text="Add User" size={'small'} />
         </Grid>
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
           <DialogTitle>{!isEditMode ? 'Add new user' : 'Edit existing user'}</DialogTitle>
@@ -333,9 +334,13 @@ export const Users: FC = () => {
               </Select>
             </FormControl>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose} text="Cancel" />
-            <Button onClick={formik.handleSubmit} text={formik.values.id ? 'Save Changes' : 'Add User'} />
+          <DialogActions className={styles.buttonContainer}>
+            <Button onClick={handleDialogClose} text="Cancel" size={'small'} outlined={true} />
+            <Button
+              onClick={formik.handleSubmit}
+              text={formik.values.id ? 'Save Changes' : 'Add User'}
+              size={'small'}
+            />
           </DialogActions>
         </Dialog>
       </Box>

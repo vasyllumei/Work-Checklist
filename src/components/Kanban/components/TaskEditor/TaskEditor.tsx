@@ -50,8 +50,8 @@ export const TaskEditor: React.FC<TaskEditorPropsType> = ({
         className={styles.editingButtonAction}
       />
       <div className={styles.taskButtonContainer}>
-        <Button text="Cancel" onClick={stopEditingTask} />
-        <Button text="Save" onClick={formik.handleSubmit} />
+        <Button text="Cancel" onClick={stopEditingTask} size={'small'} outlined={true} />
+        <Button text="Save" onClick={formik.handleSubmit} size={'small'} />
       </div>
     </div>
   );

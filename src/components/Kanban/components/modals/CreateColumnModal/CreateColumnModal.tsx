@@ -3,7 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import { ColumnType } from '@/types/Column';
-
+import styles from './CreateColumnModal.module.css';
 interface CreateColumnModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -53,9 +53,9 @@ export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
           />
         </div>
       </DialogContent>
-      <DialogActions>
-        <Button text="Cancel" onClick={handleCancelStatus} />
-        <Button text="Add Status" onClick={handleCreateStatus} />
+      <DialogActions className={styles.buttonContainer}>
+        <Button text="Cancel" onClick={handleCancelStatus} size={'small'} outlined={true} />
+        <Button text="Add Status" onClick={handleCreateStatus} size={'small'} />
       </DialogActions>
     </Dialog>
   );
