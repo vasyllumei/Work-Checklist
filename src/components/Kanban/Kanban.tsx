@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import { createColumn, deleteColumn, getAllColumns } from '@/services/columns/columnService';
+import { createColumn, deleteColumn, getAllColumns, updateColumn } from '@/services/columns/columnService';
 import { ColumnType } from '@/types/Column';
 import { Column } from '@/components/Kanban/components/Column';
 import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
@@ -15,6 +15,8 @@ import * as Yup from 'yup';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
+import { DragDropContext, Draggable } from 'react-beautiful-dnd';
+import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 
 const initialTaskForm = {
   id: '',
@@ -82,6 +84,7 @@ export const Kanban = () => {
 
   useEffect(() => {
     fetchData();
+    fetchUsers();
   }, []);
 
   const handleColumnCreate = async () => {
@@ -96,7 +99,15 @@ export const Kanban = () => {
       setNewColumn({ title: '', order: 0, id: '' });
       await fetchData();
     } catch (error) {
-      console.error('Error creating status:', error);
+      console.error('Error creating column:', error);
+    }
+  };
+  const handleSaveUpdatedColumn = async (updatedColumns: ColumnType) => {
+    try {
+      await updateColumn(updatedColumns.id, updatedColumns);
+      console.log('Columns order updated successfully');
+    } catch (error) {
+      console.error('Error updating columns:', error);
     }
   };
   const handleColumnDelete = async (statusId: string) => {
@@ -218,51 +229,82 @@ export const Kanban = () => {
       console.error('Error retrieving the list of users:', error);
     }
   };
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+
+  const onDragEnd = async (result: any) => {
+    try {
+      const { destination, source } = result;
+      if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+        return;
+      }
+      const updatedColumns = [...columns];
+      const [removed] = updatedColumns.splice(source.index, 1);
+      updatedColumns.splice(destination.index, 0, removed);
+      updatedColumns.forEach((column, index) => {
+        column.order = index;
+      });
+      await Promise.all(updatedColumns.map(updatedColumn => handleSaveUpdatedColumn(updatedColumn)));
+      setColumns(sortColumnsByOrder(updatedColumns));
+      console.log('Columns order updated successfully');
+    } catch (error) {
+      console.error('Error saving updated column order:', error);
+    }
+  };
+
   return (
     <Layout>
-      <div className={styles.addStatusButton}>
-        <Button
-          text="Add new status"
-          onClick={() => setIsAddStatusModalOpen(true)}
-          className={styles.newStatusButton}
-        />
-      </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className={styles.addStatusButton}>
+          <Button
+            text="Add new status"
+            onClick={() => setIsAddStatusModalOpen(true)}
+            className={styles.newStatusButton}
+          />
+        </div>
 
-      <div className={styles.mainContainer}>
-        {columns.map((column, index) =>
-          column ? (
-            <div key={index}>
-              {!hasTasksInColumn(column.id) && (
-                <button onClick={() => handleColumnDelete(column.id)} className={styles.deleteStatusButton}>
-                  <DeleteIcon color="primary" />
-                </button>
+        <div className={styles.mainContainer}>
+          {columns.map((column, index) => (
+            <StrictModeDroppable key={column.title} droppableId={column.title}>
+              {provided => (
+                <div key={index}>
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {!hasTasksInColumn(column.id) && (
+                      <button onClick={() => handleColumnDelete(column.id)} className={styles.deleteStatusButton}>
+                        <DeleteIcon color="primary" />
+                      </button>
+                    )}
+
+                    <Draggable draggableId={column.id} index={index}>
+                      {provided => (
+                        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                          <Column
+                            column={column}
+                            tasks={tasks.filter(task => task?.statusId === column.id)}
+                            fetchData={fetchData}
+                            isEditMode={isEditMode}
+                            handleTaskEdit={handleTaskEdit}
+                            handleTaskDelete={handleTaskDelete}
+                            isCardExpanded={isCardExpanded}
+                            isAddTaskModalOpen={isAddStatusModalOpen}
+                            getButtonStyle={getButtonStyle}
+                            onAddNewTask={onAddNewTask}
+                            startEditingTask={startEditingTask}
+                            formik={formik}
+                            getFieldError={getFieldError}
+                            handleSaveUpdatedTask={handleSaveUpdatedTask}
+                            stopEditingTask={stopEditingTask}
+                            users={users}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  </div>
+                  {provided.placeholder}
+                </div>
               )}
-
-              <Column
-                column={column}
-                tasks={tasks.filter(task => task?.statusId === column.id)}
-                fetchData={fetchData}
-                isEditMode={isEditMode}
-                handleTaskEdit={handleTaskEdit}
-                handleTaskDelete={handleTaskDelete}
-                isCardExpanded={isCardExpanded}
-                isAddTaskModalOpen={isAddStatusModalOpen}
-                getButtonStyle={getButtonStyle}
-                onAddNewTask={onAddNewTask}
-                startEditingTask={startEditingTask}
-                formik={formik}
-                getFieldError={getFieldError}
-                handleSaveUpdatedTask={handleSaveUpdatedTask}
-                stopEditingTask={stopEditingTask}
-                users={users}
-              />
-            </div>
-          ) : null,
-        )}
-      </div>
+            </StrictModeDroppable>
+          ))}
+        </div>
+      </DragDropContext>
 
       <CreateColumnModal
         newColumn={newColumn}

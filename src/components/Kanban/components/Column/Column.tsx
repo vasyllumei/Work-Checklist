@@ -60,6 +60,7 @@ export const Column: React.FC<ColumnPropsType> = ({
           <AddIcon />
         </button>
       </div>
+
       {tasks.map((task: TaskType, index: number) => (
         <div key={index} className={styles.cardsContainer}>
           <div className={styles.card}>

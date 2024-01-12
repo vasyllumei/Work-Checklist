@@ -37,4 +37,5 @@ const updateColumn = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 };
+
 export default updateColumn;
