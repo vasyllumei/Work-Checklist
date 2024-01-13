@@ -1,12 +1,9 @@
 .button {
     padding: 10px 8px;
-    width: 100%;
-    max-width: 410px;
-    height: 54px;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
-    background-color: #4318fe;
     font-weight: 300;
     font-size: 14px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+    background-color: #4318fe;
     line-height: 100%;
     text-align: center;
     letter-spacing: -0.02em;
@@ -23,3 +20,29 @@
     box-shadow: none;
 }
 
+.medium {
+    height: 54px;
+    width: 100%;
+    max-width: 410px;
+}
+.small {
+    height: 34px;
+    width: 100%;
+    max-width: 200px;
+    font-weight: 250;
+    font-size: 12px;
+}
+.large {
+    height: 74px;
+    width: 100%;
+    max-width: 610px;
+    font-weight: 500;
+    font-size: 16px;
+}
+.outlined {
+    background-color: transparent;
+    border: 1px solid #4318fe;
+    color: rgb(82, 85, 94);
+    box-shadow: none;
+
+}

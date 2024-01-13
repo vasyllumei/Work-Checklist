@@ -7,8 +7,8 @@ import { Column } from '@/components/Kanban/components/Column';
 import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
 import { ButtonStateType, TaskType } from '@/types/Task';
 import { useFormik } from 'formik';
-import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal';
-import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal';
+import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal/CreateColumnModal';
+import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal';
 import { Button } from '@/components/Button';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import * as Yup from 'yup';
@@ -228,6 +228,7 @@ export const Kanban = () => {
           text="Add new status"
           onClick={() => setIsAddStatusModalOpen(true)}
           className={styles.newStatusButton}
+          size={'small'}
         />
       </div>
 

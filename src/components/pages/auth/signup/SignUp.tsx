@@ -144,10 +144,10 @@ export const SignUp: FC = () => {
                 Keep me logged in
               </label>
             </div>
-            <Button disabled={signUpDisabled} text="Sign Up" onClick={handleSingUp} />
+            <Button disabled={signUpDisabled} text="Sign Up" onClick={handleSingUp} size={'medium'} />
           </div>
           <footer>
-            <div className={styles.leftFooter}>© 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!</div>
+            <div className={styles.leftFooter}>© 2022 Horizon UI. All Rights Reserved. Made with love by Simple!</div>
           </footer>
         </div>
       </div>

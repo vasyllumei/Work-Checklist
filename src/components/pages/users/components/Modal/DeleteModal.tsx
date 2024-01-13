@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Button } from '@/components/Button';
+import styles from './DeleteModal.module.css';
 interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,9 +24,9 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onDel
       <DialogContent>
         <DialogContentText>Are you sure you want to delete this user? This action cannot be undone.</DialogContentText>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel} text="Cancel" />
-        <Button onClick={handleDelete} text="Delete" />
+      <DialogActions className={styles.buttonContainer}>
+        <Button onClick={handleCancel} text="Cancel" size={'small'} outlined={true} />
+        <Button onClick={handleDelete} text="Delete" size={'small'} />
       </DialogActions>
     </Dialog>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
-import styles from '@/components/Kanban/components/modals/CreateTaskModal.module.css';
+import styles from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal.module.css';
 import { Select } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 import { UserType } from '@/types/User';
@@ -78,8 +78,14 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
         </div>
       </DialogContent>
       <DialogActions className={styles.buttonsContainer}>
-        <Button text="Cancel" onClick={handleCancelTask} className={styles.modalTaskCancel} />
-        <Button text="Add Task" onClick={formik.handleSubmit} className={styles.modalTaskAdd} />
+        <Button
+          text="Cancel"
+          onClick={handleCancelTask}
+          className={styles.modalTaskCancel}
+          size={'small'}
+          outlined={true}
+        />
+        <Button text="Add Task" onClick={formik.handleSubmit} className={styles.modalTaskAdd} size={'small'} />
       </DialogActions>
     </Dialog>
   );

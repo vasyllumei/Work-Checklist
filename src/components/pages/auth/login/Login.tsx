@@ -138,7 +138,7 @@ export const Login: FC = () => {
                 Forget password?
               </a>
             </div>
-            <Button disabled={signInDisabled} text="Sign In" onClick={handleLogin} />
+            <Button disabled={signInDisabled} text="Sign In" onClick={handleLogin} size={'medium'} />
             <div className={styles.forgotText}>
               Not registered yet?
               <a className={styles.authLink} href="/signUp" onClick={() => router.push('/signUp')}>
