@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Task, { TaskDocumentType } from '@/models/Task';
-
+async function getNextOrderValue() {
+  const latestTask = await Task.findOne({}, {}, { sort: { order: -1 } });
+  return latestTask ? latestTask.order + 1 : 0;
+}
 const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed' });
@@ -10,10 +13,12 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
 
   await dbConnect();
 
-  const { userId, assignedTo, title, description, statusId, buttonState, order } = req.body;
+  const { userId, assignedTo, title, description, statusId, buttonState } = req.body;
   console.log('Received data:', userId, assignedTo, title, description, statusId, buttonState);
 
   try {
+    const order = await getNextOrderValue();
+
     const newTask: TaskDocumentType = new Task({
       userId,
       assignedTo,

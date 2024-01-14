@@ -54,7 +54,7 @@ export const Column: React.FC<ColumnPropsType> = ({
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
   return (
-    <Draggable draggableId={column.id} index={index}>
+    <Draggable key={column.id} draggableId={column.id} index={index}>
       {provided => (
         <div ref={provided.innerRef} {...provided.draggableProps} key={index}>
           <div className={styles.column}>
@@ -72,50 +72,44 @@ export const Column: React.FC<ColumnPropsType> = ({
                   {tasks.map((task: TaskType, index) => (
                     <Draggable key={task.id} draggableId={task.id} index={index}>
                       {provided => (
-                        <div key={task.id}>
-                          <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
-                            <div className={styles.card} {...provided.dragHandleProps}>
-                              {isEditMode && formik.values.id === task.id ? (
-                                <TaskEditor
-                                  formik={formik}
-                                  getFieldError={getFieldError}
-                                  getButtonStyle={getButtonStyle}
-                                  handleSaveUpdatedTask={handleSaveUpdatedTask}
-                                  stopEditingTask={stopEditingTask}
-                                />
-                              ) : (
-                                <div className={styles.contentContainer}>
-                                  <div className={styles.titleContainer}>
-                                    <h2 className={styles.title}>{task.title}</h2>
-                                    <div>
-                                      <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
-                                      <DeleteIcon
-                                        onClick={() => handleTaskDelete(task.id)}
-                                        className={styles.editIcon}
-                                      />
-                                    </div>
+                        <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
+                          <div className={styles.card} {...provided.dragHandleProps}>
+                            {isEditMode && formik.values.id === task.id ? (
+                              <TaskEditor
+                                formik={formik}
+                                getFieldError={getFieldError}
+                                getButtonStyle={getButtonStyle}
+                                handleSaveUpdatedTask={handleSaveUpdatedTask}
+                                stopEditingTask={stopEditingTask}
+                              />
+                            ) : (
+                              <div className={styles.contentContainer}>
+                                <div className={styles.titleContainer}>
+                                  <h2 className={styles.title}>{task.title}</h2>
+                                  <div>
+                                    <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
+                                    <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
                                   </div>
-                                  <p>{task.description}</p>
                                 </div>
-                              )}
-                              {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
-                                <div className={styles.actionContainer}>
-                                  <div
-                                    key={index}
-                                    className={styles.avatar}
-                                    style={{
-                                      backgroundColor:
-                                        userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
-                                    }}
-                                  >
-                                    {userDisplayDataMap.get(task.assignedTo)?.initials}
-                                  </div>
-                                  <button style={getButtonStyle(task.buttonState)} className={styles.buttonAction}>
-                                    {task.buttonState}
-                                  </button>
+                                <p>{task.description}</p>
+                              </div>
+                            )}
+                            {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
+                              <div className={styles.actionContainer}>
+                                <div
+                                  key={index}
+                                  className={styles.avatar}
+                                  style={{
+                                    backgroundColor: userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
+                                  }}
+                                >
+                                  {userDisplayDataMap.get(task.assignedTo)?.initials}
                                 </div>
-                              ) : null}
-                            </div>
+                                <button style={getButtonStyle(task.buttonState)} className={styles.buttonAction}>
+                                  {task.buttonState}
+                                </button>
+                              </div>
+                            ) : null}
                           </div>
                         </div>
                       )}

@@ -14,6 +14,7 @@ export default async function getAllTasks(req: NextApiRequest, res: NextApiRespo
 
     const data = tasks.map((task: TaskDocumentType) => {
       const { _id, userId, assignedTo, description, title, statusId, buttonState, order } = task;
+      console.log('order', order);
       return { id: _id, userId, assignedTo, statusId, title, description, buttonState, order };
     });
 

@@ -75,7 +75,8 @@ export const Kanban = () => {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
 
-      setTasks(sortTaskByOrder(tasksData));
+      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
+      setTasks(sortedTasks);
       setColumns(sortColumnsByOrder(columnsData));
     } catch (error) {
       console.error('Error loading columns:', error);
@@ -206,7 +207,8 @@ export const Kanban = () => {
   const stopEditingTask = () => {
     formik.setFieldValue('editMode', false);
   };
-  const hasTasksInColumn = (columnId: string) => tasks.some(task => task.statusId === columnId);
+  const hasTasksInColumn = (columnId: string) =>
+    tasks.some(task => task.statusId !== undefined && task.statusId === columnId);
   const sortColumnsByOrder = (columns: ColumnType[]) => {
     return columns.sort((a: ColumnType, b: ColumnType) => {
       if (a.order < b.order) {
@@ -218,18 +220,6 @@ export const Kanban = () => {
       return 0;
     });
   };
-  const sortTaskByOrder = (tasks: TaskType[]) => {
-    return tasks.sort((a: TaskType, b: TaskType) => {
-      if (a.order < b.order) {
-        return -1;
-      }
-      if (a.order > b.order) {
-        return 1;
-      }
-      return 0;
-    });
-  };
-
   const fetchUsers = async () => {
     try {
       const fetchedUsersData = await getAllUsers();
@@ -243,9 +233,11 @@ export const Kanban = () => {
     try {
       console.log('Drag result:', result);
       const { destination, source, type, draggableId } = result;
+
       if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
         return;
       }
+
       if (type === 'COLUMN') {
         const updatedColumns = [...columns];
         const movedColumn = updatedColumns[source.index];
@@ -255,52 +247,78 @@ export const Kanban = () => {
         replacedColumn.order = tempOrder;
         updatedColumns.splice(source.index, 1, replacedColumn);
         updatedColumns.splice(destination.index, 1, movedColumn);
-        await updateColumns(updatedColumns);
         setColumns(updatedColumns);
+        await updateColumns(updatedColumns);
       } else if (type === 'TASK') {
         const updatedTasks = [...tasks];
         const movedTaskIndex = updatedTasks.findIndex(task => task.id === draggableId);
 
         if (movedTaskIndex !== -1) {
           const movedTask = updatedTasks[movedTaskIndex];
-
           if (source.droppableId === destination.droppableId) {
-            updatedTasks.splice(movedTaskIndex, 1);
-            updatedTasks.splice(destination.index, 0, movedTask);
+            console.log('Reordering tasks in the same column.');
 
-            updatedTasks.forEach((task, index) => {
-              const updatedTask = { ...task, order: index };
-              const taskIndex = updatedTasks.findIndex(t => t.id === task.id);
-              updatedTasks[taskIndex] = updatedTask;
+            // Создаем копию массива задач в колонне
+            const tasksInColumn = [...updatedTasks.filter(task => task.statusId === source.droppableId)];
+
+            // Убеждаемся, что задачи в колонне отсортированы по order
+            const sortedTasksInColumn = tasksInColumn.sort((a, b) => a.order - b.order);
+
+            // Перемещаем задачу внутри колонны
+            const movedTask = sortedTasksInColumn.splice(source.index, 1)[0];
+            sortedTasksInColumn.splice(destination.index, 0, movedTask);
+
+            // Обновляем порядок order внутри колонны
+            sortedTasksInColumn.forEach((task, index) => {
+              task.order = index + 1;
             });
-            await updateTasks(updatedTasks);
-            setTasks(updatedTasks);
+
+            // Обновляем общий массив задач
+            const updatedTasksCopy = [...updatedTasks];
+            let columnIndex = 0;
+
+            updatedTasksCopy.forEach((task, index) => {
+              if (task.statusId === source.droppableId) {
+                // Убеждаемся, что мы не выходим за границы массива
+                if (columnIndex < sortedTasksInColumn.length) {
+                  updatedTasksCopy[index] = sortedTasksInColumn[columnIndex++];
+                }
+              }
+            });
+
+            // Устанавливаем новое состояние задач
+            setTasks(updatedTasksCopy);
+
+            // Обновляем задачи в базе данных
+            await updateTasks(updatedTasksCopy);
           } else {
+            console.log('Moving task to a different column.');
             movedTask.statusId = destination.droppableId;
             updatedTasks.splice(movedTaskIndex, 1);
-            const destinationIndex = tasks.findIndex(task => task.statusId === destination.droppableId);
-            updatedTasks.splice(destinationIndex, 0, movedTask);
 
-            updatedTasks.forEach((task, index) => {
-              const updatedTask = { ...task, order: index };
-              const taskIndex = updatedTasks.findIndex(t => t.id === task.id);
-              updatedTasks[taskIndex] = updatedTask;
-            });
+            const tasksInDestinationColumn = updatedTasks.filter(task => task.statusId === destination.droppableId);
+            const movedTaskClone = { ...movedTask };
+            tasksInDestinationColumn.splice(destination.index, 0, movedTaskClone);
 
-            await updateTask(movedTask.id, {
-              ...movedTask,
-              order: destination.index,
-              statusId: destination.droppableId,
-            });
+            const updatedTasksWithoutMoved = updatedTasks.filter(task => task.statusId !== destination.droppableId);
+            updatedTasksWithoutMoved.push(...tasksInDestinationColumn);
+            updatedTasks.splice(0, updatedTasks.length, ...updatedTasksWithoutMoved);
           }
 
-          setTasks(updatedTasks);
+          console.log('Updated tasks:', updatedTasks);
+
+          const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
+          console.log('Sorted tasks:', sortedTasks);
+
+          setTasks(sortedTasks);
+          await updateTasks(sortedTasks);
         }
       }
     } catch (error) {
       console.error('Error in onDragEnd:', error);
     }
   };
+
   return (
     <Layout>
       <div className={styles.addStatusButton}>

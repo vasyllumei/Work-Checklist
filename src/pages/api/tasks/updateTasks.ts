@@ -6,18 +6,21 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PATCH') {
     try {
       await dbConnect();
-
       const updatedTasks = await Promise.all(
-        req.body.map(async ({ id, ...updateData }: TaskDocumentType) => {
+        req.body.map(async ({ id, title, description, statusId, order }: TaskDocumentType) => {
           const task: TaskDocumentType | null = await Task.findById(id);
 
           if (!task) {
             return null;
           }
 
-          Object.assign(task, updateData);
+          task.title = title || task.title;
+          task.description = description || task.description;
+          task.statusId = statusId || task.statusId;
+          task.order = order || task.order;
 
           console.log('task', task);
+
           return task.save();
         }),
       );
@@ -27,7 +30,12 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
       console.log('Tasks updated successfully:', validUpdatedTasks);
 
       return res.status(200).json({
-        tasks: validUpdatedTasks.map(({ title, order }) => ({ title, order })),
+        tasks: validUpdatedTasks.map(({ title, description, statusId, order }) => ({
+          title,
+          description,
+          statusId,
+          order,
+        })),
       });
     } catch (error) {
       console.error('Error updating tasks:', error);
@@ -37,4 +45,5 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 };
+
 export default updateTasks;
