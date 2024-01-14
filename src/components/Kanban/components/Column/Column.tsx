@@ -8,6 +8,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { TaskEditor } from '@/components/Kanban/components/TaskEditor/TaskEditor';
 import { ColumnTitleEdit } from '@/components/Kanban/components/ColumnTitleEdit/ColumnTitleEdit';
 import { UserType } from '@/types/User';
+import { Draggable } from 'react-beautiful-dnd';
+import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 
 type ColumnPropsType = {
   tasks: TaskType[];
@@ -26,6 +28,7 @@ type ColumnPropsType = {
   handleSaveUpdatedTask: () => void;
   stopEditingTask: () => void;
   users: UserType[];
+  index: number;
 };
 export const Column: React.FC<ColumnPropsType> = ({
   column,
@@ -40,6 +43,7 @@ export const Column: React.FC<ColumnPropsType> = ({
   stopEditingTask,
   isEditMode,
   users,
+  index,
 }) => {
   const userDisplayDataMap = new Map();
 
@@ -49,60 +53,81 @@ export const Column: React.FC<ColumnPropsType> = ({
 
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
-
   return (
-    <div className={styles.column}>
-      <div className={styles.titleColumn}>
-        <h2 className={styles.title}>
-          <ColumnTitleEdit column={column} />
-        </h2>
-        <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>
-          <AddIcon />
-        </button>
-      </div>
-
-      {tasks.map((task: TaskType, index: number) => (
-        <div key={index} className={styles.cardsContainer}>
-          <div className={styles.card}>
-            {isEditMode && formik.values.id === task.id ? (
-              <TaskEditor
-                formik={formik}
-                getFieldError={getFieldError}
-                getButtonStyle={getButtonStyle}
-                handleSaveUpdatedTask={handleSaveUpdatedTask}
-                stopEditingTask={stopEditingTask}
-              />
-            ) : (
-              <div className={styles.contentContainer}>
-                <div className={styles.titleContainer}>
-                  <h2 className={styles.title}>{task.title}</h2>
-                  <div>
-                    <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
-                    <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
-                  </div>
+    <Draggable draggableId={column.id} index={index}>
+      {provided => (
+        <div ref={provided.innerRef} {...provided.draggableProps} key={index}>
+          <div className={styles.column}>
+            <div className={styles.titleColumn} {...provided.dragHandleProps}>
+              <h2 className={styles.title}>
+                <ColumnTitleEdit column={column} />
+              </h2>
+              <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>
+                <AddIcon />
+              </button>
+            </div>
+            <StrictModeDroppable key={column.id} droppableId={column.id} type="TASK">
+              {provided => (
+                <div ref={provided.innerRef} {...provided.droppableProps} className={styles.droppable}>
+                  {tasks.map((task: TaskType, index) => (
+                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                      {provided => (
+                        <div key={task.id}>
+                          <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
+                            <div className={styles.card} {...provided.dragHandleProps}>
+                              {isEditMode && formik.values.id === task.id ? (
+                                <TaskEditor
+                                  formik={formik}
+                                  getFieldError={getFieldError}
+                                  getButtonStyle={getButtonStyle}
+                                  handleSaveUpdatedTask={handleSaveUpdatedTask}
+                                  stopEditingTask={stopEditingTask}
+                                />
+                              ) : (
+                                <div className={styles.contentContainer}>
+                                  <div className={styles.titleContainer}>
+                                    <h2 className={styles.title}>{task.title}</h2>
+                                    <div>
+                                      <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
+                                      <DeleteIcon
+                                        onClick={() => handleTaskDelete(task.id)}
+                                        className={styles.editIcon}
+                                      />
+                                    </div>
+                                  </div>
+                                  <p>{task.description}</p>
+                                </div>
+                              )}
+                              {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
+                                <div className={styles.actionContainer}>
+                                  <div
+                                    key={index}
+                                    className={styles.avatar}
+                                    style={{
+                                      backgroundColor:
+                                        userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
+                                    }}
+                                  >
+                                    {userDisplayDataMap.get(task.assignedTo)?.initials}
+                                  </div>
+                                  <button style={getButtonStyle(task.buttonState)} className={styles.buttonAction}>
+                                    {task.buttonState}
+                                  </button>
+                                </div>
+                              ) : null}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
-                <p>{task.description}</p>
-              </div>
-            )}
-            {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
-              <div className={styles.actionContainer}>
-                <div
-                  key={index}
-                  className={styles.avatar}
-                  style={{
-                    backgroundColor: userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
-                  }}
-                >
-                  {userDisplayDataMap.get(task.assignedTo)?.initials}
-                </div>
-                <button style={getButtonStyle(task.buttonState)} className={styles.buttonAction}>
-                  {task.buttonState}
-                </button>
-              </div>
-            ) : null}
+              )}
+            </StrictModeDroppable>
           </div>
         </div>
-      ))}
-    </div>
+      )}
+    </Draggable>
   );
 };

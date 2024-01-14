@@ -1,5 +1,6 @@
 import { api, ResponseType } from '@/services/apiService';
 import { TaskType } from '@/types/Task';
+import { ColumnType } from '@/types/Column';
 
 export const getAllTasks = async (): Promise<ResponseType<TaskType[]>> =>
   await api.get<ResponseType<TaskType[]>>('/tasks/getAllTasks').then(resolve => resolve.data);
@@ -18,3 +19,13 @@ export const deleteTask = async (taskId: string): Promise<{ success: boolean }> 
 
 export const updateTask = async (taskId: string, taskData: TaskType): Promise<TaskType> =>
   await api.put<TaskType>(`/tasks/updateTask?id=${taskId}`, taskData).then(resolve => resolve.data);
+
+export const updateTasks = async (taskData: TaskType[]): Promise<ResponseType<ColumnType>> => {
+  try {
+    const response = await api.patch<ResponseType<TaskType>>(`/tasks/updateTasks`, taskData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating task:', error);
+    throw error;
+  }
+};

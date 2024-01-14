@@ -16,7 +16,9 @@ const StatusSchema = new Schema<StatusDocumentType>(
       required: true,
     },
   },
-  { timestamps: true },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } },
 );
+
+StatusSchema.index({ order: 1 });
 
 export default mongoose.models.Status || mongoose.model<StatusDocumentType>('Status', StatusSchema);

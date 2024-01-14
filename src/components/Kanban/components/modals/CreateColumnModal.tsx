@@ -7,7 +7,7 @@ import { ColumnType } from '@/types/Column';
 interface CreateColumnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onChange: () => void;
+  onSave: () => void;
   newColumn: ColumnType;
   setNewColumn: React.Dispatch<React.SetStateAction<ColumnType>>;
 }
@@ -15,12 +15,12 @@ interface CreateColumnModalProps {
 export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
   isOpen,
   onClose,
-  onChange,
+  onSave,
   newColumn,
   setNewColumn,
 }) => {
   const handleCreateStatus = async () => {
-    await onChange();
+    await onSave();
     onClose();
   };
 

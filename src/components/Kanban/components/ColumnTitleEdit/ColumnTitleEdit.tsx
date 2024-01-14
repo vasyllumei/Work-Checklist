@@ -13,7 +13,7 @@ type ColumnTitleEditType = {
 export const ColumnTitleEdit: React.FC<ColumnTitleEditType> = ({ column }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(column.title || '');
+  const [editedTitle, setEditedTitle] = useState(column?.title || '');
   const containerRef = useRef<HTMLDivElement>(null);
   const excludeRefs = [containerRef];
 

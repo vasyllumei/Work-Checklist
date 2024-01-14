@@ -19,7 +19,7 @@ const handleCreateStatus = async (req: NextApiRequest, res: NextApiResponse): Pr
     });
 
     const savedStatus = await newStatus.save();
-    res.status(201).json({ status: savedStatus });
+    res.status(201).json({ id: savedStatus._id, title: savedStatus.title, order: savedStatus.order });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
