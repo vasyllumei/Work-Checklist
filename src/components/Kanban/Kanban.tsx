@@ -298,20 +298,24 @@ export const Kanban = () => {
 
             const tasksInDestinationColumn = updatedTasks.filter(task => task.statusId === destination.droppableId);
             const movedTaskClone = { ...movedTask };
+
+            // Используйте destination.index для обновления order в новой колонке
+            movedTaskClone.order = destination.index + 1;
+
             tasksInDestinationColumn.splice(destination.index, 0, movedTaskClone);
 
             const updatedTasksWithoutMoved = updatedTasks.filter(task => task.statusId !== destination.droppableId);
             updatedTasksWithoutMoved.push(...tasksInDestinationColumn);
             updatedTasks.splice(0, updatedTasks.length, ...updatedTasksWithoutMoved);
+
+            console.log('Updated tasks:', updatedTasks);
+
+            const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
+            console.log('Sorted tasks:', sortedTasks);
+
+            setTasks(sortedTasks);
+            await updateTasks(sortedTasks);
           }
-
-          console.log('Updated tasks:', updatedTasks);
-
-          const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
-          console.log('Sorted tasks:', sortedTasks);
-
-          setTasks(sortedTasks);
-          await updateTasks(sortedTasks);
         }
       }
     } catch (error) {
