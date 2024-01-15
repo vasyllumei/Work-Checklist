@@ -273,10 +273,13 @@ export const Kanban = () => {
 
             const tasksInDestinationColumn = updatedTasks.filter(task => task.statusId === destination.droppableId);
             const movedTaskClone = { ...movedTask };
-
             movedTaskClone.order = destination.index + 1;
 
             tasksInDestinationColumn.splice(destination.index, 0, movedTaskClone);
+
+            tasksInDestinationColumn.forEach((task, index) => {
+              task.order = index + 1;
+            });
 
             const updatedTasksWithoutMoved = updatedTasks.filter(task => task.statusId !== destination.droppableId);
             updatedTasksWithoutMoved.push(...tasksInDestinationColumn);
@@ -302,39 +305,38 @@ export const Kanban = () => {
           className={styles.newStatusButton}
         />
       </div>
-      <div className={styles.mainContainer}>
-        <DragDropContext onDragEnd={onDragEnd}>
-          {columns.map((column, index) => (
-            <StrictModeDroppable key={column.id} droppableId={column.id} type="COLUMN">
-              {provided => (
-                <div key={column.id} ref={provided.innerRef} {...provided.droppableProps}>
-                  <Column
-                    index={index}
-                    column={column}
-                    tasks={tasks.filter(task => task?.statusId === column.id)}
-                    fetchData={fetchData}
-                    isEditMode={isEditMode}
-                    handleTaskEdit={handleTaskEdit}
-                    handleTaskDelete={handleTaskDelete}
-                    isCardExpanded={isCardExpanded}
-                    isAddTaskModalOpen={isAddStatusModalOpen}
-                    getButtonStyle={getButtonStyle}
-                    onAddNewTask={onAddNewTask}
-                    startEditingTask={startEditingTask}
-                    formik={formik}
-                    getFieldError={getFieldError}
-                    handleSaveUpdatedTask={handleSaveUpdatedTask}
-                    stopEditingTask={stopEditingTask}
-                    users={users}
-                    onDelete={handleColumnDelete}
-                  />
-                  {provided.placeholder}
-                </div>
-              )}
-            </StrictModeDroppable>
-          ))}
-        </DragDropContext>
-      </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps} className={styles.mainContainer}>
+              {columns.map((column, index) => (
+                <Column
+                  key={column.id}
+                  index={index}
+                  column={column}
+                  tasks={tasks.filter(task => task?.statusId === column.id)}
+                  fetchData={fetchData}
+                  isEditMode={isEditMode}
+                  handleTaskEdit={handleTaskEdit}
+                  handleTaskDelete={handleTaskDelete}
+                  isCardExpanded={isCardExpanded}
+                  isAddTaskModalOpen={isAddStatusModalOpen}
+                  getButtonStyle={getButtonStyle}
+                  onAddNewTask={onAddNewTask}
+                  startEditingTask={startEditingTask}
+                  formik={formik}
+                  getFieldError={getFieldError}
+                  handleSaveUpdatedTask={handleSaveUpdatedTask}
+                  stopEditingTask={stopEditingTask}
+                  users={users}
+                  onDelete={handleColumnDelete}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </StrictModeDroppable>
+      </DragDropContext>
 
       <CreateColumnModal
         newColumn={newColumn}
