@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import { createColumn, deleteColumn, getAllColumns } from '@/services/columns/columnService';
+import { createColumn, deleteColumn, getAllColumns, updateColumns } from '@/services/columns/columnService';
 import { ColumnType } from '@/types/Column';
 import { Column } from '@/components/Kanban/components/Column';
-import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
+import { createTask, deleteTask, getAllTasks, updateTask, updateTasks } from '@/services/task/taskService';
 import { ButtonStateType, TaskType } from '@/types/Task';
 import { useFormik } from 'formik';
 import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal/CreateColumnModal';
@@ -12,9 +12,10 @@ import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTas
 import { Button } from '@/components/Button';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import * as Yup from 'yup';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
+import { DragDropContext } from 'react-beautiful-dnd';
+import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 
 const initialTaskForm = {
   id: '',
@@ -43,6 +44,7 @@ export const Kanban = () => {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
+  const [searchText, setSearchText] = useState('');
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -73,8 +75,10 @@ export const Kanban = () => {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
 
-      setTasks(tasksData);
-      setColumns(sortColumnsByOrder(columnsData));
+      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
+      const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
+      setTasks(sortedTasks);
+      setColumns(sortedColumns);
     } catch (error) {
       console.error('Error loading columns:', error);
     }
@@ -82,23 +86,19 @@ export const Kanban = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    fetchUsers();
+  }, [searchText]);
 
   const handleColumnCreate = async () => {
     try {
-      const response = await createColumn(newColumn);
-      const columnData = response.data;
-
-      setColumns(prevColumns => {
-        const updatedColumns = [...prevColumns, columnData];
-        return sortColumnsByOrder(updatedColumns);
-      });
+      const columnData = await createColumn(newColumn);
+      setColumns(prevColumns => [...prevColumns, columnData]);
       setNewColumn({ title: '', order: 0, id: '' });
-      await fetchData();
     } catch (error) {
-      console.error('Error creating status:', error);
+      console.error('Error creating column:', error);
     }
   };
+
   const handleColumnDelete = async (statusId: string) => {
     try {
       await deleteColumn(statusId);
@@ -205,10 +205,7 @@ export const Kanban = () => {
   const stopEditingTask = () => {
     formik.setFieldValue('editMode', false);
   };
-  const hasTasksInColumn = (columnId: string) => tasks.some(task => task.statusId === columnId);
-  const sortColumnsByOrder = (columns: ColumnType[]) => {
-    return columns.sort((a: ColumnType, b: ColumnType) => a.order - b.order);
-  };
+
   const fetchUsers = async () => {
     try {
       const fetchedUsersData = await getAllUsers();
@@ -218,11 +215,102 @@ export const Kanban = () => {
       console.error('Error retrieving the list of users:', error);
     }
   };
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const onDragEnd = async (result: any) => {
+    try {
+      console.log('Drag result:', result);
+      const { destination, source, type, draggableId } = result;
+
+      if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+        return;
+      }
+
+      if (type === 'COLUMN') {
+        const updatedColumns = [...columns];
+        const movedColumn = updatedColumns.splice(source.index, 1)[0];
+        updatedColumns.splice(destination.index, 0, movedColumn);
+        if (source.index !== destination.index) {
+          updatedColumns.forEach((column, index) => {
+            column.order = index + 1;
+          });
+        }
+
+        setColumns(updatedColumns);
+        await updateColumns(updatedColumns);
+      } else if (type === 'TASK') {
+        const updatedTasks = [...tasks];
+        const movedTaskIndex = updatedTasks.findIndex(task => task.id === draggableId);
+
+        if (movedTaskIndex !== -1) {
+          const movedTask = updatedTasks[movedTaskIndex];
+          if (source.droppableId === destination.droppableId) {
+            const tasksInColumn = [...updatedTasks.filter(task => task.statusId === source.droppableId)];
+
+            const sortedTasksInColumn = tasksInColumn.sort((a, b) => a.order - b.order);
+
+            const movedTask = sortedTasksInColumn.splice(source.index, 1)[0];
+            sortedTasksInColumn.splice(destination.index, 0, movedTask);
+
+            sortedTasksInColumn.forEach((task, index) => {
+              task.order = index + 1;
+            });
+
+            const updatedTasksCopy = [...updatedTasks];
+            let columnIndex = 0;
+
+            updatedTasksCopy.forEach((task, index) => {
+              if (task.statusId === source.droppableId) {
+                if (columnIndex < sortedTasksInColumn.length) {
+                  updatedTasksCopy[index] = sortedTasksInColumn[columnIndex++];
+                }
+              }
+            });
+
+            setTasks(updatedTasksCopy);
+
+            await updateTasks(updatedTasksCopy);
+          } else {
+            movedTask.statusId = destination.droppableId;
+            updatedTasks.splice(movedTaskIndex, 1);
+
+            const tasksInDestinationColumn = updatedTasks.filter(task => task.statusId === destination.droppableId);
+            const movedTaskClone = { ...movedTask };
+            movedTaskClone.order = destination.index + 1;
+
+            tasksInDestinationColumn.splice(destination.index, 0, movedTaskClone);
+
+            tasksInDestinationColumn.forEach((task, index) => {
+              task.order = index + 1;
+            });
+
+            const updatedTasksWithoutMoved = updatedTasks.filter(task => task.statusId !== destination.droppableId);
+            updatedTasksWithoutMoved.push(...tasksInDestinationColumn);
+            updatedTasks.splice(0, updatedTasks.length, ...updatedTasksWithoutMoved);
+
+            const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
+
+            setTasks(sortedTasks);
+            await updateTasks(sortedTasks);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error in onDragEnd:', error);
+    }
+  };
+  const filteredTasks = tasks.filter(
+    task =>
+      task.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+      task.description?.toLowerCase().includes(searchText.toLowerCase()),
+  );
   return (
-    <Layout>
+    <Layout
+      setSearchText={setSearchText}
+      headTitle="Kanban"
+      breadcrumbs={[
+        { title: 'Dashboard', link: '/' },
+        { title: 'Kanban', link: '/kanban' },
+      ]}
+    >
       <div className={styles.addStatusButton}>
         <Button
           text="Add new status"
@@ -231,46 +319,46 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
-
-      <div className={styles.mainContainer}>
-        {columns.map((column, index) =>
-          column ? (
-            <div key={index}>
-              {!hasTasksInColumn(column.id) && (
-                <button onClick={() => handleColumnDelete(column.id)} className={styles.deleteStatusButton}>
-                  <DeleteIcon color="primary" />
-                </button>
-              )}
-
-              <Column
-                column={column}
-                tasks={tasks.filter(task => task?.statusId === column.id)}
-                fetchData={fetchData}
-                isEditMode={isEditMode}
-                handleTaskEdit={handleTaskEdit}
-                handleTaskDelete={handleTaskDelete}
-                isCardExpanded={isCardExpanded}
-                isAddTaskModalOpen={isAddStatusModalOpen}
-                getButtonStyle={getButtonStyle}
-                onAddNewTask={onAddNewTask}
-                startEditingTask={startEditingTask}
-                formik={formik}
-                getFieldError={getFieldError}
-                handleSaveUpdatedTask={handleSaveUpdatedTask}
-                stopEditingTask={stopEditingTask}
-                users={users}
-              />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps} className={styles.mainContainer}>
+              {columns.map((column, index) => (
+                <Column
+                  key={column.id}
+                  index={index}
+                  column={column}
+                  tasks={tasks.filter(task => task?.statusId === column.id)}
+                  fetchData={fetchData}
+                  isEditMode={isEditMode}
+                  handleTaskEdit={handleTaskEdit}
+                  handleTaskDelete={handleTaskDelete}
+                  isCardExpanded={isCardExpanded}
+                  isAddTaskModalOpen={isAddStatusModalOpen}
+                  getButtonStyle={getButtonStyle}
+                  onAddNewTask={onAddNewTask}
+                  startEditingTask={startEditingTask}
+                  formik={formik}
+                  getFieldError={getFieldError}
+                  handleSaveUpdatedTask={handleSaveUpdatedTask}
+                  stopEditingTask={stopEditingTask}
+                  users={users}
+                  onDelete={handleColumnDelete}
+                  filteredTasks={filteredTasks}
+                />
+              ))}
+              {provided.placeholder}
             </div>
-          ) : null,
-        )}
-      </div>
+          )}
+        </StrictModeDroppable>
+      </DragDropContext>
 
       <CreateColumnModal
         newColumn={newColumn}
         setNewColumn={setNewColumn}
         isOpen={isAddStatusModalOpen}
         onClose={closeAddStatusModal}
-        onChange={createStatusModal}
+        onSave={createStatusModal}
       />
       <CreateTaskModal
         onClose={closeAddTaskModal}

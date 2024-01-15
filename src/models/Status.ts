@@ -16,7 +16,7 @@ const StatusSchema = new Schema<StatusDocumentType>(
       required: true,
     },
   },
-  { timestamps: true },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } },
 );
 
 export default mongoose.models.Status || mongoose.model<StatusDocumentType>('Status', StatusSchema);

@@ -7,7 +7,7 @@ import styles from './CreateColumnModal.module.css';
 interface CreateColumnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onChange: () => void;
+  onSave: () => void;
   newColumn: ColumnType;
   setNewColumn: React.Dispatch<React.SetStateAction<ColumnType>>;
 }
@@ -15,12 +15,12 @@ interface CreateColumnModalProps {
 export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
   isOpen,
   onClose,
-  onChange,
+  onSave,
   newColumn,
   setNewColumn,
 }) => {
   const handleCreateStatus = async () => {
-    await onChange();
+    await onSave();
     onClose();
   };
 
@@ -32,26 +32,15 @@ export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
     <Dialog open={isOpen} onClose={handleCancelStatus}>
       <DialogTitle>Add New Status</DialogTitle>
       <DialogContent>
-        <div>
-          <TextInput
-            label="Title"
-            error=""
-            name="title"
-            type="text"
-            value={newColumn.title || ''}
-            onChange={value => setNewColumn({ ...newColumn, title: value })}
-            placeholder="Add title"
-          />
-          <TextInput
-            label="Order"
-            error=""
-            name="order"
-            type="number"
-            value={newColumn.order !== undefined ? String(newColumn.order) : ''}
-            onChange={value => setNewColumn({ ...newColumn, order: Number(value) })}
-            placeholder="Add order"
-          />
-        </div>
+        <TextInput
+          label="Title"
+          error=""
+          name="title"
+          type="text"
+          value={newColumn.title || ''}
+          onChange={value => setNewColumn({ ...newColumn, title: value })}
+          placeholder="Add title"
+        />
       </DialogContent>
       <DialogActions className={styles.buttonContainer}>
         <Button text="Cancel" onClick={handleCancelStatus} size={'small'} outlined={true} />
