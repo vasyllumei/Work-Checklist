@@ -44,6 +44,7 @@ export const Kanban = () => {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
+  const [searchText, setSearchText] = useState('');
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -86,7 +87,7 @@ export const Kanban = () => {
   useEffect(() => {
     fetchData();
     fetchUsers();
-  }, []);
+  }, [searchText]);
 
   const handleColumnCreate = async () => {
     try {
@@ -296,8 +297,20 @@ export const Kanban = () => {
       console.error('Error in onDragEnd:', error);
     }
   };
+  const filteredTasks = tasks.filter(
+    task =>
+      task.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+      task.description?.toLowerCase().includes(searchText.toLowerCase()),
+  );
   return (
-    <Layout>
+    <Layout
+      setSearchText={setSearchText}
+      headTitle="Kanban"
+      breadcrumbs={[
+        { title: 'Dashboard', link: '/' },
+        { title: 'Kanban', link: '/kanban' },
+      ]}
+    >
       <div className={styles.addStatusButton}>
         <Button
           text="Add new status"
@@ -330,6 +343,7 @@ export const Kanban = () => {
                   stopEditingTask={stopEditingTask}
                   users={users}
                   onDelete={handleColumnDelete}
+                  filteredTasks={filteredTasks}
                 />
               ))}
               {provided.placeholder}

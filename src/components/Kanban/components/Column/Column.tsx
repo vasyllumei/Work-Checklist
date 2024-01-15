@@ -30,6 +30,7 @@ type ColumnPropsType = {
   users: UserType[];
   index: number;
   onDelete: (columnId: string) => void;
+  filteredTasks: TaskType[];
 };
 export const Column: React.FC<ColumnPropsType> = ({
   column,
@@ -46,6 +47,7 @@ export const Column: React.FC<ColumnPropsType> = ({
   users,
   index,
   onDelete,
+  filteredTasks,
 }) => {
   const hasTasksInColumn = (columnId: string) =>
     tasks.some(task => task.statusId !== undefined && task.statusId === columnId);
@@ -57,6 +59,7 @@ export const Column: React.FC<ColumnPropsType> = ({
 
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
+  const tasksToRender = filteredTasks.filter(task => task.statusId === column.id);
   return (
     <Draggable key={column.id} draggableId={column.id} index={index}>
       {provided => (
@@ -77,7 +80,7 @@ export const Column: React.FC<ColumnPropsType> = ({
           <StrictModeDroppable key={column.id} droppableId={column.id} type="TASK">
             {provided => (
               <div ref={provided.innerRef} {...provided.droppableProps} className={styles.droppable}>
-                {tasks.map((task: TaskType, index) => (
+                {tasksToRender.map((task: TaskType, index) => (
                   <Draggable key={task.id} draggableId={task.id} index={index}>
                     {provided => (
                       <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
