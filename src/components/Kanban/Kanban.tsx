@@ -12,7 +12,6 @@ import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTas
 import { Button } from '@/components/Button';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import * as Yup from 'yup';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -76,8 +75,9 @@ export const Kanban = () => {
       const { data: tasksData } = await getAllTasks();
 
       const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
+      const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
       setTasks(sortedTasks);
-      setColumns(sortColumnsByOrder(columnsData));
+      setColumns(sortedColumns);
     } catch (error) {
       console.error('Error loading columns:', error);
     }
@@ -91,10 +91,7 @@ export const Kanban = () => {
   const handleColumnCreate = async () => {
     try {
       const columnData = await createColumn(newColumn);
-      setColumns(prevColumns => {
-        const updatedColumns = [...prevColumns, columnData];
-        return sortColumnsByOrder(updatedColumns);
-      });
+      setColumns(prevColumns => [...prevColumns, columnData]);
       setNewColumn({ title: '', order: 0, id: '' });
     } catch (error) {
       console.error('Error creating column:', error);
@@ -207,19 +204,7 @@ export const Kanban = () => {
   const stopEditingTask = () => {
     formik.setFieldValue('editMode', false);
   };
-  const hasTasksInColumn = (columnId: string) =>
-    tasks.some(task => task.statusId !== undefined && task.statusId === columnId);
-  const sortColumnsByOrder = (columns: ColumnType[]) => {
-    return columns.sort((a: ColumnType, b: ColumnType) => {
-      if (a.order < b.order) {
-        return -1;
-      }
-      if (a.order > b.order) {
-        return 1;
-      }
-      return 0;
-    });
-  };
+
   const fetchUsers = async () => {
     try {
       const fetchedUsersData = await getAllUsers();
@@ -240,13 +225,14 @@ export const Kanban = () => {
 
       if (type === 'COLUMN') {
         const updatedColumns = [...columns];
-        const movedColumn = updatedColumns[source.index];
-        const replacedColumn = updatedColumns[destination.index];
-        const tempOrder = movedColumn.order;
-        movedColumn.order = replacedColumn.order;
-        replacedColumn.order = tempOrder;
-        updatedColumns.splice(source.index, 1, replacedColumn);
-        updatedColumns.splice(destination.index, 1, movedColumn);
+        const movedColumn = updatedColumns.splice(source.index, 1)[0];
+        updatedColumns.splice(destination.index, 0, movedColumn);
+        if (source.index !== destination.index) {
+          updatedColumns.forEach((column, index) => {
+            column.order = index + 1;
+          });
+        }
+
         setColumns(updatedColumns);
         await updateColumns(updatedColumns);
       } else if (type === 'TASK') {
@@ -256,50 +242,38 @@ export const Kanban = () => {
         if (movedTaskIndex !== -1) {
           const movedTask = updatedTasks[movedTaskIndex];
           if (source.droppableId === destination.droppableId) {
-            console.log('Reordering tasks in the same column.');
-
-            // Создаем копию массива задач в колонне
             const tasksInColumn = [...updatedTasks.filter(task => task.statusId === source.droppableId)];
 
-            // Убеждаемся, что задачи в колонне отсортированы по order
             const sortedTasksInColumn = tasksInColumn.sort((a, b) => a.order - b.order);
 
-            // Перемещаем задачу внутри колонны
             const movedTask = sortedTasksInColumn.splice(source.index, 1)[0];
             sortedTasksInColumn.splice(destination.index, 0, movedTask);
 
-            // Обновляем порядок order внутри колонны
             sortedTasksInColumn.forEach((task, index) => {
               task.order = index + 1;
             });
 
-            // Обновляем общий массив задач
             const updatedTasksCopy = [...updatedTasks];
             let columnIndex = 0;
 
             updatedTasksCopy.forEach((task, index) => {
               if (task.statusId === source.droppableId) {
-                // Убеждаемся, что мы не выходим за границы массива
                 if (columnIndex < sortedTasksInColumn.length) {
                   updatedTasksCopy[index] = sortedTasksInColumn[columnIndex++];
                 }
               }
             });
 
-            // Устанавливаем новое состояние задач
             setTasks(updatedTasksCopy);
 
-            // Обновляем задачи в базе данных
             await updateTasks(updatedTasksCopy);
           } else {
-            console.log('Moving task to a different column.');
             movedTask.statusId = destination.droppableId;
             updatedTasks.splice(movedTaskIndex, 1);
 
             const tasksInDestinationColumn = updatedTasks.filter(task => task.statusId === destination.droppableId);
             const movedTaskClone = { ...movedTask };
 
-            // Используйте destination.index для обновления order в новой колонке
             movedTaskClone.order = destination.index + 1;
 
             tasksInDestinationColumn.splice(destination.index, 0, movedTaskClone);
@@ -308,10 +282,7 @@ export const Kanban = () => {
             updatedTasksWithoutMoved.push(...tasksInDestinationColumn);
             updatedTasks.splice(0, updatedTasks.length, ...updatedTasksWithoutMoved);
 
-            console.log('Updated tasks:', updatedTasks);
-
             const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
-            console.log('Sorted tasks:', sortedTasks);
 
             setTasks(sortedTasks);
             await updateTasks(sortedTasks);
@@ -322,7 +293,6 @@ export const Kanban = () => {
       console.error('Error in onDragEnd:', error);
     }
   };
-
   return (
     <Layout>
       <div className={styles.addStatusButton}>
@@ -332,40 +302,32 @@ export const Kanban = () => {
           className={styles.newStatusButton}
         />
       </div>
-
       <div className={styles.mainContainer}>
         <DragDropContext onDragEnd={onDragEnd}>
           {columns.map((column, index) => (
             <StrictModeDroppable key={column.id} droppableId={column.id} type="COLUMN">
               {provided => (
-                <div key={column.id}>
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {!hasTasksInColumn(column.id) && (
-                      <button onClick={() => handleColumnDelete(column.id)} className={styles.deleteStatusButton}>
-                        <DeleteIcon color="primary" />
-                      </button>
-                    )}
-
-                    <Column
-                      index={index}
-                      column={column}
-                      tasks={tasks.filter(task => task?.statusId === column.id)}
-                      fetchData={fetchData}
-                      isEditMode={isEditMode}
-                      handleTaskEdit={handleTaskEdit}
-                      handleTaskDelete={handleTaskDelete}
-                      isCardExpanded={isCardExpanded}
-                      isAddTaskModalOpen={isAddStatusModalOpen}
-                      getButtonStyle={getButtonStyle}
-                      onAddNewTask={onAddNewTask}
-                      startEditingTask={startEditingTask}
-                      formik={formik}
-                      getFieldError={getFieldError}
-                      handleSaveUpdatedTask={handleSaveUpdatedTask}
-                      stopEditingTask={stopEditingTask}
-                      users={users}
-                    />
-                  </div>
+                <div key={column.id} ref={provided.innerRef} {...provided.droppableProps}>
+                  <Column
+                    index={index}
+                    column={column}
+                    tasks={tasks.filter(task => task?.statusId === column.id)}
+                    fetchData={fetchData}
+                    isEditMode={isEditMode}
+                    handleTaskEdit={handleTaskEdit}
+                    handleTaskDelete={handleTaskDelete}
+                    isCardExpanded={isCardExpanded}
+                    isAddTaskModalOpen={isAddStatusModalOpen}
+                    getButtonStyle={getButtonStyle}
+                    onAddNewTask={onAddNewTask}
+                    startEditingTask={startEditingTask}
+                    formik={formik}
+                    getFieldError={getFieldError}
+                    handleSaveUpdatedTask={handleSaveUpdatedTask}
+                    stopEditingTask={stopEditingTask}
+                    users={users}
+                    onDelete={handleColumnDelete}
+                  />
                   {provided.placeholder}
                 </div>
               )}

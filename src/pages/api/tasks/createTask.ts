@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Task, { TaskDocumentType } from '@/models/Task';
-async function getNextOrderValue() {
+async function getNextTaskOrder() {
   const latestTask = await Task.findOne({}, {}, { sort: { order: -1 } });
   return latestTask ? latestTask.order + 1 : 0;
 }
@@ -14,10 +14,9 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
   await dbConnect();
 
   const { userId, assignedTo, title, description, statusId, buttonState } = req.body;
-  console.log('Received data:', userId, assignedTo, title, description, statusId, buttonState);
 
   try {
-    const order = await getNextOrderValue();
+    const order = await getNextTaskOrder();
 
     const newTask: TaskDocumentType = new Task({
       userId,

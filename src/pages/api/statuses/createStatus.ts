@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Status, { StatusDocumentType } from '@/models/Status';
-
+async function getNextStatusOrder() {
+  const latestOrder = await Status.findOne({}, {}, { sort: { order: -1 } });
+  return latestOrder ? latestOrder.order + 1 : 0;
+}
 const handleCreateStatus = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed' });
@@ -10,9 +13,10 @@ const handleCreateStatus = async (req: NextApiRequest, res: NextApiResponse): Pr
 
   await dbConnect();
 
-  const { title, order } = req.body;
+  const { title } = req.body;
 
   try {
+    const order = await getNextStatusOrder();
     const newStatus: StatusDocumentType = new Status({
       title,
       order,
