@@ -1,3 +1,5 @@
+// Ваш компонент Select
+
 import React from 'react';
 import styles from './Select.module.css';
 
@@ -17,11 +19,11 @@ interface SelectProps {
 
 export const Select: React.FC<SelectProps> = ({ value, options, onChange, style, className, label }) => {
   return (
-    <div>
+    <div className={styles.selectContainer}>
       <label className={styles.selectLabel}>{label}</label>
       <select value={value} onChange={e => onChange(e.target.value)} style={style} className={className}>
         {options.map(option => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} className={styles.option}>
             {option.label}
           </option>
         ))}

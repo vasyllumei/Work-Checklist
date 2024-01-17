@@ -46,20 +46,18 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
             placeholder="New Task Title"
             error={getFieldError('title')}
           />
-          <div className={styles.textAreaContainer}>
-            <TextInput
-              name={`Description`}
-              value={formik.values.description || ''}
-              onChange={value => {
-                formik.setFieldValue('description', value);
-              }}
-              placeholder="New task description"
-              error={getFieldError('description')}
-              label="Description"
-              isEditing={true}
-              onBlur={stopEditingTask}
-            />
-          </div>
+          <TextInput
+            name={`Description`}
+            value={formik.values.description || ''}
+            onChange={value => {
+              formik.setFieldValue('description', value);
+            }}
+            placeholder="New task description"
+            error={getFieldError('description')}
+            label="Description"
+            isEditing={true}
+            onBlur={stopEditingTask}
+          />
           <Select
             label="Select assigned  user"
             value={formik.values.assignedTo}

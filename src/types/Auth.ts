@@ -4,6 +4,12 @@ export type Auth = {
   firstName: string;
   lastName: string;
 };
+export type AuthResponse = {
+  token: string;
+  refreshToken: string;
+  userId: string;
+  assignedTo: string;
+};
 
 export type Login = {
   password: string;

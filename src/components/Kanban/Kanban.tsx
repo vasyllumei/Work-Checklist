@@ -318,6 +318,12 @@ export const Kanban = () => {
           className={styles.newStatusButton}
           size={'small'}
         />
+        <Button
+          text="Create task"
+          onClick={() => setIsAddTaskModalOpen(true)}
+          className={styles.newTaskButton}
+          size={'small'}
+        />
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">

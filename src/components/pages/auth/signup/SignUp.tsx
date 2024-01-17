@@ -5,6 +5,8 @@ import { Button } from '@/components/Button';
 import { validateInput } from '@/utils';
 import { signUp } from '@/services/auth';
 import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
+import { LOCAL_STORAGE_TOKEN } from '@/constants';
 
 interface ErrorType {
   [key: string]: string;
@@ -16,8 +18,6 @@ export const SignUp: FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<ErrorType>({});
   const [signUpError, setSignUpError] = useState('');
-
-  const router = useRouter();
 
   const inputHandler = (name: string, inputValue: string) => {
     setValues(prevValue => ({ ...prevValue, [name]: inputValue }));
@@ -51,21 +51,29 @@ export const SignUp: FC = () => {
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
-
+  const router = useRouter();
   const handleSingUp = async () => {
     try {
-      if (values.email && values.password) {
-        await signUp({
-          email: values.email,
-          password: values.password,
-          firstName: values.firstName,
-          lastName: values.lastName,
-        });
+      const response = await signUp({
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+      });
 
-        router.push('/users');
+      if (response && response.token) {
+        const token = response.token;
+        if (typeof window !== 'undefined') {
+          await Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
+          await router.push('/');
+        }
       }
     } catch (error: any) {
-      setSignUpError(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.message) {
+        setSignUpError(error.response.data.message);
+      } else {
+        console.error('Error during registration:', error);
+      }
     }
   };
 

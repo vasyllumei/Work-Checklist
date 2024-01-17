@@ -264,7 +264,7 @@ export const Users: FC = () => {
           disableRowSelectionOnClick
           getRowId={row => row.id}
         />
-        <Grid container justifyContent="left">
+        <Grid className={styles.gridContainer}>
           <Button onClick={handleDialogOpen} text="Add User" size={'small'} />
         </Grid>
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>

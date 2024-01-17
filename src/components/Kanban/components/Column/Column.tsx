@@ -87,6 +87,7 @@ export const Column: React.FC<ColumnPropsType> = ({
                         <div className={styles.card} {...provided.dragHandleProps}>
                           {isEditMode && formik.values.id === task.id ? (
                             <TaskEditor
+                              users={users}
                               formik={formik}
                               getFieldError={getFieldError}
                               getButtonStyle={getButtonStyle}

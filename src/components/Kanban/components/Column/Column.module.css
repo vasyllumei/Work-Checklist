@@ -1,4 +1,5 @@
 .column {
+
     width: 50vh;
     background: #FFFFFF;
     border-radius: 20px;
@@ -82,6 +83,7 @@ cursor: pointer;
 }
 
 .titleContainer {
+    padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -145,4 +147,6 @@ cursor: pointer;
     display: flex;
     flex-direction: column;
     width: 100%;
+    min-width: 150px;
+    min-height: 1px;
 }

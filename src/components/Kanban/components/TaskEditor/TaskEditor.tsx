@@ -4,6 +4,7 @@ import { Button } from '@/components/Button';
 import styles from './TaskEditor.module.css';
 import { Select } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
+import { UserType } from '@/types/User';
 
 type TaskEditorPropsType = {
   formik: any;
@@ -11,13 +12,19 @@ type TaskEditorPropsType = {
   handleSaveUpdatedTask: () => void;
   stopEditingTask: () => void;
   getButtonStyle: (buttonState: string) => { backgroundColor: string };
+  users: UserType[];
 };
 export const TaskEditor: React.FC<TaskEditorPropsType> = ({
   formik,
   getFieldError,
   getButtonStyle,
   stopEditingTask,
+  users,
 }) => {
+  const usersList = users.map(user => ({
+    value: user.id ? user.id.toString() : '',
+    label: `${user.firstName} ${user.lastName}`,
+  }));
   return (
     <div className={styles.editingContent}>
       <TextInput
@@ -40,6 +47,13 @@ export const TaskEditor: React.FC<TaskEditorPropsType> = ({
         error={getFieldError('description')}
         label="Description"
         isEditing={formik.values.editMode}
+      />
+      <Select
+        label="Edit assigned  user"
+        value={formik.values.assignedTo}
+        onChange={value => formik.setFieldValue('assignedTo', value)}
+        options={usersList}
+        className={styles.userList}
       />
       <Select
         label="Edit task stage"

@@ -5,7 +5,7 @@ import Task, { TaskDocumentType } from '@/models/Task';
 const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
     const { id } = req.query;
-    const { statusId, title, description, buttonState, order } = req.body;
+    const { statusId, title, description, buttonState, order, assignedTo } = req.body;
 
     try {
       await dbConnect();
@@ -24,6 +24,7 @@ const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
       task.description = description || task.description;
       task.buttonState = buttonState || task.buttonState;
       task.order = order || task.order;
+      task.assignedTo = assignedTo || task.assignedTo;
 
       const updatedTask = await task.save();
 
@@ -34,6 +35,7 @@ const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
           description: updatedTask.description,
           buttonState: updatedTask.buttonState,
           order: updatedTask.order,
+          assignedTo: updatedTask.assignedTo,
         },
       });
     } catch (error) {
