@@ -90,7 +90,6 @@ export const Column: React.FC<ColumnPropsType> = ({
                               users={users}
                               formik={formik}
                               getFieldError={getFieldError}
-                              getButtonStyle={getButtonStyle}
                               handleSaveUpdatedTask={handleSaveUpdatedTask}
                               stopEditingTask={stopEditingTask}
                             />

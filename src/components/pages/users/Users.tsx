@@ -12,7 +12,6 @@ import {
   Select,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import * as Yup from 'yup';
 import { TextInput } from '../../TextInput';
 import { Button } from '@/components/Button';
 import { Layout } from '@/components/Layout/Layout';
@@ -21,6 +20,7 @@ import { createUser, deleteUser, updateUser, getAllUsers } from '@/services/user
 import { useFormik } from 'formik';
 import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
 import styles from './Users.module.css';
+import { ValidationSchema } from '@/utils';
 const initialUserForm = {
   firstName: '',
   lastName: '',
@@ -37,25 +37,6 @@ export const Users: FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
   const [searchText, setSearchText] = useState('');
-
-  const ValidationSchema = Yup.object().shape({
-    firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('First name is required'),
-    lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Last name is required'),
-    email: Yup.string()
-      .email('Invalid email')
-      .when('editMode', (editMode, schema) => {
-        if (!editMode[0]) return schema.required('Email is required');
-        return schema;
-      }),
-    editMode: Yup.boolean(),
-    password: Yup.string()
-      .min(4, 'Password is too short - should be 4 chars min')
-      .when('editMode', (editMode, schema) => {
-        if (!editMode[0]) return schema.required('Password is required');
-        console.log('editMode', editMode);
-        return schema;
-      }),
-  });
 
   const formik = useFormik({
     initialValues: initialUserForm,

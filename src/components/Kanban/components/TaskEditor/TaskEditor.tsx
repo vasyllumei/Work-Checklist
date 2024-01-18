@@ -2,7 +2,7 @@ import React from 'react';
 import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
 import styles from './TaskEditor.module.css';
-import { Select } from '@/components/Select/Select';
+import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 import { UserType } from '@/types/User';
 
@@ -11,16 +11,9 @@ type TaskEditorPropsType = {
   getFieldError: (fieldName: string) => string | undefined;
   handleSaveUpdatedTask: () => void;
   stopEditingTask: () => void;
-  getButtonStyle: (buttonState: string) => { backgroundColor: string };
   users: UserType[];
 };
-export const TaskEditor: React.FC<TaskEditorPropsType> = ({
-  formik,
-  getFieldError,
-  getButtonStyle,
-  stopEditingTask,
-  users,
-}) => {
+export const TaskEditor: React.FC<TaskEditorPropsType> = ({ formik, getFieldError, stopEditingTask, users }) => {
   const usersList = users.map(user => ({
     value: user.id ? user.id.toString() : '',
     label: `${user.firstName} ${user.lastName}`,
@@ -48,20 +41,17 @@ export const TaskEditor: React.FC<TaskEditorPropsType> = ({
         label="Description"
         isEditing={formik.values.editMode}
       />
-      <Select
+      <SelectComponent
         label="Edit assigned  user"
         value={formik.values.assignedTo}
         onChange={value => formik.setFieldValue('assignedTo', value)}
         options={usersList}
-        className={styles.userList}
       />
-      <Select
+      <SelectComponent
         label="Edit task stage"
         value={formik.values.buttonState}
         onChange={value => formik.setFieldValue('buttonState', value)}
         options={BUTTON_STATES}
-        style={getButtonStyle(formik.values.buttonState)}
-        className={styles.editingButtonAction}
       />
       <div className={styles.taskButtonContainer}>
         <Button text="Cancel" onClick={stopEditingTask} size={'small'} outlined={true} />

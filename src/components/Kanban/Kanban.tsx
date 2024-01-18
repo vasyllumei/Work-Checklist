@@ -184,12 +184,16 @@ export const Kanban = () => {
     formik.resetForm();
     setIsAddTaskModalOpen(false);
   };
-  const onAddNewTask = (columnId: string) => {
+  const onAddNewTask = (columnId?: string) => {
     formik.resetForm();
     setIsAddTaskModalOpen(true);
-    formik.setValues({ ...initialTaskForm, statusId: columnId });
-  };
 
+    if (columnId) {
+      formik.setValues({ ...initialTaskForm, statusId: columnId });
+    } else {
+      formik.setValues({ ...initialTaskForm, statusId: '' });
+    }
+  };
   const getButtonStyle = (buttonState: string) => {
     const backgroundColor = (BUTTON_STATE_COLORS as Record<string, string>)[buttonState] || '';
     return {
@@ -367,11 +371,11 @@ export const Kanban = () => {
         onSave={createStatusModal}
       />
       <CreateTaskModal
+        columns={columns}
         onClose={closeAddTaskModal}
         formik={formik}
         isOpen={isAddTaskModalOpen}
         getFieldError={getFieldError}
-        getButtonStyle={getButtonStyle}
         stopEditingTask={stopEditingTask}
         users={users}
       />

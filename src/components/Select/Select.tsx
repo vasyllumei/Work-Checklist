@@ -1,7 +1,9 @@
-// Ваш компонент Select
-
-import React from 'react';
-import styles from './Select.module.css';
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 interface Option {
   value: string;
@@ -12,22 +14,28 @@ interface SelectProps {
   value: string;
   options: Option[];
   onChange: (value: string) => void;
-  style?: React.CSSProperties;
-  className?: string;
   label: string;
 }
 
-export const Select: React.FC<SelectProps> = ({ value, options, onChange, style, className, label }) => {
+export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label }) => {
   return (
-    <div className={styles.selectContainer}>
-      <label className={styles.selectLabel}>{label}</label>
-      <select value={value} onChange={e => onChange(e.target.value)} style={style} className={className}>
-        {options.map(option => (
-          <option key={option.value} value={option.value} className={styles.option}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Box sx={{ minWidth: 120 }}>
+      <FormControl sx={{ m: 1, width: 300 }}>
+        <InputLabel id="demo-simple-select-label">{label}</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select-autowidth"
+          value={value}
+          label={label}
+          onChange={e => onChange(e.target.value)}
+        >
+          {options.map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
   );
 };

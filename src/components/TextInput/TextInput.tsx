@@ -9,7 +9,7 @@ interface TextInputProps {
   value: string | number;
   onChange: (value: string) => void;
   placeholder?: string;
-  error?: string | undefined | boolean;
+  error?: string | boolean;
   disabled?: boolean;
   onBlur?: () => void;
   label?: string;
@@ -24,6 +24,7 @@ export function TextInput({
   placeholder,
   error,
   disabled,
+  onBlur,
   label,
   isEditing = false,
 }: TextInputProps) {
@@ -56,11 +57,12 @@ export function TextInput({
         <input
           className={classNames(styles.input, { [styles.inputError]: error })}
           name={name}
-          value={value || ''}
+          value={value}
           onChange={event => onChange(event.target.value)}
           placeholder={placeholder}
           type={inputType}
           disabled={disabled}
+          onBlur={onBlur}
         />
       )}
       {error && <span className={styles.error}>{error}</span>}

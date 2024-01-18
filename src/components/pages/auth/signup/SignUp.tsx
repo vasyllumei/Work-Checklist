@@ -54,18 +54,20 @@ export const SignUp: FC = () => {
   const router = useRouter();
   const handleSingUp = async () => {
     try {
-      const response = await signUp({
-        email: values.email,
-        password: values.password,
-        firstName: values.firstName,
-        lastName: values.lastName,
-      });
+      if (values.email && values.password) {
+        const response = await signUp({
+          email: values.email,
+          password: values.password,
+          firstName: values.firstName,
+          lastName: values.lastName,
+        });
 
-      if (response && response.token) {
-        const token = response.token;
-        if (typeof window !== 'undefined') {
-          await Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
-          await router.push('/');
+        if (response && response.token) {
+          const token = response.token;
+          if (typeof window !== 'undefined') {
+            await Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
+            await router.push('/');
+          }
         }
       }
     } catch (error: any) {
