@@ -1,7 +1,6 @@
 .mainContainer {
     display: flex;
     align-items: flex-start;
-    justify-content: space-around;
     max-height: 1077px;
 }
 

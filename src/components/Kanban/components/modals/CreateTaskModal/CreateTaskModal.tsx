@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
@@ -26,8 +26,10 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
   users,
   columns,
 }) => {
+  const [showColumn, setShowColumn] = useState(false);
   const handleCancelTask = () => {
     onClose();
+    setShowColumn(false);
   };
   const usersList = users.map(user => ({
     value: user.id ? user.id.toString() : '',
@@ -37,6 +39,13 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
     value: column.id,
     label: `${column.title}`,
   }));
+  useEffect(() => {
+    if (!formik.values.statusId && isOpen) {
+      setShowColumn(true);
+      console.log(formik.values);
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onClose={handleCancelTask}>
       <DialogTitle>Add New Task</DialogTitle>
@@ -63,7 +72,7 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
             isEditing={true}
             onBlur={stopEditingTask}
           />
-          {!formik.values.statusId ? (
+          {showColumn ? (
             <SelectComponent
               label="Select a column"
               value={formik.values.statusId || ''}
@@ -93,7 +102,15 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
           size={'small'}
           outlined={true}
         />
-        <Button text="Add Task" onClick={formik.handleSubmit} className={styles.modalTaskAdd} size={'small'} />
+        <Button
+          text="Add Task"
+          onClick={() => {
+            formik.handleSubmit();
+            setShowColumn(false);
+          }}
+          className={styles.modalTaskAdd}
+          size={'small'}
+        />
       </DialogActions>
     </Dialog>
   );
