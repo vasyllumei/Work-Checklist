@@ -20,26 +20,27 @@ export const SignUp: FC = () => {
   const [signUpError, setSignUpError] = useState('');
 
   const inputHandler = (name: string, inputValue: string) => {
-    setValues(prevValue => ({ ...prevValue, [name]: inputValue }));
+    const trimmedValue = inputValue.trim();
+    setValues(prevValue => ({ ...prevValue, [name]: trimmedValue }));
 
     const errorMessages: ErrorType = {
-      firstName: 'Enter you first name',
-      lastName: 'Enter you last name',
+      firstName: 'Enter your first name',
+      lastName: 'Enter your last name',
       email: 'Invalid email',
       password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
     };
 
-    const inputValid = validateInput(inputValue, name);
+    const inputValid = validateInput(trimmedValue, name);
     const updatedErrors = { ...errors };
 
-    if (!inputValid && inputValue !== '') {
+    if (!inputValid) {
       updatedErrors[name] = errorMessages[name];
     } else {
       delete updatedErrors[name];
     }
 
     if (name === 'confirmPassword') {
-      if (inputValue !== values.password) {
+      if (trimmedValue !== values.password) {
         updatedErrors.confirmPassword = 'Password did not match';
       } else {
         delete updatedErrors.confirmPassword;

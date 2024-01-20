@@ -14,15 +14,11 @@ import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppa
 type ColumnPropsType = {
   tasks: TaskType[];
   column: ColumnType;
-  fetchData: () => void;
   isEditMode: boolean;
   handleTaskEdit: (taskId: string) => void;
   handleTaskDelete: (taskId: string) => void;
-  isCardExpanded: (taskId: string) => boolean;
-  isAddTaskModalOpen: boolean;
   getButtonStyle: (buttonState: string) => { backgroundColor: string };
   onAddNewTask: (columnId: string) => void;
-  startEditingTask: (taskId: string) => void;
   formik: any;
   getFieldError: (fieldName: string) => string | undefined;
   handleSaveUpdatedTask: () => void;

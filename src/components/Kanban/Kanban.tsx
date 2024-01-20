@@ -14,7 +14,7 @@ import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import * as Yup from 'yup';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 
 const initialTaskForm = {
@@ -41,7 +41,6 @@ export const Kanban = () => {
   const [newColumn, setNewColumn] = useState({ title: '', order: 0, id: '' } as ColumnType);
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
   const [tasks, setTasks] = useState<TaskType[]>([]);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState('');
@@ -145,7 +144,6 @@ export const Kanban = () => {
           editMode: true,
         });
       }
-      setEditingTaskId(taskId);
     } catch (error) {
       console.error('Error updating the task', error);
     }
@@ -201,10 +199,6 @@ export const Kanban = () => {
     };
   };
   const isEditMode = formik.values.editMode;
-  const isCardExpanded = (taskId: string) => editingTaskId === taskId;
-  const startEditingTask = (taskId: string) => {
-    setEditingTaskId(taskId);
-  };
 
   const stopEditingTask = () => {
     formik.setFieldValue('editMode', false);
@@ -219,7 +213,7 @@ export const Kanban = () => {
       console.error('Error retrieving the list of users:', error);
     }
   };
-  const onDragEnd = async (result: any) => {
+  const onDragEnd = async (result: DropResult) => {
     try {
       console.log('Drag result:', result);
       const { destination, source, type, draggableId } = result;
@@ -339,15 +333,11 @@ export const Kanban = () => {
                   index={index}
                   column={column}
                   tasks={tasks.filter(task => task?.statusId === column.id)}
-                  fetchData={fetchData}
                   isEditMode={isEditMode}
                   handleTaskEdit={handleTaskEdit}
                   handleTaskDelete={handleTaskDelete}
-                  isCardExpanded={isCardExpanded}
-                  isAddTaskModalOpen={isAddStatusModalOpen}
                   getButtonStyle={getButtonStyle}
                   onAddNewTask={onAddNewTask}
-                  startEditingTask={startEditingTask}
                   formik={formik}
                   getFieldError={getFieldError}
                   handleSaveUpdatedTask={handleSaveUpdatedTask}

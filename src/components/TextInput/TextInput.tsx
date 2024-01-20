@@ -4,15 +4,15 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import classNames from 'classnames';
 
 interface TextInputProps {
-  name?: string;
+  name: string;
   type?: string;
   value: string | number;
   onChange: (value: string) => void;
-  placeholder?: string;
-  error?: string | boolean;
+  placeholder: string;
+  error: string | undefined;
   disabled?: boolean;
   onBlur?: () => void;
-  label?: string;
+  label: string;
   isEditing?: boolean;
 }
 
@@ -48,7 +48,7 @@ export function TextInput({
         <textarea
           className={classNames(styles.textArea, { [styles.inputError]: error })}
           name={name}
-          value={value}
+          value={value || ''}
           onChange={event => onChange(event.target.value)}
           placeholder={placeholder}
           disabled={disabled}
@@ -57,7 +57,7 @@ export function TextInput({
         <input
           className={classNames(styles.input, { [styles.inputError]: error })}
           name={name}
-          value={value}
+          value={value || ''}
           onChange={event => onChange(event.target.value)}
           placeholder={placeholder}
           type={inputType}
