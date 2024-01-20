@@ -311,13 +311,13 @@ export const Kanban = () => {
     >
       <div className={styles.addStatusButton}>
         <Button
-          text="Add new status"
+          text="Add status"
           onClick={() => setIsAddStatusModalOpen(true)}
           className={styles.newStatusButton}
           size={'small'}
         />
         <Button
-          text="Create task"
+          text="Add task"
           onClick={() => setIsAddTaskModalOpen(true)}
           className={styles.newTaskButton}
           size={'small'}
@@ -343,7 +343,7 @@ export const Kanban = () => {
                   handleSaveUpdatedTask={handleSaveUpdatedTask}
                   stopEditingTask={stopEditingTask}
                   users={users}
-                  onDelete={handleColumnDelete}
+                  handleColumnDelete={handleColumnDelete}
                   filteredTasks={filteredTasks}
                 />
               ))}

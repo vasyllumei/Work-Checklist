@@ -25,7 +25,7 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select-autowidth"
-          value={value}
+          value={value || ''}
           label={label}
           onChange={e => onChange(e.target.value)}
         >

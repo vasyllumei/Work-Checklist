@@ -66,7 +66,7 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
           {!formik.values.statusId ? (
             <SelectComponent
               label="Select a column"
-              value={formik.values.statusId}
+              value={formik.values.statusId || ''}
               onChange={value => formik.setFieldValue('statusId', value)}
               options={columnList}
             />
