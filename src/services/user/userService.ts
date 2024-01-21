@@ -16,6 +16,16 @@ export const deleteUser = async (userId: string): Promise<{ success: boolean }> 
     throw error;
   }
 };
-
+export const deleteAllUsers = async (userIds: string[]): Promise<ResponseType<{ success: boolean }>> => {
+  try {
+    const response = await api.delete<ResponseType<{ success: boolean }>>('/users/deleteAllUsers', {
+      data: { userIds },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting users:', error);
+    throw error;
+  }
+};
 export const updateUser = async (userId: string, userData: UserType): Promise<UserType> =>
   await api.put<UserType>(`/users/updateUser?id=${userId}`, userData).then(resolve => resolve.data);

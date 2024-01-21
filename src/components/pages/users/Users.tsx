@@ -11,16 +11,17 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { TextInput } from '../../TextInput';
 import { Button } from '@/components/Button';
 import { Layout } from '@/components/Layout/Layout';
 import { UserType, UserRoleType } from '@/types/User';
-import { createUser, deleteUser, updateUser, getAllUsers } from '@/services/user/userService';
+import { createUser, deleteUser, updateUser, getAllUsers, deleteAllUsers } from '@/services/user/userService';
 import { useFormik } from 'formik';
 import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
 import styles from './Users.module.css';
 import { ValidationSchema } from '@/utils';
+import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
 const initialUserForm = {
   firstName: '',
   lastName: '',
@@ -35,9 +36,10 @@ export const Users: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteAllUsersModalOpen, setIsDeleteAllUsersModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
   const [searchText, setSearchText] = useState('');
-
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
   const formik = useFormik({
     initialValues: initialUserForm,
     validationSchema: ValidationSchema,
@@ -55,6 +57,14 @@ export const Users: FC = () => {
   });
   const isEditMode = formik.values.editMode;
   const columns: GridColDef[] = [
+    {
+      field: 'id',
+      headerName: 'ID',
+      headerClassName: 'theme--header',
+      headerAlign: 'center',
+      align: 'center',
+      width: 70,
+    },
     {
       field: 'firstName',
       headerName: 'First Name',
@@ -141,6 +151,16 @@ export const Users: FC = () => {
       console.error('Error deleting the user:', error);
     }
   };
+  const handleDeleteAllUsers = async (userIds: string[]) => {
+    try {
+      await deleteAllUsers(userIds);
+      await fetchUsers();
+      setSelectedRows([]);
+    } catch (error) {
+      console.error('Error deleting selected users:', error);
+    }
+  };
+
   const handleUserEdit = (userId: string) => {
     try {
       const userData = users.find(user => user.id === userId);
@@ -182,6 +202,19 @@ export const Users: FC = () => {
   const handleDialogClose = () => {
     formik.resetForm();
     setIsDialogOpen(false);
+  };
+  const handleDeleteButtonClick = () => {
+    if (selectedRows.length > 0) {
+      const userIds = selectedRows.map(rowId => rowId.toString());
+      handleDeleteAllUsers(userIds);
+    }
+  };
+  const handleOpenDeleteAllUsersModal = (userIds: string[]) => {
+    setSelectedRows(userIds);
+    setIsDeleteAllUsersModalOpen(true);
+  };
+  const handleCloseDeleteAllUsersModal = () => {
+    setIsDeleteAllUsersModalOpen(false);
   };
   const getError = (fieldName: string): string | undefined => {
     const touchedField = formik.touched[fieldName as keyof typeof formik.touched];
@@ -229,8 +262,31 @@ export const Users: FC = () => {
             backgroundColor: 'rgba(67, 24, 254, 100)',
             color: 'rgba(255,255,255,100)',
           },
+          '.css-acpdh7-MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer': {
+            backgroundColor: 'rgba(67, 24, 254, 100)',
+          },
+          '.css-i4bv87-MuiSvgIcon-root': {
+            color: 'rgb(168,158,158)',
+          },
         }}
       >
+        {selectedRows && selectedRows.length > 0 ? (
+          <div className={styles.deleteAllUserContainer}>
+            <Button
+              onClick={() => handleOpenDeleteAllUsersModal(selectedRows.map(String))}
+              text="Delete selected users"
+              size={'small'}
+            />
+          </div>
+        ) : null}
+
+        <DeleteModal
+          title="Delete Selected Users"
+          item={`selected users`}
+          isOpen={isDeleteAllUsersModalOpen}
+          onClose={handleCloseDeleteAllUsersModal}
+          onDelete={async () => await handleDeleteButtonClick()}
+        />
         <DataGrid
           rows={filteredUsers}
           columns={columns}
@@ -243,8 +299,12 @@ export const Users: FC = () => {
           }}
           pageSizeOptions={[5]}
           disableRowSelectionOnClick
-          getRowId={row => row.id}
-        />
+          getRowId={(row: UserType) => row.id}
+          checkboxSelection
+          onRowSelectionModelChange={ids => {
+            setSelectedRows(ids as string[]);
+          }}
+        ></DataGrid>
         <Grid className={styles.gridContainer}>
           <Button onClick={handleDialogOpen} text="Add User" size={'small'} />
         </Grid>

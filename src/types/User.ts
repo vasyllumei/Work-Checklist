@@ -4,7 +4,7 @@ export type UserType = {
   email: string;
   password?: string;
   role: UserRoleType;
-  id?: string;
+  id: string;
   iconColor?: string;
 };
 
