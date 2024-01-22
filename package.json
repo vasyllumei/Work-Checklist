@@ -40,11 +40,10 @@
     "next": "13.2.4",
     "react": "18.2.0",
     "react-beautiful-dnd": "^13.1.1",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "18.2.0",
     "react-icons": "^4.10.1",
     "styled-components": "^5.3.9",
+    "typeorm": "^0.3.19",
     "typescript": "5.0.2",
     "yup": "^1.2.0"
   },

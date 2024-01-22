@@ -89,7 +89,7 @@ export const Login: FC = () => {
       <div className={styles.leftContainer}>
         <div className={styles.form}>
           <div className={styles.backLink}>
-            <a className={styles.backDashboard} href="/signup">
+            <a className={styles.backDashboard} href="/">
               &#8249; Back to dashboard
             </a>
           </div>

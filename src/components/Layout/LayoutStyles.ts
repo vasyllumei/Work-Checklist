@@ -1,4 +1,4 @@
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/system';
 
 export const StyledLayout = {
   Container: styled('div')({
@@ -9,15 +9,14 @@ export const StyledLayout = {
     flex: 1,
   }),
   Menu: styled('div')({
-    width: '290px',
+    maxWidth: '290px',
     height: '100vh',
     background: '#ffffff',
     borderBottomRightRadius: '20px',
   }),
   Content: styled('div')({
-    width: '100%',
-    height: '100%',
-    overflowY: 'visible',
+    flex: 1,
+    overflowY: 'auto',
     padding: 20,
   }),
 };

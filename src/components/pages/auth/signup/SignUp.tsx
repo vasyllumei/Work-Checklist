@@ -5,6 +5,8 @@ import { Button } from '@/components/Button';
 import { validateInput } from '@/utils';
 import { signUp } from '@/services/auth';
 import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
+import { LOCAL_STORAGE_TOKEN } from '@/constants';
 
 interface ErrorType {
   [key: string]: string;
@@ -17,29 +19,28 @@ export const SignUp: FC = () => {
   const [errors, setErrors] = useState<ErrorType>({});
   const [signUpError, setSignUpError] = useState('');
 
-  const router = useRouter();
-
   const inputHandler = (name: string, inputValue: string) => {
-    setValues(prevValue => ({ ...prevValue, [name]: inputValue }));
+    const trimmedValue = inputValue.trim();
+    setValues(prevValue => ({ ...prevValue, [name]: trimmedValue }));
 
     const errorMessages: ErrorType = {
-      firstName: 'Enter you first name',
-      lastName: 'Enter you last name',
+      firstName: 'Enter your first name',
+      lastName: 'Enter your last name',
       email: 'Invalid email',
       password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
     };
 
-    const inputValid = validateInput(inputValue, name);
+    const inputValid = validateInput(trimmedValue, name);
     const updatedErrors = { ...errors };
 
-    if (!inputValid && inputValue !== '') {
+    if (!inputValid) {
       updatedErrors[name] = errorMessages[name];
     } else {
       delete updatedErrors[name];
     }
 
     if (name === 'confirmPassword') {
-      if (inputValue !== values.password) {
+      if (trimmedValue !== values.password) {
         updatedErrors.confirmPassword = 'Password did not match';
       } else {
         delete updatedErrors.confirmPassword;
@@ -51,21 +52,31 @@ export const SignUp: FC = () => {
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
-
+  const router = useRouter();
   const handleSingUp = async () => {
     try {
       if (values.email && values.password) {
-        await signUp({
+        const response = await signUp({
           email: values.email,
           password: values.password,
           firstName: values.firstName,
           lastName: values.lastName,
         });
 
-        router.push('/users');
+        if (response && response.token) {
+          const token = response.token;
+          if (typeof window !== 'undefined') {
+            await Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
+            await router.push('/');
+          }
+        }
       }
     } catch (error: any) {
-      setSignUpError(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.message) {
+        setSignUpError(error.response.data.message);
+      } else {
+        console.error('Error during registration:', error);
+      }
     }
   };
 

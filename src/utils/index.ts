@@ -1,3 +1,5 @@
+import * as Yup from 'yup';
+
 export const validateInput = (value: string, key: string): boolean => {
   if (key === 'email') {
     const re =
@@ -34,3 +36,22 @@ export const getRandomColor = (userId: string) => {
   const lightness = Math.floor(Math.random() * 30) + 60; // 60-90
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
+
+export const ValidationSchema = Yup.object().shape({
+  firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('First name is required'),
+  lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Last name is required'),
+  email: Yup.string()
+    .email('Invalid email')
+    .when('editMode', (editMode, schema) => {
+      if (!editMode[0]) return schema.required('Email is required');
+      return schema;
+    }),
+  editMode: Yup.boolean(),
+  password: Yup.string()
+    .min(4, 'Password is too short - should be 4 chars min')
+    .when('editMode', (editMode, schema) => {
+      if (!editMode[0]) return schema.required('Password is required');
+      console.log('editMode', editMode);
+      return schema;
+    }),
+});

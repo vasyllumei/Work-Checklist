@@ -26,6 +26,10 @@ export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
 
   const handleCancelStatus = () => {
     onClose();
+    setNewColumn(prevColumn => ({
+      ...prevColumn,
+      title: '',
+    }));
   };
 
   return (
@@ -44,7 +48,12 @@ export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
       </DialogContent>
       <DialogActions className={styles.buttonContainer}>
         <Button text="Cancel" onClick={handleCancelStatus} size={'small'} outlined={true} />
-        <Button text="Add Status" onClick={handleCreateStatus} size={'small'} />
+        <Button
+          text="Add Status"
+          onClick={handleCreateStatus}
+          size={'small'}
+          disabled={newColumn.title.trim() === ''}
+        />
       </DialogActions>
     </Dialog>
   );

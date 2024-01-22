@@ -14,7 +14,7 @@ import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import * as Yup from 'yup';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 
 const initialTaskForm = {
@@ -41,7 +41,6 @@ export const Kanban = () => {
   const [newColumn, setNewColumn] = useState({ title: '', order: 0, id: '' } as ColumnType);
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
   const [tasks, setTasks] = useState<TaskType[]>([]);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState('');
@@ -145,7 +144,6 @@ export const Kanban = () => {
           editMode: true,
         });
       }
-      setEditingTaskId(taskId);
     } catch (error) {
       console.error('Error updating the task', error);
     }
@@ -184,12 +182,16 @@ export const Kanban = () => {
     formik.resetForm();
     setIsAddTaskModalOpen(false);
   };
-  const onAddNewTask = (columnId: string) => {
+  const onAddNewTask = (columnId?: string) => {
     formik.resetForm();
     setIsAddTaskModalOpen(true);
-    formik.setValues({ ...initialTaskForm, statusId: columnId });
-  };
 
+    if (columnId) {
+      formik.setValues({ ...initialTaskForm, statusId: columnId });
+    } else {
+      formik.setValues({ ...initialTaskForm, statusId: '' });
+    }
+  };
   const getButtonStyle = (buttonState: string) => {
     const backgroundColor = (BUTTON_STATE_COLORS as Record<string, string>)[buttonState] || '';
     return {
@@ -197,10 +199,6 @@ export const Kanban = () => {
     };
   };
   const isEditMode = formik.values.editMode;
-  const isCardExpanded = (taskId: string) => editingTaskId === taskId;
-  const startEditingTask = (taskId: string) => {
-    setEditingTaskId(taskId);
-  };
 
   const stopEditingTask = () => {
     formik.setFieldValue('editMode', false);
@@ -215,7 +213,7 @@ export const Kanban = () => {
       console.error('Error retrieving the list of users:', error);
     }
   };
-  const onDragEnd = async (result: any) => {
+  const onDragEnd = async (result: DropResult) => {
     try {
       console.log('Drag result:', result);
       const { destination, source, type, draggableId } = result;
@@ -313,9 +311,15 @@ export const Kanban = () => {
     >
       <div className={styles.addStatusButton}>
         <Button
-          text="Add new status"
+          text="Add status"
           onClick={() => setIsAddStatusModalOpen(true)}
           className={styles.newStatusButton}
+          size={'small'}
+        />
+        <Button
+          text="Add task"
+          onClick={() => setIsAddTaskModalOpen(true)}
+          className={styles.newTaskButton}
           size={'small'}
         />
       </div>
@@ -329,21 +333,17 @@ export const Kanban = () => {
                   index={index}
                   column={column}
                   tasks={tasks.filter(task => task?.statusId === column.id)}
-                  fetchData={fetchData}
                   isEditMode={isEditMode}
                   handleTaskEdit={handleTaskEdit}
                   handleTaskDelete={handleTaskDelete}
-                  isCardExpanded={isCardExpanded}
-                  isAddTaskModalOpen={isAddStatusModalOpen}
                   getButtonStyle={getButtonStyle}
                   onAddNewTask={onAddNewTask}
-                  startEditingTask={startEditingTask}
                   formik={formik}
                   getFieldError={getFieldError}
                   handleSaveUpdatedTask={handleSaveUpdatedTask}
                   stopEditingTask={stopEditingTask}
                   users={users}
-                  onDelete={handleColumnDelete}
+                  handleColumnDelete={handleColumnDelete}
                   filteredTasks={filteredTasks}
                 />
               ))}
@@ -361,11 +361,11 @@ export const Kanban = () => {
         onSave={createStatusModal}
       />
       <CreateTaskModal
+        columns={columns}
         onClose={closeAddTaskModal}
         formik={formik}
         isOpen={isAddTaskModalOpen}
         getFieldError={getFieldError}
-        getButtonStyle={getButtonStyle}
         stopEditingTask={stopEditingTask}
         users={users}
       />

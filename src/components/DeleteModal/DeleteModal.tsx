@@ -6,9 +6,11 @@ interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDelete: () => Promise<void>;
+  item: string;
+  title: string;
 }
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onDelete }) => {
+export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onDelete, item, title }) => {
   const handleDelete = async () => {
     await onDelete();
     onClose();
@@ -19,10 +21,10 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onDel
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleCancel}>
-      <DialogTitle>Delete User</DialogTitle>
+    <Dialog open={isOpen} onClose={handleCancel} sx={{ '& .MuiBackdrop-root': { backgroundColor: 'transparent' } }}>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>Are you sure you want to delete this user? This action cannot be undone.</DialogContentText>
+        <DialogContentText>{`Are you sure you want to delete ${item}? This action cannot be undone.`}</DialogContentText>
       </DialogContent>
       <DialogActions className={styles.buttonContainer}>
         <Button onClick={handleCancel} text="Cancel" size={'small'} outlined={true} />

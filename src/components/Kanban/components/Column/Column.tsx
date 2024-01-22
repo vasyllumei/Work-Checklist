@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AddIcon from '../../../../assets/image/menuicon/addIcon.svg';
 import EditIcon from '@mui/icons-material/Edit';
 import { TaskType } from '@/types/Task';
@@ -10,28 +10,26 @@ import { ColumnTitleEdit } from '@/components/Kanban/components/ColumnTitleEdit/
 import { UserType } from '@/types/User';
 import { Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
+import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
 
 type ColumnPropsType = {
   tasks: TaskType[];
   column: ColumnType;
-  fetchData: () => void;
   isEditMode: boolean;
   handleTaskEdit: (taskId: string) => void;
   handleTaskDelete: (taskId: string) => void;
-  isCardExpanded: (taskId: string) => boolean;
-  isAddTaskModalOpen: boolean;
   getButtonStyle: (buttonState: string) => { backgroundColor: string };
   onAddNewTask: (columnId: string) => void;
-  startEditingTask: (taskId: string) => void;
   formik: any;
   getFieldError: (fieldName: string) => string | undefined;
   handleSaveUpdatedTask: () => void;
   stopEditingTask: () => void;
   users: UserType[];
   index: number;
-  onDelete: (columnId: string) => void;
+  handleColumnDelete: (columnId: string) => void;
   filteredTasks: TaskType[];
 };
+
 export const Column: React.FC<ColumnPropsType> = ({
   column,
   tasks,
@@ -46,11 +44,17 @@ export const Column: React.FC<ColumnPropsType> = ({
   isEditMode,
   users,
   index,
-  onDelete,
+  handleColumnDelete,
   filteredTasks,
 }) => {
+  const [isDeleteColumnModalOpen, setIsDeleteColumnModalOpen] = useState(false);
+  const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+  const [selectedColumn, setSelectedColumn] = useState<string>('');
+  const [selectedTask, setSelectedTask] = useState<{ id: string; title: string } | null>(null);
+
   const hasTasksInColumn = (columnId: string) =>
     tasks.some(task => task.statusId !== undefined && task.statusId === columnId);
+
   const userDisplayDataMap = new Map();
 
   users.forEach(user => {
@@ -59,7 +63,28 @@ export const Column: React.FC<ColumnPropsType> = ({
 
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
+
   const tasksToRender = filteredTasks.filter(task => task.statusId === column.id);
+
+  const handleOpenDeleteColumnModal = (columnId: string) => {
+    setSelectedColumn(columnId);
+    setIsDeleteColumnModalOpen(true);
+  };
+
+  const handleCloseDeleteColumnModal = () => {
+    setSelectedColumn('');
+    setIsDeleteColumnModalOpen(false);
+  };
+
+  const handleOpenDeleteTaskModal = (taskId: string, taskTitle: string) => {
+    setSelectedTask({ id: taskId, title: taskTitle });
+    setIsDeleteTaskModalOpen(true);
+  };
+
+  const handleCloseDeleteTaskModal = () => {
+    setIsDeleteTaskModalOpen(false);
+  };
+
   return (
     <Draggable key={column.id} draggableId={column.id} index={index}>
       {provided => (
@@ -68,10 +93,20 @@ export const Column: React.FC<ColumnPropsType> = ({
             <h2 className={styles.title}>
               <ColumnTitleEdit column={column} />
             </h2>
+
             {!hasTasksInColumn(column.id) && (
-              <button onClick={() => onDelete(column.id)} className={styles.deleteStatusButton}>
-                <DeleteIcon color="primary" />
-              </button>
+              <div>
+                <button onClick={() => handleOpenDeleteColumnModal(column.id)} className={styles.deleteStatusButton}>
+                  <DeleteIcon color="primary" />
+                </button>
+                <DeleteModal
+                  title="Delete Column"
+                  item={`column "${column.title}"`}
+                  isOpen={isDeleteColumnModalOpen}
+                  onClose={handleCloseDeleteColumnModal}
+                  onDelete={async () => await handleColumnDelete(selectedColumn)}
+                />
+              </div>
             )}
             <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>
               <AddIcon />
@@ -87,9 +122,9 @@ export const Column: React.FC<ColumnPropsType> = ({
                         <div className={styles.card} {...provided.dragHandleProps}>
                           {isEditMode && formik.values.id === task.id ? (
                             <TaskEditor
+                              users={users}
                               formik={formik}
                               getFieldError={getFieldError}
-                              getButtonStyle={getButtonStyle}
                               handleSaveUpdatedTask={handleSaveUpdatedTask}
                               stopEditingTask={stopEditingTask}
                             />
@@ -99,7 +134,22 @@ export const Column: React.FC<ColumnPropsType> = ({
                                 <h2 className={styles.title}>{task.title}</h2>
                                 <div>
                                   <EditIcon onClick={() => handleTaskEdit(task.id)} className={styles.editIcon} />
-                                  <DeleteIcon onClick={() => handleTaskDelete(task.id)} className={styles.editIcon} />
+                                  <DeleteIcon
+                                    onClick={() => handleOpenDeleteTaskModal(task.id, task.title)}
+                                    className={styles.editIcon}
+                                  />
+                                  <DeleteModal
+                                    title="Delete Task"
+                                    item={`task "${selectedTask?.title}"`}
+                                    isOpen={isDeleteTaskModalOpen}
+                                    onClose={handleCloseDeleteTaskModal}
+                                    onDelete={async () => {
+                                      if (selectedTask) {
+                                        await handleTaskDelete(selectedTask.id);
+                                        handleCloseDeleteTaskModal();
+                                      }
+                                    }}
+                                  />
                                 </div>
                               </div>
                               <p>{task.description}</p>

@@ -1,3 +1,6 @@
+.taskForm > * {
+    margin-bottom: 20px;
+}
 .createTaskButton {
     display: flex;
     cursor: pointer;
@@ -9,6 +12,7 @@
     line-height: 28px;
     border:none;
 }
+
 .userList{
     display: flex;
     flex-direction: column;
@@ -23,6 +27,7 @@
     letter-spacing: -0.02em;
     color: #2B3674;
 }
+
 .buttonsContainer{
     display: flex;
     justify-content: space-around;

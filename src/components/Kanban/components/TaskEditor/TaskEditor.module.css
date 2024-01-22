@@ -1,13 +1,8 @@
 .editingContent {
-    height: 150%;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 26px;
-    letter-spacing: -0.019em;
-    color: #A3AED0;
-    margin-top: 20px;
     margin-bottom: 12px;
+}
+.editingContent >* {
+    margin-bottom: 20px;
 }
 .taskButtonContainer {
      display: flex;
@@ -35,4 +30,18 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+}
+.userList{
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    border-radius: 16px;
+    border: 1px solid rgba(224, 229, 242, 1);
+    padding: 10px 15px;
+    font-family: "DM Sans", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 14px;
+    letter-spacing: -0.02em;
+    color: #2B3674;
 }

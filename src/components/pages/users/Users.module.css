@@ -3,3 +3,12 @@
     justify-content: space-around;
     margin-bottom: 20px;
 }
+.gridContainer{
+    display: flex;
+    justify-content:left ;
+}
+.deleteAllUserContainer{
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 40px 5px 0;
+}
