@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import User from '../../../models/User';
 import dbConnect from '@/lib/dbConnect';
-import { DeleteResult } from 'typeorm';
-
+interface CustomDeleteResult {
+  acknowledged: boolean;
+  deletedCount?: number;
+}
 const handlerDeleteAllUsers = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, body } = req;
   const userIds = body?.userIds;
@@ -16,7 +18,7 @@ const handlerDeleteAllUsers = async (req: NextApiRequest, res: NextApiResponse) 
   try {
     switch (method) {
       case 'DELETE':
-        const deletionResult: DeleteResult = await User.deleteMany({ _id: { $in: userIds } });
+        const deletionResult: CustomDeleteResult = await User.deleteMany({ _id: { $in: userIds } });
 
         if (deletionResult.acknowledged && deletionResult.deletedCount !== undefined) {
           console.log('Deletion Result:', deletionResult);
