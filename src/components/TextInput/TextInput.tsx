@@ -4,15 +4,15 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import classNames from 'classnames';
 
 interface TextInputProps {
-  name: string;
+  name?: string;
   type?: string;
   value: string | number;
   onChange: (value: string) => void;
-  placeholder: string;
-  error: string | undefined;
+  placeholder?: string;
+  error?: string | undefined;
   disabled?: boolean;
   onBlur?: () => void;
-  label: string;
+  label?: string;
   isEditing?: boolean;
 }
 

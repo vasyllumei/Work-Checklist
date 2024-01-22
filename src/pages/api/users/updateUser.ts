@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import User, { UserDocumentType } from '@/models/User';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const handlerUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
@@ -42,4 +43,4 @@ const handlerUpdate = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handlerUpdate;
+export default authenticateToken(handlerUpdate);

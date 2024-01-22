@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import User, { UserDocumentType } from '../../../models/User';
 import dbConnect from '@/lib/dbConnect';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const handlerDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
@@ -28,4 +29,4 @@ const handlerDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handlerDelete;
+export default authenticateToken(handlerDelete);

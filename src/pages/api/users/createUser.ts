@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User, { UserDocumentType } from '@/models/User';
 import { getRandomColor } from '@/utils';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const handleCreateUser = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
@@ -42,4 +43,4 @@ const handleCreateUser = async (req: NextApiRequest, res: NextApiResponse): Prom
   }
 };
 
-export default handleCreateUser;
+export default authenticateToken(handleCreateUser);
