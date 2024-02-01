@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import {
-  Box,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,6 +10,7 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
+import StyledBox from './components/StyledBox/StyledBox';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { TextInput } from '../../TextInput';
 import { Button } from '@/components/Button';
@@ -247,6 +247,7 @@ export const Users: FC = () => {
 
   return (
     <Layout
+      users={users}
       setSearchText={setSearchText}
       headTitle="Users"
       breadcrumbs={[
@@ -254,22 +255,7 @@ export const Users: FC = () => {
         { title: 'Users', link: '/users' },
       ]}
     >
-      <Box
-        sx={{
-          height: 400,
-          width: '100%',
-          '& .theme--header': {
-            backgroundColor: 'rgba(67, 24, 254, 100)',
-            color: 'rgba(255,255,255,100)',
-          },
-          '.css-acpdh7-MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer': {
-            backgroundColor: 'rgba(67, 24, 254, 100)',
-          },
-          '.css-i4bv87-MuiSvgIcon-root': {
-            color: 'rgb(168,158,158)',
-          },
-        }}
-      >
+      <StyledBox>
         {selectedRows && selectedRows.length > 0 ? (
           <div className={styles.deleteAllUserContainer}>
             <Button
@@ -288,6 +274,7 @@ export const Users: FC = () => {
           onDelete={async () => await handleDeleteButtonClick()}
         />
         <DataGrid
+          className={styles.dataGridContainer}
           rows={filteredUsers}
           columns={columns}
           initialState={{
@@ -384,7 +371,7 @@ export const Users: FC = () => {
             />
           </DialogActions>
         </Dialog>
-      </Box>
+      </StyledBox>
     </Layout>
   );
 };

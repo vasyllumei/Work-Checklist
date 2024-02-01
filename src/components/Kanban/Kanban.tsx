@@ -302,6 +302,7 @@ export const Kanban = () => {
   );
   return (
     <Layout
+      users={users}
       setSearchText={setSearchText}
       headTitle="Kanban"
       breadcrumbs={[

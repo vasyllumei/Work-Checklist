@@ -1,4 +1,12 @@
 .headerAvatar {
- max-width: 45px;
- cursor: pointer;
+ display: flex;
+}
+
+.imageContainer {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ height: 30px;
+ width: 30px;
+ border-radius: 50%;
 }

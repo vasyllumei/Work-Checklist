@@ -6,14 +6,16 @@ import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { FC } from 'react';
 import { UserMenu } from '@/components/Header/UserMenu/UserMenu';
+import { UserType } from '@/types/User';
 
 interface HeaderProps {
   breadcrumbData: BreadcrumbsItem[];
   searchText?: string | undefined;
   handleSearch: (text: string) => void;
+  users: UserType[];
 }
 
-export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSearch }) => {
+export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSearch, users }) => {
   const currentPage = breadcrumbData[breadcrumbData.length - 1];
 
   return (
@@ -31,7 +33,7 @@ export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSear
           <NotificationsNoneIcon className={styles.notificationIcon} />
           <NightlightRoundIcon className={styles.moonIcon} />
           <InfoOutlinedIcon className={styles.infoIcon} />
-          <UserMenu />
+          <UserMenu users={users} />
         </div>
       </div>
     </div>

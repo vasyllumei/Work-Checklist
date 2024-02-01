@@ -4,8 +4,12 @@ import { MenuDocumentType } from '@/models/Menu';
 import { getAllMenus } from '@/services/menu/menuService';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
+import { UserType } from '@/types/User';
 
-export const Menus = () => {
+interface MenusProps {
+  users: UserType[];
+}
+export const UserMenu: React.FC<MenusProps> = ({ users }) => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
   const [searchText, setSearchText] = useState('');
 
@@ -80,6 +84,7 @@ export const Menus = () => {
 
   return (
     <Layout
+      users={users}
       setSearchText={setSearchText}
       headTitle="Menus"
       breadcrumbs={[
