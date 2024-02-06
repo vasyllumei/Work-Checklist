@@ -12,7 +12,7 @@ interface HeaderProps {
   breadcrumbData: BreadcrumbsItem[];
   searchText?: string | undefined;
   handleSearch: (text: string) => void;
-  users: UserType[];
+  users?: UserType[];
 }
 
 export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSearch, users }) => {

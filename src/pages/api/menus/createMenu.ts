@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Menu, { MenuDocumentType } from '@/models/Menu';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const handleCreateMenu = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
@@ -28,4 +29,4 @@ const handleCreateMenu = async (req: NextApiRequest, res: NextApiResponse): Prom
   }
 };
 
-export default handleCreateMenu;
+export default authenticateToken(handleCreateMenu);

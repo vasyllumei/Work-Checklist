@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Task, { TaskDocumentType } from '@/models/Task';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PATCH') {
@@ -46,4 +47,4 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default updateTasks;
+export default authenticateToken(updateTasks);

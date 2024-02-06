@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 import { UserType } from '@/types/User';
 import { useEffect, useState } from 'react';
 interface UserMenuProps {
-  users: UserType[];
+  users?: UserType[];
 }
 export const UserMenu: React.FC<UserMenuProps> = ({ users }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -36,7 +36,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ users }) => {
 
   const userDisplayDataMap = new Map();
 
-  users.map(user => {
+  users?.map(user => {
     const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`;
     const backgroundColor = user.iconColor ?? 'blue';
 

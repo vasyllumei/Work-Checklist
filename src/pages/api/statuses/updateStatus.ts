@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Status, { StatusDocumentType } from '@/models/Status';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const updateColumn = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
@@ -38,4 +39,4 @@ const updateColumn = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default updateColumn;
+export default authenticateToken(updateColumn);

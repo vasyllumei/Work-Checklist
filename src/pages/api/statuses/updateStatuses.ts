@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Status, { StatusDocumentType } from '@/models/Status';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const updateColumns = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PATCH') {
@@ -37,4 +38,4 @@ const updateColumns = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default updateColumns;
+export default authenticateToken(updateColumns);

@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Menu, { MenuDocumentType } from '@/models/Menu';
+import authenticateToken from '@/middlewares/authenticateToken';
 
-export default async function getAllMenus(req: NextApiRequest, res: NextApiResponse) {
+async function getAllMenus(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -23,3 +24,4 @@ export default async function getAllMenus(req: NextApiRequest, res: NextApiRespo
     res.status(500).json({ message: 'Internal server error' });
   }
 }
+export default authenticateToken(getAllMenus);

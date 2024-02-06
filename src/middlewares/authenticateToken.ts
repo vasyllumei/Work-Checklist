@@ -28,10 +28,9 @@ const authenticateToken =
 
     try {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
-
       req.userId = decodedToken.userId;
-
       await handler(req, res);
+      console.log('User authenticated:', decodedToken.userId);
     } catch (err) {
       console.error(err);
       res.status(401).json({ message: 'Not authenticated' });

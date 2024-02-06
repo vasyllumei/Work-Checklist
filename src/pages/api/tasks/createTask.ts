@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Task, { TaskDocumentType } from '@/models/Task';
+import authenticateToken from '@/middlewares/authenticateToken';
 async function getNextTaskOrder() {
   const latestTask = await Task.findOne({}, {}, { sort: { order: -1 } });
   return latestTask ? latestTask.order + 1 : 0;
@@ -50,4 +51,4 @@ const handleCreateTask = async (req: NextApiRequest, res: NextApiResponse): Prom
   }
 };
 
-export default handleCreateTask;
+export default authenticateToken(handleCreateTask);

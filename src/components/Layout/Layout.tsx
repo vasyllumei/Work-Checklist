@@ -16,7 +16,7 @@ interface LayoutProps {
   breadcrumbs?: Breadcrumb[];
   searchText?: string | undefined;
   setSearchText?: (text: string) => void;
-  users: UserType[];
+  users?: UserType[];
 }
 
 export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, setSearchText, users }) => {

@@ -9,7 +9,7 @@ import { UserType } from '@/types/User';
 interface MenusProps {
   users: UserType[];
 }
-export const UserMenu: React.FC<MenusProps> = ({ users }) => {
+export const Menus: React.FC<MenusProps> = ({ users }) => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
   const [searchText, setSearchText] = useState('');
 

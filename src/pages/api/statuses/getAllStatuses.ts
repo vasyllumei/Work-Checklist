@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Status, { StatusDocumentType } from '@/models/Status';
+import authenticateToken from '@/middlewares/authenticateToken';
 
-export default async function getAllStatuses(req: NextApiRequest, res: NextApiResponse) {
+async function getAllStatuses(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -22,3 +23,4 @@ export default async function getAllStatuses(req: NextApiRequest, res: NextApiRe
     res.status(500).json({ message: 'Internal server error' });
   }
 }
+export default authenticateToken(getAllStatuses);
