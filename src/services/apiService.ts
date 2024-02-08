@@ -6,7 +6,6 @@ export type ResponseType<Data> = {
   data: Data;
   message?: string;
 };
-
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
@@ -17,11 +16,19 @@ const api = axios.create({
   responseType: 'json',
 });
 
-if (typeof window !== 'undefined') {
-  const token = Cookies.get(LOCAL_STORAGE_TOKEN);
-  if (token) {
-    api.defaults.headers.Authorization = `Bearer ${token}`;
-  }
-}
+api.interceptors.request.use(
+  config => {
+    const token = Cookies.get(LOCAL_STORAGE_TOKEN);
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  },
+);
 
 export { api };

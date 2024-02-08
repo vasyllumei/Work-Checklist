@@ -7,12 +7,16 @@ const RouteGuard = ({ children }) => {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
 
+  const isPublicRoute = path => {
+    const publicRoutes = ['/login', '/signUp', '/'];
+    return publicRoutes.includes(path);
+  };
   useEffect(() => {
     const checkAuthentication = () => {
       const token = Cookies.get(LOCAL_STORAGE_TOKEN);
       if (token && isTokenValid(token)) {
         setAuthenticated(true);
-      } else if (!router.pathname.startsWith('/login')) {
+      } else if (!isPublicRoute(router.pathname)) {
         setAuthenticated(false);
         router.push('/login');
       }
@@ -30,8 +34,7 @@ const RouteGuard = ({ children }) => {
     };
 
     const handleRouteChangeStart = url => {
-      console.log('Route change started:', url);
-      if (!url.startsWith('/login')) {
+      if (!isPublicRoute(url)) {
         checkAuthentication();
       }
     };
@@ -45,7 +48,7 @@ const RouteGuard = ({ children }) => {
     };
   }, [router]);
 
-  return authenticated ? <>{children}</> : null;
+  return authenticated || isPublicRoute(router.pathname) ? <>{children}</> : null;
 };
 
 export default RouteGuard;
