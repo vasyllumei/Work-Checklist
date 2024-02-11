@@ -9,9 +9,9 @@ import { ColumnTitleEdit } from '@/components/Kanban/components/ColumnTitleEdit/
 import { Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
 import { ColumnType } from '@/types/Column';
 import { UserType } from '@/types/User';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider';
 interface ColumnProps {
   column: ColumnType;
   index: number;

@@ -3,7 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from './CreateColumnModal.module.css';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider';
 
 export const CreateColumnModal = () => {
   const { createStatusModal, closeAddStatusModal, setNewColumn, isAddStatusModalOpen, newColumn } = useKanbanContext();

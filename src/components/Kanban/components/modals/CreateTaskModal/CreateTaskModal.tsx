@@ -5,7 +5,7 @@ import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal.module.css';
 import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider';
 
 export const CreateTaskModal = () => {
   const { users, formik, getFieldError, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } =

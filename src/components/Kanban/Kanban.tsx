@@ -7,8 +7,8 @@ import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTas
 import { Button } from '@/components/Button';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
 import { ColumnType } from '@/types/Column';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider';
 
 export const Kanban = () => {
   const {

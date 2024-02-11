@@ -84,7 +84,7 @@ export default interface KanbanContextProps {
 }
 export const KanbanContext = createContext<KanbanContextProps | null>(null);
 
-export const KanbanProvider = ({ children }: any) => {
+export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [newColumn, setNewColumn] = useState<ColumnType>({ title: '', order: 0, id: '' });
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
@@ -385,13 +385,4 @@ export const KanbanProvider = ({ children }: any) => {
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;
-};
-export const useKanbanContext = (): KanbanContextProps => {
-  const context = useContext(KanbanContext);
-
-  if (!context) {
-    throw new Error('useKanbanContext must be used within a KanbanProvider');
-  }
-
-  return context;
 };

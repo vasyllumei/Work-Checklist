@@ -4,8 +4,8 @@ import { Button } from '@/components/Button';
 import styles from './TaskEditor.module.css';
 import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
 import { UserType } from '@/types/User';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider';
 
 export const TaskEditor = () => {
   const { users, formik, getFieldError, stopEditingTask } = useKanbanContext();
