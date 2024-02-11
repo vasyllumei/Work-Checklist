@@ -2,30 +2,18 @@ import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
-import { ColumnType } from '@/types/Column';
 import styles from './CreateColumnModal.module.css';
-interface CreateColumnModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  newColumn: ColumnType;
-  setNewColumn: React.Dispatch<React.SetStateAction<ColumnType>>;
-}
+import { useKanbanContext } from '@/components/Context/KanbanContext';
 
-export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
-  isOpen,
-  onClose,
-  onSave,
-  newColumn,
-  setNewColumn,
-}) => {
+export const CreateColumnModal = () => {
+  const { createStatusModal, closeAddStatusModal, setNewColumn, isAddStatusModalOpen, newColumn } = useKanbanContext();
   const handleCreateStatus = async () => {
-    await onSave();
-    onClose();
+    await createStatusModal();
+    closeAddStatusModal();
   };
 
   const handleCancelStatus = () => {
-    onClose();
+    closeAddStatusModal();
     setNewColumn(prevColumn => ({
       ...prevColumn,
       title: '',
@@ -33,7 +21,7 @@ export const CreateColumnModal: React.FC<CreateColumnModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleCancelStatus}>
+    <Dialog open={isAddStatusModalOpen} onClose={handleCancelStatus}>
       <DialogTitle>Add New Status</DialogTitle>
       <DialogContent>
         <TextInput

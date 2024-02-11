@@ -5,30 +5,14 @@ import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal.module.css';
 import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
-import { UserType } from '@/types/User';
-import { ColumnType } from '@/types/Column';
-interface CreateStatusModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  formik: any;
-  getFieldError: (fieldName: string) => string | undefined;
-  stopEditingTask: () => void;
-  users: UserType[];
-  columns: ColumnType[];
-}
+import { useKanbanContext } from '@/components/Context/KanbanContext';
 
-export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
-  isOpen,
-  onClose,
-  formik,
-  getFieldError,
-  stopEditingTask,
-  users,
-  columns,
-}) => {
+export const CreateTaskModal = () => {
+  const { users, formik, getFieldError, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } =
+    useKanbanContext();
   const [showColumn, setShowColumn] = useState(false);
   const handleCancelTask = () => {
-    onClose();
+    closeAddTaskModal();
     setShowColumn(false);
   };
   const usersList = users.map(user => ({
@@ -40,14 +24,13 @@ export const CreateTaskModal: React.FC<CreateStatusModalProps> = ({
     label: `${column.title}`,
   }));
   useEffect(() => {
-    if (!formik.values.statusId && isOpen) {
+    if (!formik.values.statusId && isAddTaskModalOpen) {
       setShowColumn(true);
-      console.log(formik.values);
     }
-  }, [isOpen]);
+  }, [formik.values.statusId, isAddTaskModalOpen]);
 
   return (
-    <Dialog open={isOpen} onClose={handleCancelTask}>
+    <Dialog open={isAddTaskModalOpen} onClose={handleCancelTask}>
       <DialogTitle>Add New Task</DialogTitle>
       <DialogContent>
         <div className={styles.taskForm}>
