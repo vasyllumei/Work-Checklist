@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { ColumnType } from '@/types/Column';
 import { ButtonStateType, TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
