@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { ColumnType } from '@/types/Column';
 import { ButtonStateType, TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
-import { getAllColumns, createColumn, deleteColumn, updateColumns } from '@/services/columns/columnService';
+import { getAllColumns, createColumn, deleteColumn, updateColumns } from '@/services/column/columnService';
 import { getAllTasks, createTask, deleteTask, updateTask, updateTasks } from '@/services/task/taskService';
 import { getAllUsers } from '@/services/user/userService';
 import { DropResult } from 'react-beautiful-dnd';
@@ -58,6 +58,7 @@ export default interface KanbanContextProps {
   searchText: string;
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
   fetchData: () => void;
+  fetchUsers: () => void;
   filteredTasks: TaskType[];
   createStatusModal: () => void;
   closeAddStatusModal: () => void;
@@ -119,19 +120,14 @@ export const KanbanProvider = ({ children }: any) => {
     try {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
-      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      setTasks(sortedTasks);
+      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
       setColumns(sortedColumns);
+      setTasks(sortedTasks);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-    fetchUsers();
-  }, []);
 
   const handleColumnCreate = async () => {
     try {
@@ -385,6 +381,7 @@ export const KanbanProvider = ({ children }: any) => {
     onDragEnd,
     filteredTasks,
     formik,
+    fetchUsers,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;

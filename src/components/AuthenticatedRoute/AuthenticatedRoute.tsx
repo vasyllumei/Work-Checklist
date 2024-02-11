@@ -42,20 +42,24 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   };
 
   const handleRouteChangeStart = (url: string): void => {
-    if (!isPublicRoute(url)) {
-      checkAuthentication();
+    if (typeof window !== 'undefined' && url) {
+      if (!isPublicRoute(url)) {
+        checkAuthentication();
+      }
     }
   };
 
   useEffect(() => {
-    checkAuthentication();
+    if (typeof window !== 'undefined') {
+      checkAuthentication();
 
-    router.events.on('routeChangeStart', handleRouteChangeStart);
+      router.events.on('routeChangeStart', handleRouteChangeStart);
 
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-    };
-  }, [router.pathname]);
+      return () => {
+        router.events.off('routeChangeStart', handleRouteChangeStart);
+      };
+    }
+  }, [router.pathname, checkAuthentication]);
 
   return authenticated || isPublicRoute(router.pathname) ? <>{children}</> : null;
 };

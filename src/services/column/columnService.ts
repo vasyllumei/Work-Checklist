@@ -11,7 +11,7 @@ export const deleteColumn = async (statusId: string): Promise<{ success: boolean
     const response = await api.delete<{ success: boolean }>(`/statuses/deleteStatus?id=${statusId}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting columns:', error);
+    console.error('Error deleting column:', error);
     throw error;
   }
 };

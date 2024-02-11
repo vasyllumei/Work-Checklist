@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from '@/components/Kanban/components/Column';
@@ -11,8 +11,21 @@ import { useKanbanContext } from '@/components/Context/KanbanContext';
 import { ColumnType } from '@/types/Column';
 
 export const Kanban = () => {
-  const { columns, setIsAddStatusModalOpen, onDragEnd, setIsAddTaskModalOpen, setSearchText, users } =
-    useKanbanContext();
+  const {
+    columns,
+    setIsAddStatusModalOpen,
+    fetchData,
+    fetchUsers,
+    onDragEnd,
+    setIsAddTaskModalOpen,
+    setSearchText,
+    users,
+  } = useKanbanContext();
+
+  useEffect(() => {
+    fetchData();
+    fetchUsers();
+  }, []);
 
   return (
     <Layout

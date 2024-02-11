@@ -30,7 +30,7 @@ const updateColumns = async (req: NextApiRequest, res: NextApiResponse) => {
         columns: validUpdatedColumns.map(({ title, order }) => ({ title, order })),
       });
     } catch (error) {
-      console.error('Error updating columns:', error);
+      console.error('Error updating column:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
   } else {
