@@ -4,6 +4,7 @@ import { StyledLayout } from '@/components/Layout/LayoutStyles';
 import { Menu } from '@/components/Menu/Menu';
 import { Header } from '@/components/Header/Header';
 import { Footer } from '@/components/Footer/Footer';
+import { KanbanProvider } from '@/components/Kanban/providers/kanbanProvider';
 
 interface Breadcrumb {
   title: string;
@@ -13,14 +14,9 @@ interface LayoutProps {
   children: ReactNode;
   headTitle?: string;
   breadcrumbs?: Breadcrumb[];
-  searchText?: string | undefined;
-  setSearchText?: (text: string) => void;
 }
 
-export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, setSearchText }) => {
-  const handleSearch = (text: string) => {
-    setSearchText && setSearchText(text);
-  };
+export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs }) => {
   return (
     <StyledLayout.Container>
       <Head>
@@ -32,7 +28,11 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, sear
       </StyledLayout.Menu>
 
       <StyledLayout.Content>
-        {breadcrumbs && <Header searchText={searchText} handleSearch={handleSearch} breadcrumbData={breadcrumbs} />}
+        {breadcrumbs && (
+          <KanbanProvider>
+            <Header breadcrumbData={breadcrumbs} />
+          </KanbanProvider>
+        )}
         {children}
         <Footer />
       </StyledLayout.Content>

@@ -26,9 +26,11 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onDel
       <DialogContent>
         <DialogContentText>{`Are you sure you want to delete ${item}? This action cannot be undone.`}</DialogContentText>
       </DialogContent>
-      <DialogActions className={styles.buttonContainer}>
-        <Button onClick={handleCancel} text="Cancel" size={'small'} outlined={true} />
-        <Button onClick={handleDelete} text="Delete" size={'small'} />
+      <DialogActions>
+        <div className={styles.buttonContainer}>
+          <Button onClick={handleCancel} text="Cancel" size={'small'} outlined={true} />
+          <Button onClick={handleDelete} text="Delete" size={'small'} />
+        </div>
       </DialogActions>
     </Dialog>
   );

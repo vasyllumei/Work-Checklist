@@ -6,9 +6,20 @@ import styles from '@/components/Header/UserMenu/UserMenu.module.css';
 import { useRouter } from 'next/router';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
 import Cookies from 'js-cookie';
-
-export const UserMenu = () => {
+import { UserType } from '@/types/User';
+import { useEffect, useState } from 'react';
+interface UserMenuProps {
+  users?: UserType[];
+}
+export const UserMenu: React.FC<UserMenuProps> = ({ users }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    setCurrentUser(userId);
+  }, []);
+
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -23,6 +34,14 @@ export const UserMenu = () => {
     router.push('/login');
   };
 
+  const userDisplayDataMap = new Map();
+
+  users?.map(user => {
+    const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`;
+    const backgroundColor = user.iconColor ?? 'blue';
+
+    userDisplayDataMap.set(currentUser, { initials, backgroundColor });
+  });
   return (
     <div className={styles.headerAvatar}>
       <Button
@@ -32,7 +51,14 @@ export const UserMenu = () => {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-        <img className={styles.headerAvatar} src="/headerAvatar.png" alt="Header Avatar"></img>
+        <div
+          className={styles.imageContainer}
+          style={{
+            backgroundColor: userDisplayDataMap.get(currentUser)?.backgroundColor || 'blue',
+          }}
+        >
+          {userDisplayDataMap.get(currentUser)?.initials}
+        </div>
       </Button>
       <Menu
         id="basic-menu"

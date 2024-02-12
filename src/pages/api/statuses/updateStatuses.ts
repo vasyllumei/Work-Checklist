@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Status, { StatusDocumentType } from '@/models/Status';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const updateColumns = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PATCH') {
@@ -29,7 +30,7 @@ const updateColumns = async (req: NextApiRequest, res: NextApiResponse) => {
         columns: validUpdatedColumns.map(({ title, order }) => ({ title, order })),
       });
     } catch (error) {
-      console.error('Error updating columns:', error);
+      console.error('Error updating column:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
   } else {
@@ -37,4 +38,4 @@ const updateColumns = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default updateColumns;
+export default authenticateToken(updateColumns);

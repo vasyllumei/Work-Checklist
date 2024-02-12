@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './TextInput.module.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import classNames from 'classnames';
+import TextArea from '@/components/TextInput/TextArea/TextArea';
 
 interface TextInputProps {
   name?: string;
@@ -45,14 +46,7 @@ export function TextInput({
       )}
       {label && <label className={styles.inputLabel}>{label}</label>}
       {isEditing ? (
-        <textarea
-          className={classNames(styles.textArea, { [styles.inputError]: error })}
-          name={name}
-          value={value || ''}
-          onChange={event => onChange(event.target.value)}
-          placeholder={placeholder}
-          disabled={disabled}
-        />
+        <TextArea placeholder="Enter text here..." className="custom-textarea" onChange={onChange} />
       ) : (
         <input
           className={classNames(styles.input, { [styles.inputError]: error })}

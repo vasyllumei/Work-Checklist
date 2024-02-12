@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Task, { TaskDocumentType } from '@/models/Task';
+import authenticateToken from '@/middlewares/authenticateToken';
 
-export default async function getAllTasks(req: NextApiRequest, res: NextApiResponse) {
+async function getAllTasks(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -24,3 +25,4 @@ export default async function getAllTasks(req: NextApiRequest, res: NextApiRespo
     res.status(500).json({ message: 'Internal server error' });
   }
 }
+export default authenticateToken(getAllTasks);

@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Task, { TaskDocumentType } from '@/models/Task';
+import authenticateToken from '@/middlewares/authenticateToken';
 
 const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
@@ -46,4 +47,4 @@ const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 };
-export default handlerUpdateTask;
+export default authenticateToken(handlerUpdateTask);

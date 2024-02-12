@@ -5,9 +5,8 @@ import { getAllMenus } from '@/services/menu/menuService';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
 
-export const Menus = () => {
+export const Menus: React.FC = () => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
-  const [searchText, setSearchText] = useState('');
 
   const columns: GridColDef[] = [
     {
@@ -70,17 +69,10 @@ export const Menus = () => {
 
   useEffect(() => {
     fetchMenus();
-  }, [searchText]);
-
-  const filteredMenu = menus.filter(
-    menu =>
-      menu.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      menu.link.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  }, []);
 
   return (
     <Layout
-      setSearchText={setSearchText}
       headTitle="Menus"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -98,7 +90,7 @@ export const Menus = () => {
         }}
       >
         <DataGrid
-          rows={filteredMenu}
+          rows={menus}
           columns={columns}
           initialState={{
             pagination: {

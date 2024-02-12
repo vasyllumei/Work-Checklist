@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import User from '../../../models/User';
 import dbConnect from '@/lib/dbConnect';
+import authenticateToken from '@/middlewares/authenticateToken';
 interface CustomDeleteResult {
   acknowledged: boolean;
   deletedCount?: number;
@@ -42,4 +43,4 @@ const handlerDeleteAllUsers = async (req: NextApiRequest, res: NextApiResponse) 
   }
 };
 
-export default handlerDeleteAllUsers;
+export default authenticateToken(handlerDeleteAllUsers);

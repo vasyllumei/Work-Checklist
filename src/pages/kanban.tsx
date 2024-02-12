@@ -1,3 +1,12 @@
-import { Kanban } from '@/components/Kanban';
+import { Kanban } from '@/components/Kanban/Kanban';
+import { KanbanProvider } from '@/components/Kanban/providers/kanbanProvider/KanbanContext';
 
-export default Kanban;
+const KanbanPage = () => {
+  return (
+    <KanbanProvider>
+      <Kanban />
+    </KanbanProvider>
+  );
+};
+
+export default KanbanPage;

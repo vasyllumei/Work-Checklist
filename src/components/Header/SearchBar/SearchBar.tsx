@@ -1,27 +1,27 @@
 import { IconButton, InputBase } from '@mui/material';
-import React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from './SearchBar.module.css';
 
-interface SearchBarProps {
-  handleSearch: (text: string) => void;
-  searchText?: string | undefined;
-}
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
+import { useRouter } from 'next/router';
+import { ChangeEvent } from 'react';
 
-const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleSearch(event.target.value);
-  };
+const SearchBar = () => {
+  const { handleSearchText } = useKanbanContext();
+  const router = useRouter();
+  const searchText = router.query.searchText ? router.query.searchText.toString() : '';
 
-  const handleSearchButtonClick = () => {
-    if (searchText) {
-      handleSearch(searchText);
-    }
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newText = event.target.value;
+    const currentRoute = router.pathname;
+    const updatedRoute = newText ? `${currentRoute}?searchText=${newText}` : currentRoute;
+    router.replace(updatedRoute);
+    handleSearchText(newText);
   };
 
   return (
     <div className={styles.searchField}>
-      <IconButton type="button" aria-label="search" onClick={handleSearchButtonClick}>
+      <IconButton type="button" aria-label="search">
         <SearchIcon />
       </IconButton>
       <InputBase

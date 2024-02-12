@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import styles from '@/components/Kanban/components/ColumnTitleEdit/ColumnTitleEdit.module.css';
 import EditIcon from '@mui/icons-material/Edit';
 import { TextInput } from '@/components/TextInput';
-import { updateColumn } from '@/services/columns/columnService';
+import { updateColumn } from '@/services/column/columnService';
 import { ColumnType } from '@/types/Column';
 import useOutsideClick from '@/hooks/useOutsideClick';
 

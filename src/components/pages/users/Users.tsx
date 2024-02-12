@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import {
-  Box,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,6 +10,7 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
+import StyledBox from './components/StyledBox/StyledBox';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { TextInput } from '../../TextInput';
 import { Button } from '@/components/Button';
@@ -38,7 +38,6 @@ export const Users: FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleteAllUsersModalOpen, setIsDeleteAllUsersModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
-  const [searchText, setSearchText] = useState('');
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
   const formik = useFormik({
     initialValues: initialUserForm,
@@ -236,40 +235,17 @@ export const Users: FC = () => {
   };
   useEffect(() => {
     fetchUsers();
-  }, [searchText]);
-
-  const filteredUsers = users.filter(
-    user =>
-      user.firstName?.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.lastName?.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  }, []);
 
   return (
     <Layout
-      setSearchText={setSearchText}
       headTitle="Users"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
         { title: 'Users', link: '/users' },
       ]}
     >
-      <Box
-        sx={{
-          height: 400,
-          width: '100%',
-          '& .theme--header': {
-            backgroundColor: 'rgba(67, 24, 254, 100)',
-            color: 'rgba(255,255,255,100)',
-          },
-          '.css-acpdh7-MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer': {
-            backgroundColor: 'rgba(67, 24, 254, 100)',
-          },
-          '.css-i4bv87-MuiSvgIcon-root': {
-            color: 'rgb(168,158,158)',
-          },
-        }}
-      >
+      <StyledBox>
         {selectedRows && selectedRows.length > 0 ? (
           <div className={styles.deleteAllUserContainer}>
             <Button
@@ -288,7 +264,8 @@ export const Users: FC = () => {
           onDelete={async () => await handleDeleteButtonClick()}
         />
         <DataGrid
-          rows={filteredUsers}
+          className={styles.dataGridContainer}
+          rows={users}
           columns={columns}
           initialState={{
             pagination: {
@@ -375,16 +352,18 @@ export const Users: FC = () => {
               </Select>
             </FormControl>
           </DialogContent>
-          <DialogActions className={styles.buttonContainer}>
-            <Button onClick={handleDialogClose} text="Cancel" size={'small'} outlined={true} />
-            <Button
-              onClick={formik.handleSubmit}
-              text={formik.values.id ? 'Save Changes' : 'Add User'}
-              size={'small'}
-            />
+          <DialogActions>
+            <div className={styles.buttonContainer}>
+              <Button onClick={handleDialogClose} text="Cancel" size={'small'} outlined={true} />
+              <Button
+                onClick={formik.handleSubmit}
+                text={formik.values.id ? 'Save Changes' : 'Add User'}
+                size={'small'}
+              />
+            </div>
           </DialogActions>
         </Dialog>
-      </Box>
+      </StyledBox>
     </Layout>
   );
 };
