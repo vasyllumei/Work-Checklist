@@ -4,12 +4,8 @@ import { MenuDocumentType } from '@/models/Menu';
 import { getAllMenus } from '@/services/menu/menuService';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
-import { UserType } from '@/types/User';
 
-interface MenusProps {
-  users: UserType[];
-}
-export const Menus: React.FC<MenusProps> = ({ users }) => {
+export const Menus: React.FC = () => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
 
   const columns: GridColDef[] = [
@@ -77,7 +73,6 @@ export const Menus: React.FC<MenusProps> = ({ users }) => {
 
   return (
     <Layout
-      users={users}
       headTitle="Menus"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },

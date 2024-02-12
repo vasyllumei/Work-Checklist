@@ -11,16 +11,8 @@ import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/'
 import { ColumnType } from '@/types/Column';
 
 export const Kanban = () => {
-  const {
-    columns,
-    searchText,
-    users,
-    setIsAddStatusModalOpen,
-    fetchData,
-    fetchUsers,
-    onDragEnd,
-    setIsAddTaskModalOpen,
-  } = useKanbanContext();
+  const { columns, searchText, setIsAddStatusModalOpen, fetchData, fetchUsers, onDragEnd, setIsAddTaskModalOpen } =
+    useKanbanContext();
 
   useEffect(() => {
     fetchData();
@@ -29,7 +21,6 @@ export const Kanban = () => {
 
   return (
     <Layout
-      users={users}
       headTitle="Kanban"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },

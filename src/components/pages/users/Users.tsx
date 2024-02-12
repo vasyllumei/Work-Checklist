@@ -239,7 +239,6 @@ export const Users: FC = () => {
 
   return (
     <Layout
-      users={users}
       headTitle="Users"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },

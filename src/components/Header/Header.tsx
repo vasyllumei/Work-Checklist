@@ -6,14 +6,12 @@ import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { FC } from 'react';
 import { UserMenu } from '@/components/Header/UserMenu/UserMenu';
-import { UserType } from '@/types/User';
 
 interface HeaderProps {
   breadcrumbData: BreadcrumbsItem[];
-  users: UserType[];
 }
 
-export const Header: FC<HeaderProps> = ({ breadcrumbData, users }) => {
+export const Header: FC<HeaderProps> = ({ breadcrumbData }) => {
   const currentPage = breadcrumbData[breadcrumbData.length - 1];
 
   return (
@@ -31,7 +29,7 @@ export const Header: FC<HeaderProps> = ({ breadcrumbData, users }) => {
           <NotificationsNoneIcon className={styles.notificationIcon} />
           <NightlightRoundIcon className={styles.moonIcon} />
           <InfoOutlinedIcon className={styles.infoIcon} />
-          <UserMenu users={users} />
+          <UserMenu />
         </div>
       </div>
     </div>

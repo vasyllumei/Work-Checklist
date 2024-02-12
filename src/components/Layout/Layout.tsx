@@ -5,7 +5,6 @@ import { Menu } from '@/components/Menu/Menu';
 import { Header } from '@/components/Header/Header';
 import { Footer } from '@/components/Footer/Footer';
 import { KanbanProvider } from '@/components/Kanban/providers/kanbanProvider';
-import { UserType } from '@/types/User';
 
 interface Breadcrumb {
   title: string;
@@ -15,10 +14,9 @@ interface LayoutProps {
   children: ReactNode;
   headTitle?: string;
   breadcrumbs?: Breadcrumb[];
-  users: UserType[];
 }
 
-export const Layout: FC<LayoutProps> = ({ children, users, headTitle, breadcrumbs }) => {
+export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs }) => {
   return (
     <StyledLayout.Container>
       <Head>
@@ -32,7 +30,7 @@ export const Layout: FC<LayoutProps> = ({ children, users, headTitle, breadcrumb
       <StyledLayout.Content>
         {breadcrumbs && (
           <KanbanProvider>
-            <Header breadcrumbData={breadcrumbs} users={users} />
+            <Header breadcrumbData={breadcrumbs} />
           </KanbanProvider>
         )}
         {children}
