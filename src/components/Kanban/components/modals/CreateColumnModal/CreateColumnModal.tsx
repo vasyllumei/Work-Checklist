@@ -3,7 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from './CreateColumnModal.module.css';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 
 export const CreateColumnModal = () => {
   const { createStatusModal, closeAddStatusModal, setNewColumn, isAddStatusModalOpen, newColumn } = useKanbanContext();
@@ -34,14 +34,16 @@ export const CreateColumnModal = () => {
           placeholder="Add title"
         />
       </DialogContent>
-      <DialogActions className={styles.buttonContainer}>
-        <Button text="Cancel" onClick={handleCancelStatus} size={'small'} outlined={true} />
-        <Button
-          text="Add Status"
-          onClick={handleCreateStatus}
-          size={'small'}
-          disabled={newColumn.title.trim() === ''}
-        />
+      <DialogActions>
+        <div className={styles.buttonContainer}>
+          <Button text="Cancel" onClick={handleCancelStatus} size={'small'} outlined={true} />
+          <Button
+            text="Add Status"
+            onClick={handleCreateStatus}
+            size={'small'}
+            disabled={newColumn.title.trim() === ''}
+          />
+        </div>
       </DialogActions>
     </Dialog>
   );

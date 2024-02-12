@@ -4,7 +4,7 @@ import { Button } from '@/components/Button';
 import styles from './TaskEditor.module.css';
 import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { UserType } from '@/types/User';
 
 export const TaskEditor = () => {

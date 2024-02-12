@@ -11,7 +11,6 @@ interface MenusProps {
 }
 export const Menus: React.FC<MenusProps> = ({ users }) => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
-  const [searchText, setSearchText] = useState('');
 
   const columns: GridColDef[] = [
     {
@@ -74,18 +73,11 @@ export const Menus: React.FC<MenusProps> = ({ users }) => {
 
   useEffect(() => {
     fetchMenus();
-  }, [searchText]);
-
-  const filteredMenu = menus.filter(
-    menu =>
-      menu.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      menu.link.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  }, []);
 
   return (
     <Layout
       users={users}
-      setSearchText={setSearchText}
       headTitle="Menus"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -103,7 +95,7 @@ export const Menus: React.FC<MenusProps> = ({ users }) => {
         }}
       >
         <DataGrid
-          rows={filteredMenu}
+          rows={menus}
           columns={columns}
           initialState={{
             pagination: {

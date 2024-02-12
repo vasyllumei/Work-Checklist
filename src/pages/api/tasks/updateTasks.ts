@@ -20,15 +20,11 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
           task.statusId = statusId || task.statusId;
           task.order = order || task.order;
 
-          console.log('task', task);
-
           return task.save();
         }),
       );
 
       const validUpdatedTasks = updatedTasks.filter(task => task !== null);
-
-      console.log('Tasks updated successfully:', validUpdatedTasks);
 
       return res.status(200).json({
         tasks: validUpdatedTasks.map(({ title, description, statusId, order }) => ({

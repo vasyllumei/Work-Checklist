@@ -38,7 +38,6 @@ export const Users: FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleteAllUsersModalOpen, setIsDeleteAllUsersModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
-  const [searchText, setSearchText] = useState('');
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
   const formik = useFormik({
     initialValues: initialUserForm,
@@ -236,19 +235,11 @@ export const Users: FC = () => {
   };
   useEffect(() => {
     fetchUsers();
-  }, [searchText]);
-
-  const filteredUsers = users.filter(
-    user =>
-      user.firstName?.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.lastName?.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  }, []);
 
   return (
     <Layout
       users={users}
-      setSearchText={setSearchText}
       headTitle="Users"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -275,7 +266,7 @@ export const Users: FC = () => {
         />
         <DataGrid
           className={styles.dataGridContainer}
-          rows={filteredUsers}
+          rows={users}
           columns={columns}
           initialState={{
             pagination: {
@@ -362,13 +353,15 @@ export const Users: FC = () => {
               </Select>
             </FormControl>
           </DialogContent>
-          <DialogActions className={styles.buttonContainer}>
-            <Button onClick={handleDialogClose} text="Cancel" size={'small'} outlined={true} />
-            <Button
-              onClick={formik.handleSubmit}
-              text={formik.values.id ? 'Save Changes' : 'Add User'}
-              size={'small'}
-            />
+          <DialogActions>
+            <div className={styles.buttonContainer}>
+              <Button onClick={handleDialogClose} text="Cancel" size={'small'} outlined={true} />
+              <Button
+                onClick={formik.handleSubmit}
+                text={formik.values.id ? 'Save Changes' : 'Add User'}
+                size={'small'}
+              />
+            </div>
           </DialogActions>
         </Dialog>
       </StyledBox>

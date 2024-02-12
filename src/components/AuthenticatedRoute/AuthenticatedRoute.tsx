@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
@@ -7,7 +7,7 @@ interface RouteGuardProps {
   children: ReactNode;
 }
 
-const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
+const RouteGuard: FC<RouteGuardProps> = ({ children }) => {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
 

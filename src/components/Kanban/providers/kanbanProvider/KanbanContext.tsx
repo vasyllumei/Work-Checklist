@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { ColumnType } from '@/types/Column';
 import { ButtonStateType, TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
@@ -43,6 +43,10 @@ interface FormikValues {
   editMode: boolean;
 }
 export default interface KanbanContextProps {
+  setSearchText: React.Dispatch<React.SetStateAction<string>>;
+  handleSearchText: (text: string) => void;
+  searchText: string;
+  filteredTasks: TaskType[];
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
@@ -55,11 +59,8 @@ export default interface KanbanContextProps {
   setIsAddTaskModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   users: UserType[];
   setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
-  searchText: string;
-  setSearchText: React.Dispatch<React.SetStateAction<string>>;
   fetchData: () => void;
   fetchUsers: () => void;
-  filteredTasks: TaskType[];
   createStatusModal: () => void;
   closeAddStatusModal: () => void;
   stopEditingTask: () => void;
@@ -84,7 +85,7 @@ export default interface KanbanContextProps {
 }
 export const KanbanContext = createContext<KanbanContextProps | null>(null);
 
-export const KanbanProvider = ({ children }: any) => {
+export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [newColumn, setNewColumn] = useState<ColumnType>({ title: '', order: 0, id: '' });
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
@@ -344,12 +345,12 @@ export const KanbanProvider = ({ children }: any) => {
       console.error('Error in onDragEnd:', error);
     }
   };
-
-  const filteredTasks = tasks.filter(
-    task =>
-      task.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-      task.description?.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  const handleSearchText = (text: string) => {
+    setSearchText(text);
+  };
+  const filteredTasks = searchText
+    ? tasks.filter(task => task.title.includes(searchText) || task.description.includes(searchText))
+    : tasks;
 
   const value = {
     columns,
@@ -364,8 +365,6 @@ export const KanbanProvider = ({ children }: any) => {
     setIsAddTaskModalOpen,
     users,
     setUsers,
-    searchText,
-    setSearchText,
     fetchData,
     handleColumnDelete,
     handleTaskEdit,
@@ -379,19 +378,13 @@ export const KanbanProvider = ({ children }: any) => {
     isEditMode,
     stopEditingTask,
     onDragEnd,
-    filteredTasks,
     formik,
     fetchUsers,
+    handleSearchText,
+    searchText,
+    filteredTasks,
+    setSearchText,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;
-};
-export const useKanbanContext = (): KanbanContextProps => {
-  const context = useContext(KanbanContext);
-
-  if (!context) {
-    throw new Error('useKanbanContext must be used within a KanbanProvider');
-  }
-
-  return context;
 };

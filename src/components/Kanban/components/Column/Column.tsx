@@ -9,7 +9,7 @@ import { ColumnTitleEdit } from '@/components/Kanban/components/ColumnTitleEdit/
 import { Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { ColumnType } from '@/types/Column';
 import { UserType } from '@/types/User';
 interface ColumnProps {
@@ -20,7 +20,6 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
   const {
     tasks,
     users,
-    filteredTasks,
     handleColumnDelete,
     onAddNewTask,
     formik,
@@ -28,6 +27,7 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
     handleTaskEdit,
     getButtonStyle,
     handleTaskDelete,
+    searchText,
   } = useKanbanContext();
 
   const [isDeleteColumnModalOpen, setIsDeleteColumnModalOpen] = useState(false);
@@ -46,6 +46,10 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
 
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
+
+  const filteredTasks = searchText
+    ? tasks.filter((task: TaskType) => task.title.includes(searchText) || task.description.includes(searchText))
+    : tasks;
 
   const tasksToRender = filteredTasks.filter((task: TaskType) => task.statusId === column.id);
 

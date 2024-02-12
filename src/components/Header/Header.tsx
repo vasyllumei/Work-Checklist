@@ -10,12 +10,10 @@ import { UserType } from '@/types/User';
 
 interface HeaderProps {
   breadcrumbData: BreadcrumbsItem[];
-  searchText?: string | undefined;
-  handleSearch: (text: string) => void;
-  users?: UserType[];
+  users: UserType[];
 }
 
-export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSearch, users }) => {
+export const Header: FC<HeaderProps> = ({ breadcrumbData, users }) => {
   const currentPage = breadcrumbData[breadcrumbData.length - 1];
 
   return (
@@ -26,7 +24,7 @@ export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSear
       </h1>
       <div className={styles.misc}>
         <div className={styles.search}>
-          <SearchBar searchText={searchText} handleSearch={handleSearch} />
+          <SearchBar />
         </div>
 
         <div className={styles.actionsMenu}>

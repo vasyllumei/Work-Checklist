@@ -7,30 +7,29 @@ import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTas
 import { Button } from '@/components/Button';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
-import { useKanbanContext } from '@/components/Context/KanbanContext';
+import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/';
 import { ColumnType } from '@/types/Column';
 
 export const Kanban = () => {
   const {
     columns,
+    searchText,
+    users,
     setIsAddStatusModalOpen,
     fetchData,
     fetchUsers,
     onDragEnd,
     setIsAddTaskModalOpen,
-    setSearchText,
-    users,
   } = useKanbanContext();
 
   useEffect(() => {
     fetchData();
     fetchUsers();
-  }, []);
+  }, [searchText]);
 
   return (
     <Layout
       users={users}
-      setSearchText={setSearchText}
       headTitle="Kanban"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
