@@ -33,19 +33,39 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
       return;
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET!, {
-      expiresIn: '1h',
-    });
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+        iconColor: user.iconColor,
+      },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: '1h',
+      },
+    );
 
-    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_REFRESH_SECRET!, {
-      expiresIn: '7d',
-    });
+    const refreshToken = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+        iconColor: user.iconColor,
+      },
+      process.env.JWT_REFRESH_SECRET!,
+      {
+        expiresIn: '7d',
+      },
+    );
 
     user.token = token;
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.status(200).json({ token, refreshToken, userId: user._id });
+    res
+      .status(200)
+      .json({ token, refreshToken, userId: user._id, role: user.role, email: user.email, iconColor: user.iconColor });
   } catch (error: any) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });

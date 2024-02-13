@@ -1,3 +1,5 @@
+import { UserRoleType } from '@/types/User';
+
 export type Auth = {
   password: string;
   email: string;
@@ -19,6 +21,8 @@ export type Login = {
 export type LoginResponse = {
   token: string;
   refreshToken: string;
+  role: UserRoleType;
+  email: string;
+  iconColor: string;
   userId: string;
-  assignedTo: string;
 };

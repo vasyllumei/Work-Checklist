@@ -1,20 +1,29 @@
 import { IconButton, InputBase } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from './SearchBar.module.css';
-
-import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { useRouter } from 'next/router';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 const SearchBar = () => {
-  const { handleSearchText } = useKanbanContext();
+  const [inputText, setInputText] = useState<string>('');
   const router = useRouter();
-  const searchText = router.query.searchText ? router.query.searchText.toString() : '';
+
+  useEffect(() => {
+    const storedInputText = localStorage.getItem('searchInputText');
+    if (storedInputText) {
+      setInputText(storedInputText);
+    }
+  }, []);
+
+  const handleSearchText = (text: string) => {
+    setInputText(text);
+    localStorage.setItem('searchInputText', text);
+  };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newText = event.target.value;
     const currentRoute = router.pathname;
-    const updatedRoute = newText ? `${currentRoute}?searchText=${newText}` : currentRoute;
+    const updatedRoute = newText ? `${currentRoute}?inputText=${newText}` : currentRoute;
     router.replace(updatedRoute);
     handleSearchText(newText);
   };
@@ -28,7 +37,7 @@ const SearchBar = () => {
         id="searchInput"
         className={styles.text}
         placeholder="Search"
-        value={searchText}
+        value={inputText}
         onChange={handleInputChange}
       />
     </div>

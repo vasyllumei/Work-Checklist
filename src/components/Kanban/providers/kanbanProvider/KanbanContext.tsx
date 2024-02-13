@@ -43,10 +43,6 @@ interface FormikValues {
   editMode: boolean;
 }
 export default interface KanbanContextProps {
-  setSearchText: React.Dispatch<React.SetStateAction<string>>;
-  handleSearchText: (text: string) => void;
-  searchText: string;
-  filteredTasks: TaskType[];
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
@@ -92,7 +88,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
-  const [searchText, setSearchText] = useState<string>('');
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -117,14 +112,19 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       }
     },
   });
-  const fetchData = async () => {
+  const fetchData = async (searchText?: string) => {
     try {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
+      const searchInputText = searchText || localStorage.getItem('searchInputText') || '';
+
+      const filteredTasks = tasksData.filter(task => task.title.toLowerCase().includes(searchInputText.toLowerCase()));
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
+      const sortedTasks = filteredTasks.sort((a, b) => a.order - b.order);
       setColumns(sortedColumns);
       setTasks(sortedTasks);
+
+      return searchInputText;
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -345,12 +345,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       console.error('Error in onDragEnd:', error);
     }
   };
-  const handleSearchText = (text: string) => {
-    setSearchText(text);
-  };
-  const filteredTasks = searchText
-    ? tasks.filter(task => task.title.includes(searchText) || task.description.includes(searchText))
-    : tasks;
 
   const value = {
     columns,
@@ -380,10 +374,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     onDragEnd,
     formik,
     fetchUsers,
-    handleSearchText,
-    searchText,
-    filteredTasks,
-    setSearchText,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;

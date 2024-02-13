@@ -6,18 +6,28 @@ import styles from '@/components/Header/UserMenu/UserMenu.module.css';
 import { useRouter } from 'next/router';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
 import Cookies from 'js-cookie';
-import { UserType } from '@/types/User';
 import { useEffect, useState } from 'react';
-interface UserMenuProps {
-  users?: UserType[];
-}
-export const UserMenu: React.FC<UserMenuProps> = ({ users }) => {
+import { getAllUsers } from '@/services/user/userService';
+import { UserType } from '@/types/User';
+
+export const UserMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
-
+  const [users, setUsers] = useState<UserType[]>([]);
   useEffect(() => {
-    const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
-    setCurrentUser(userId);
+    const fetchData = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        setCurrentUser(userId);
+        const fetchedUsersData = await getAllUsers();
+        const fetchedUsers: UserType[] = fetchedUsersData.data;
+        setUsers(fetchedUsers);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const open = Boolean(anchorEl);
@@ -42,6 +52,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ users }) => {
 
     userDisplayDataMap.set(currentUser, { initials, backgroundColor });
   });
+
   return (
     <div className={styles.headerAvatar}>
       <Button

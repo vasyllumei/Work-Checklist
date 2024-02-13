@@ -11,13 +11,13 @@ import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/'
 import { ColumnType } from '@/types/Column';
 
 export const Kanban = () => {
-  const { columns, searchText, setIsAddStatusModalOpen, fetchData, fetchUsers, onDragEnd, setIsAddTaskModalOpen } =
+  const { columns, setIsAddStatusModalOpen, fetchData, fetchUsers, onDragEnd, setIsAddTaskModalOpen } =
     useKanbanContext();
 
   useEffect(() => {
     fetchData();
     fetchUsers();
-  }, [searchText]);
+  }, []);
 
   return (
     <Layout

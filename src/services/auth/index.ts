@@ -20,9 +20,17 @@ export const login = async ({ email, password }: Login): Promise<LoginResponse> 
   try {
     const response = await api.post<LoginResponse>('/auth/login', { email, password });
 
-    const { token } = response.data;
+    const { token, refreshToken, role, userId, iconColor } = response.data;
     Cookies.set(LOCAL_STORAGE_TOKEN, token);
-
+    localStorage.setItem(
+      'currentUser',
+      JSON.stringify({
+        userId,
+        role,
+        iconColor,
+        refreshToken,
+      }),
+    );
     return response.data;
   } catch (error) {
     throw error;

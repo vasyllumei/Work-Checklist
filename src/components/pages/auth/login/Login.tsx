@@ -66,11 +66,14 @@ export const Login: FC = () => {
       const response = await login({ email: value.email, password: value.password });
 
       if (response && response.token) {
-        const token = response.token;
+        const { token, userId, role, iconColor, email } = response;
+
         if (typeof window !== 'undefined') {
           Cookies.set(LOCAL_STORAGE_TOKEN, token, { expires: 7, secure: true });
-          const { userId } = response;
           localStorage.setItem('userId', userId);
+          localStorage.setItem('role', role);
+          localStorage.setItem('iconColor', iconColor);
+          localStorage.setItem('email', email);
           await router.push('/');
         }
       }
