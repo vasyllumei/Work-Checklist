@@ -61,19 +61,22 @@ export const CreateTaskModal = () => {
               value={formik.values.statusId || ''}
               onChange={value => formik.setFieldValue('statusId', value)}
               options={columnList}
+              multiple={false}
             />
           ) : null}
           <SelectComponent
             label="Select assigned  user"
-            value={formik.values.assignedTo}
+            value={formik.values.assignedTo || ''}
             onChange={value => formik.setFieldValue('assignedTo', value)}
             options={usersList}
+            multiple={false}
           />
           <SelectComponent
             label="Select a task stage"
-            value={formik.values.buttonState}
+            value={formik.values.buttonState || ''}
             onChange={value => formik.setFieldValue('buttonState', value)}
             options={BUTTON_STATES}
+            multiple={false}
           />
         </div>
       </DialogContent>

@@ -5,14 +5,9 @@ import styles from './TaskEditor.module.css';
 import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
-import { UserType } from '@/types/User';
-
 export const TaskEditor = () => {
-  const { users, formik, getFieldError, stopEditingTask } = useKanbanContext();
-  const usersList = users.map((user: UserType) => ({
-    value: user.id ? user.id.toString() : '',
-    label: `${user.firstName} ${user.lastName}`,
-  }));
+  const { usersList, formik, getFieldError, stopEditingTask } = useKanbanContext();
+
   return (
     <div className={styles.editingContent}>
       <TextInput
@@ -39,14 +34,16 @@ export const TaskEditor = () => {
       <SelectComponent
         label="Edit assigned  user"
         value={formik.values.assignedTo}
-        onChange={value => formik.setFieldValue('assignedTo', value)}
+        onChange={(value: string) => formik.setFieldValue('assignedTo', value)}
         options={usersList}
+        multiple={false}
       />
       <SelectComponent
         label="Edit task stage"
         value={formik.values.buttonState}
-        onChange={value => formik.setFieldValue('buttonState', value)}
+        onChange={(value: string) => formik.setFieldValue('buttonState', value)}
         options={BUTTON_STATES}
+        multiple={false}
       />
       <div className={styles.taskButtonContainer}>
         <Button text="Cancel" onClick={stopEditingTask} size={'small'} outlined={true} />

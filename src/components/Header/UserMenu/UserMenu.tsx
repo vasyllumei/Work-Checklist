@@ -10,10 +10,16 @@ import { useEffect, useState } from 'react';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
 
+interface UserDisplayData {
+  initials: string;
+  backgroundColor: string;
+}
+
 export const UserMenu: React.FC = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [users, setUsers] = useState<UserType[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -31,26 +37,29 @@ export const UserMenu: React.FC = () => {
   }, []);
 
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const router = useRouter();
+
   const handleLogout = () => {
     Cookies.remove(LOCAL_STORAGE_TOKEN);
     router.push('/login');
   };
 
-  const userDisplayDataMap = new Map();
+  const userDisplayDataMap: Record<string, UserDisplayData> = {};
 
-  users?.map(user => {
+  users?.forEach(user => {
     const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`;
     const backgroundColor = user.iconColor ?? 'blue';
 
-    userDisplayDataMap.set(currentUser, { initials, backgroundColor });
+    userDisplayDataMap[user.id ?? ''] = { initials, backgroundColor };
   });
 
   return (
@@ -65,10 +74,10 @@ export const UserMenu: React.FC = () => {
         <div
           className={styles.imageContainer}
           style={{
-            backgroundColor: userDisplayDataMap.get(currentUser)?.backgroundColor || 'blue',
+            backgroundColor: userDisplayDataMap[currentUser ?? '']?.backgroundColor || 'blue',
           }}
         >
-          {userDisplayDataMap.get(currentUser)?.initials}
+          {userDisplayDataMap[currentUser ?? '']?.initials}
         </div>
       </Button>
       <Menu

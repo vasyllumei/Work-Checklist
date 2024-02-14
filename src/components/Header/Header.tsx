@@ -9,9 +9,11 @@ import { UserMenu } from '@/components/Header/UserMenu/UserMenu';
 
 interface HeaderProps {
   breadcrumbData: BreadcrumbsItem[];
+  searchText?: string | undefined;
+  handleSearch?: ((text: string) => void) | undefined;
 }
 
-export const Header: FC<HeaderProps> = ({ breadcrumbData }) => {
+export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSearch }) => {
   const currentPage = breadcrumbData[breadcrumbData.length - 1];
 
   return (
@@ -22,7 +24,7 @@ export const Header: FC<HeaderProps> = ({ breadcrumbData }) => {
       </h1>
       <div className={styles.misc}>
         <div className={styles.search}>
-          <SearchBar />
+          <SearchBar searchText={searchText} handleSearch={handleSearch} />
         </div>
 
         <div className={styles.actionsMenu}>

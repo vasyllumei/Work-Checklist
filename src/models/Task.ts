@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { ButtonStateType } from '@/types/Task';
 
 export type TaskDocumentType = Document & {
   userId: string;
@@ -7,7 +6,7 @@ export type TaskDocumentType = Document & {
   title: string;
   description: string;
   statusId: string;
-  buttonState: ButtonStateType;
+  buttonState: string;
   order: number;
 };
 
@@ -38,8 +37,8 @@ const TaskSchema = new Schema<TaskDocumentType>(
     },
     buttonState: {
       type: String,
-      enum: [ButtonStateType.Pending, ButtonStateType.Updates, ButtonStateType.Done, ButtonStateType.Errors],
-      default: ButtonStateType.Pending,
+      ref: 'ButtonState',
+      required: true,
     },
     order: {
       type: Number,

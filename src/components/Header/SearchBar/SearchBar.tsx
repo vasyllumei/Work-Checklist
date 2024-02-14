@@ -1,44 +1,46 @@
 import { IconButton, InputBase } from '@mui/material';
+import React, { useEffect } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from './SearchBar.module.css';
 import { useRouter } from 'next/router';
-import { ChangeEvent, useEffect, useState } from 'react';
 
-const SearchBar = () => {
-  const [inputText, setInputText] = useState<string>('');
+interface SearchBarProps {
+  handleSearch?: ((text: string) => void) | undefined;
+  searchText?: string | undefined;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
   const router = useRouter();
 
-  useEffect(() => {
-    const storedInputText = localStorage.getItem('searchInputText');
-    if (storedInputText) {
-      setInputText(storedInputText);
-    }
-  }, []);
+  const handleInteraction = (text: string) => {
+    const updatedRoute = text ? `${router.pathname}?inputText=${text}` : router.pathname;
+    router.replace(updatedRoute);
+    handleSearchAndSave(text);
+  };
 
-  const handleSearchText = (text: string) => {
-    setInputText(text);
+  const handleSearchAndSave = (text: string) => {
+    if (handleSearch) {
+      handleSearch(text || '');
+    }
     localStorage.setItem('searchInputText', text);
   };
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const newText = event.target.value;
-    const currentRoute = router.pathname;
-    const updatedRoute = newText ? `${currentRoute}?inputText=${newText}` : currentRoute;
-    router.replace(updatedRoute);
-    handleSearchText(newText);
-  };
+  useEffect(() => {
+    const storedText = localStorage.getItem('searchInputText');
+    storedText && handleSearchAndSave(storedText);
+  }, []);
 
   return (
     <div className={styles.searchField}>
-      <IconButton type="button" aria-label="search">
+      <IconButton type="button" aria-label="search" disabled>
         <SearchIcon />
       </IconButton>
       <InputBase
         id="searchInput"
         className={styles.text}
         placeholder="Search"
-        value={inputText}
-        onChange={handleInputChange}
+        value={searchText}
+        onChange={event => handleInteraction(event.target.value)}
       />
     </div>
   );

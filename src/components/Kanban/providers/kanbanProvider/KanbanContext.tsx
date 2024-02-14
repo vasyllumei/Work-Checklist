@@ -1,6 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { ColumnType } from '@/types/Column';
-import { ButtonStateType, TaskType } from '@/types/Task';
+import { TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
 import { getAllColumns, createColumn, deleteColumn, updateColumns } from '@/services/column/columnService';
 import { getAllTasks, createTask, deleteTask, updateTask, updateTasks } from '@/services/task/taskService';
@@ -25,7 +25,7 @@ const initialTaskForm = {
   statusId: '',
   avatar: '',
   image: '',
-  buttonState: ButtonStateType.Pending,
+  buttonState: '',
   order: 0,
   editMode: false,
 };
@@ -38,11 +38,12 @@ interface FormikValues {
   statusId: string;
   avatar: string;
   image: string;
-  buttonState: ButtonStateType;
+  buttonState: string;
   order: number;
   editMode: boolean;
 }
 export default interface KanbanContextProps {
+  usersList: any;
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
@@ -55,6 +56,8 @@ export default interface KanbanContextProps {
   setIsAddTaskModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   users: UserType[];
   setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
+  searchText: string;
+  handleSearch?: ((text: string) => void) | undefined;
   fetchData: () => void;
   fetchUsers: () => void;
   createStatusModal: () => void;
@@ -88,6 +91,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
+  const [searchText, setSearchText] = useState<string>('');
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -112,19 +116,14 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       }
     },
   });
-  const fetchData = async (searchText?: string) => {
+  const fetchData = async () => {
     try {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
-      const searchInputText = searchText || localStorage.getItem('searchInputText') || '';
-
-      const filteredTasks = tasksData.filter(task => task.title.toLowerCase().includes(searchInputText.toLowerCase()));
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      const sortedTasks = filteredTasks.sort((a, b) => a.order - b.order);
+      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
       setColumns(sortedColumns);
       setTasks(sortedTasks);
-
-      return searchInputText;
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -346,6 +345,15 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     }
   };
 
+  const handleSearch = (text: string) => {
+    setSearchText && setSearchText(text);
+  };
+
+  const usersList = users.map((user: UserType) => ({
+    value: user.id ? user.id.toString() : '',
+    label: `${user.firstName} ${user.lastName}`,
+  }));
+
   const value = {
     columns,
     setColumns,
@@ -359,6 +367,8 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     setIsAddTaskModalOpen,
     users,
     setUsers,
+    searchText,
+    handleSearch,
     fetchData,
     handleColumnDelete,
     handleTaskEdit,
@@ -374,6 +384,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     onDragEnd,
     formik,
     fetchUsers,
+    usersList,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;

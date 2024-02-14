@@ -9,18 +9,32 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/';
 import { ColumnType } from '@/types/Column';
+import { SelectComponent } from '@/components/Select/Select';
+import { BUTTON_STATES } from '@/constants';
 
 export const Kanban = () => {
-  const { columns, setIsAddStatusModalOpen, fetchData, fetchUsers, onDragEnd, setIsAddTaskModalOpen } =
-    useKanbanContext();
+  const {
+    columns,
+    searchText,
+    handleSearch,
+    setIsAddStatusModalOpen,
+    fetchData,
+    fetchUsers,
+    onDragEnd,
+    usersList,
+    formik,
+    setIsAddTaskModalOpen,
+  } = useKanbanContext();
 
   useEffect(() => {
     fetchData();
     fetchUsers();
-  }, []);
+  }, [searchText]);
 
   return (
     <Layout
+      searchText={searchText}
+      handleSearch={handleSearch}
       headTitle="Kanban"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -41,6 +55,23 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
+      <div className={styles.selectContainer}>
+        <SelectComponent
+          label="Choise assigneds users"
+          value={formik.values.assignedTo || ''}
+          onChange={value => formik.setFieldValue('assignedTo', value)}
+          options={usersList}
+          multiple
+        />
+        <SelectComponent
+          label="Choise buttons states"
+          value={formik.values.buttonState}
+          onChange={value => formik.setFieldValue('buttonState', value)}
+          options={BUTTON_STATES}
+          multiple
+        />
+      </div>
+
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
           {provided => (
