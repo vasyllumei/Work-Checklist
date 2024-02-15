@@ -4,7 +4,10 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { Checkbox, ListItemText } from '@mui/material';
+import { Checkbox, Divider, ListItemText } from '@mui/material';
+import { Button } from '@/components/Button';
+import styles from './Select.module.css';
+import { useState } from 'react';
 
 interface Option {
   value: string;
@@ -17,47 +20,53 @@ interface SelectProps {
   onChange: (value: string) => void;
   label: string;
   multiple: boolean;
+  applyFilters?: any;
 }
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple }) => {
-  const [personName, setPersonName] = React.useState<string[]>([]);
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+
+export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple, applyFilters }) => {
+  const [selectedProp, setSelectedProp] = useState<string[]>([]);
+  const handleChange = (event: SelectChangeEvent<typeof selectedProp>) => {
     const {
       target: { value },
     } = event;
-    setPersonName(typeof value === 'string' ? value.split(',') : value);
+    setSelectedProp(typeof value === 'string' ? value.split(',') : value);
   };
 
+  const handleResetCheckbox = () => {
+    setSelectedProp([]);
+  };
+  const handleApplyFilters = () => {
+    console.log('Applying filters...');
+    console.log('Selected values:', selectedProp);
+    if (applyFilters) {
+      applyFilters(selectedProp);
+    }
+  };
   return (
-    <Box sx={{ minWidth: 120 }}>
+    <Box>
       {multiple ? (
-        <FormControl sx={{ m: 1, width: 300 }}>
+        <FormControl size="small" sx={{ m: 1, width: 300 }}>
           <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
           <Select
             labelId="demo-multiple-checkbox-label"
             id="demo-multiple-checkbox"
             multiple
             label={label}
-            value={personName}
+            value={selectedProp}
             onChange={handleChange}
             renderValue={selected => selected.join(', ')}
-            MenuProps={MenuProps}
           >
             {options.map(option => (
               <MenuItem key={option.value} value={option.label}>
-                <Checkbox checked={personName.indexOf(option.label) > -1} />
+                <Checkbox checked={selectedProp.indexOf(option.label) > -1} />
                 <ListItemText primary={option.label} />
               </MenuItem>
             ))}
+            <Divider />
+            <div className={styles.multiSelectButton}>
+              <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
+              <Button text="Apply" onClick={handleApplyFilters} size="small" />
+            </div>
           </Select>
         </FormControl>
       ) : (

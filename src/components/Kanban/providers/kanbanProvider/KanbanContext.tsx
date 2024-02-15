@@ -44,6 +44,7 @@ interface FormikValues {
 }
 export default interface KanbanContextProps {
   usersList: any;
+  applyFilters: any;
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
@@ -92,6 +93,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
+  const [personName, setPersonName] = useState<string[]>([]);
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -116,12 +118,27 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       }
     },
   });
+  const applyFilters = (data: any, assignedTo: any, buttonState: any) => {
+    return data.filter((item: any) => {
+      // Ваша логика фильтрации на основе выбранных значений
+      // Например, проверка наличия assignedTo в списке выбранных пользователей и buttonState в списке выбранных состояний
+      const isAssignedToMatch = !assignedTo || assignedTo.includes(item.assignedTo);
+      const isButtonStateMatch = !buttonState || buttonState.includes(item.buttonState);
+
+      return isAssignedToMatch && isButtonStateMatch;
+    });
+  };
   const fetchData = async () => {
     try {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
+
+      // Применяем фильтрацию на клиентской стороне
+      const filteredTasks = applyFilters(tasksData, formik.values.assignedTo, formik.values.buttonState);
+
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
+      const sortedTasks = filteredTasks.sort((a: TaskType, b: TaskType) => a.order - b.order);
+
       setColumns(sortedColumns);
       setTasks(sortedTasks);
     } catch (error) {
@@ -366,6 +383,8 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     isAddTaskModalOpen,
     setIsAddTaskModalOpen,
     users,
+    setPersonName,
+    personName,
     setUsers,
     searchText,
     handleSearch,
@@ -385,6 +404,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     formik,
     fetchUsers,
     usersList,
+    applyFilters,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;

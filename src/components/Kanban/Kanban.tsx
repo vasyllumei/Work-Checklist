@@ -20,6 +20,7 @@ export const Kanban = () => {
     setIsAddStatusModalOpen,
     fetchData,
     fetchUsers,
+    applyFilters,
     onDragEnd,
     usersList,
     formik,
@@ -57,6 +58,7 @@ export const Kanban = () => {
       </div>
       <div className={styles.selectContainer}>
         <SelectComponent
+          applyFilters={applyFilters}
           label="Choise assigneds users"
           value={formik.values.assignedTo || ''}
           onChange={value => formik.setFieldValue('assignedTo', value)}
@@ -64,6 +66,7 @@ export const Kanban = () => {
           multiple
         />
         <SelectComponent
+          applyFilters={applyFilters}
           label="Choise buttons states"
           value={formik.values.buttonState}
           onChange={value => formik.setFieldValue('buttonState', value)}
