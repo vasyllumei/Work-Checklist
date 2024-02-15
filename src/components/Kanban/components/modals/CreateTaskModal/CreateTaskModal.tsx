@@ -3,9 +3,10 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal.module.css';
-import { SelectComponent } from '@/components/Select/Select';
+
 import { BUTTON_STATES } from '@/constants';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
+import { SelectComponent } from '@/components/Select/Select';
 
 export const CreateTaskModal = () => {
   const { users, formik, getFieldError, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } =
@@ -15,14 +16,22 @@ export const CreateTaskModal = () => {
     closeAddTaskModal();
     setShowColumn(false);
   };
+  const handleSubmitForm = () => {
+    formik.handleSubmit();
+    if (!formik.errors) {
+      setShowColumn(false);
+    }
+  };
   const usersList = users.map(user => ({
     value: user.id ? user.id.toString() : '',
     label: `${user.firstName} ${user.lastName}`,
   }));
+
   const columnList = columns.map(column => ({
     value: column.id,
     label: `${column.title}`,
   }));
+
   useEffect(() => {
     if (!formik.values.statusId && isAddTaskModalOpen) {
       setShowColumn(true);
@@ -89,15 +98,7 @@ export const CreateTaskModal = () => {
             size={'small'}
             outlined={true}
           />
-          <Button
-            text="Add Task"
-            onClick={() => {
-              formik.handleSubmit();
-              setShowColumn(false);
-            }}
-            className={styles.modalTaskAdd}
-            size={'small'}
-          />
+          <Button text="Add Task" onClick={handleSubmitForm} className={styles.modalTaskAdd} size={'small'} />
         </div>
       </DialogActions>
     </Dialog>
