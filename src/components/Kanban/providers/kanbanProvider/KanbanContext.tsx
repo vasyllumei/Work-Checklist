@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { ColumnType } from '@/types/Column';
 import { TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
@@ -93,7 +93,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
-  const [personName, setPersonName] = useState<string[]>([]);
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -118,26 +117,35 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       }
     },
   });
-  const applyFilters = (data: any, assignedTo: any, buttonState: any) => {
-    return data.filter((item: any) => {
-      // Ваша логика фильтрации на основе выбранных значений
-      // Например, проверка наличия assignedTo в списке выбранных пользователей и buttonState в списке выбранных состояний
-      const isAssignedToMatch = !assignedTo || assignedTo.includes(item.assignedTo);
-      const isButtonStateMatch = !buttonState || buttonState.includes(item.buttonState);
+  const applyFilters = (data: TaskType[], assignedTo: string[], buttonState: string[], multiple: boolean) => {
+    console.log('assignedTo:', assignedTo);
+    console.log('buttonState:', buttonState);
+
+    return data.filter(task => {
+      const isAssignedToMatch =
+        (multiple &&
+          (assignedTo.length === 0 || (!assignedTo.includes(task.assignedTo || '') && task.assignedTo !== ''))) ||
+        (!multiple &&
+          (assignedTo.length === 0 || (assignedTo.includes(task.assignedTo || '') && task.assignedTo !== '')));
+      const isButtonStateMatch = !buttonState || !task?.buttonState || !buttonState.includes(task.buttonState);
+
+      console.log('isAssignedToMatch:', isAssignedToMatch);
+      console.log('isButtonStateMatch:', isButtonStateMatch);
 
       return isAssignedToMatch && isButtonStateMatch;
     });
   };
+  useEffect(() => {
+    fetchData();
+    fetchUsers();
+  }, [searchText]);
   const fetchData = async () => {
     try {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
 
-      // Применяем фильтрацию на клиентской стороне
-      const filteredTasks = applyFilters(tasksData, formik.values.assignedTo, formik.values.buttonState);
-
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      const sortedTasks = filteredTasks.sort((a: TaskType, b: TaskType) => a.order - b.order);
+      const sortedTasks = tasksData.sort((a: TaskType, b: TaskType) => a.order - b.order);
 
       setColumns(sortedColumns);
       setTasks(sortedTasks);
@@ -383,8 +391,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     isAddTaskModalOpen,
     setIsAddTaskModalOpen,
     users,
-    setPersonName,
-    personName,
     setUsers,
     searchText,
     handleSearch,

@@ -13,7 +13,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
   const router = useRouter();
 
   const handleInteraction = (text: string) => {
-    const updatedRoute = text ? `${router.pathname}?inputText=${text}` : router.pathname;
+    const updatedRoute = text ? `${router.pathname}?searchText=${text}` : router.pathname;
     router.replace(updatedRoute);
     handleSearchAndSave(text);
   };

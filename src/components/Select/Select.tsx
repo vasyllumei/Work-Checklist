@@ -17,7 +17,7 @@ interface Option {
 interface SelectProps {
   value: string;
   options: Option[];
-  onChange: (value: string) => void;
+  onChange: (value: string | string[]) => void;
   label: string;
   multiple: boolean;
   applyFilters?: any;
@@ -38,8 +38,10 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
   const handleApplyFilters = () => {
     console.log('Applying filters...');
     console.log('Selected values:', selectedProp);
+
+    // Check if selectedProp is non-empty before applying filters
     if (applyFilters) {
-      applyFilters(selectedProp);
+      applyFilters(selectedProp, false);
     }
   };
   return (

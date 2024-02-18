@@ -34,14 +34,14 @@ export const TaskEditor = () => {
       <SelectComponent
         label="Edit assigned  user"
         value={formik.values.assignedTo}
-        onChange={(value: string) => formik.setFieldValue('assignedTo', value)}
+        onChange={value => formik.setFieldValue('assignedTo', value)}
         options={usersList}
         multiple={false}
       />
       <SelectComponent
         label="Edit task stage"
         value={formik.values.buttonState}
-        onChange={(value: string) => formik.setFieldValue('buttonState', value)}
+        onChange={value => formik.setFieldValue('buttonState', value)}
         options={BUTTON_STATES}
         multiple={false}
       />

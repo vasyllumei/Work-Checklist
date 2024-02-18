@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from '@/components/Kanban/components/Column';
@@ -18,19 +18,13 @@ export const Kanban = () => {
     searchText,
     handleSearch,
     setIsAddStatusModalOpen,
-    fetchData,
-    fetchUsers,
     applyFilters,
     onDragEnd,
     usersList,
+    tasks,
     formik,
     setIsAddTaskModalOpen,
   } = useKanbanContext();
-
-  useEffect(() => {
-    fetchData();
-    fetchUsers();
-  }, [searchText]);
 
   return (
     <Layout
@@ -58,15 +52,15 @@ export const Kanban = () => {
       </div>
       <div className={styles.selectContainer}>
         <SelectComponent
-          applyFilters={applyFilters}
+          applyFilters={(assignedTo: string[], buttonState: string[]) => applyFilters(tasks, assignedTo, buttonState)}
           label="Choise assigneds users"
-          value={formik.values.assignedTo || ''}
+          value={formik.values.assignedTo}
           onChange={value => formik.setFieldValue('assignedTo', value)}
           options={usersList}
           multiple
         />
         <SelectComponent
-          applyFilters={applyFilters}
+          applyFilters={(assignedTo: string[], buttonState: string[]) => applyFilters(tasks, assignedTo, buttonState)}
           label="Choise buttons states"
           value={formik.values.buttonState}
           onChange={value => formik.setFieldValue('buttonState', value)}
