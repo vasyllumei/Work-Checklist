@@ -18,11 +18,12 @@ export const Kanban = () => {
     searchText,
     handleSearch,
     setIsAddStatusModalOpen,
-    applyFilters,
     onDragEnd,
+    setSelectedAssignedTo,
+    selectedAssignedTo,
+    setSelectedButtonState,
+    selectedButtonState,
     usersList,
-    tasks,
-    formik,
     setIsAddTaskModalOpen,
   } = useKanbanContext();
 
@@ -52,18 +53,20 @@ export const Kanban = () => {
       </div>
       <div className={styles.selectContainer}>
         <SelectComponent
-          applyFilters={(assignedTo: string[], buttonState: string[]) => applyFilters(tasks, assignedTo, buttonState)}
           label="Choise assigneds users"
-          value={formik.values.assignedTo}
-          onChange={value => formik.setFieldValue('assignedTo', value)}
+          value={selectedAssignedTo}
+          onChange={(selectedValues: string | string[]) =>
+            setSelectedAssignedTo(Array.isArray(selectedValues) ? selectedValues : [selectedValues])
+          }
           options={usersList}
           multiple
         />
         <SelectComponent
-          applyFilters={(assignedTo: string[], buttonState: string[]) => applyFilters(tasks, assignedTo, buttonState)}
           label="Choise buttons states"
-          value={formik.values.buttonState}
-          onChange={value => formik.setFieldValue('buttonState', value)}
+          value={selectedButtonState}
+          onChange={(selectedValues: string | string[]) =>
+            setSelectedButtonState(Array.isArray(selectedValues) ? selectedValues : [selectedValues])
+          }
           options={BUTTON_STATES}
           multiple
         />

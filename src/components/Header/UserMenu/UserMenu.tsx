@@ -7,8 +7,6 @@ import { useRouter } from 'next/router';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
-import { getAllUsers } from '@/services/user/userService';
-import { UserType } from '@/types/User';
 
 interface UserDisplayData {
   initials: string;
@@ -17,23 +15,19 @@ interface UserDisplayData {
 
 export const UserMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [users, setUsers] = useState<UserType[]>([]);
+  const currentUserString = localStorage.getItem('currentUser');
+  const [userDisplayData, setUserDisplayData] = useState<UserDisplayData | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-        setCurrentUser(userId);
-        const fetchedUsersData = await getAllUsers();
-        const fetchedUsers: UserType[] = fetchedUsersData.data;
-        setUsers(fetchedUsers);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
+    if (currentUserString) {
+      const currentUser = JSON.parse(currentUserString);
 
-    fetchData();
+      const initials = `${currentUser.user.firstName?.[0] ?? ''}${currentUser.user.lastName?.[0] ?? ''}`;
+      const backgroundColor = currentUser.user.iconColor ?? 'blue';
+
+      setUserDisplayData({ initials, backgroundColor });
+    }
   }, []);
 
   const open = Boolean(anchorEl);
@@ -46,21 +40,11 @@ export const UserMenu: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const router = useRouter();
-
   const handleLogout = () => {
     Cookies.remove(LOCAL_STORAGE_TOKEN);
+    localStorage.clear();
     router.push('/login');
   };
-
-  const userDisplayDataMap: Record<string, UserDisplayData> = {};
-
-  users?.forEach(user => {
-    const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`;
-    const backgroundColor = user.iconColor ?? 'blue';
-
-    userDisplayDataMap[user.id ?? ''] = { initials, backgroundColor };
-  });
 
   return (
     <div className={styles.headerAvatar}>
@@ -74,16 +58,16 @@ export const UserMenu: React.FC = () => {
         <div
           className={styles.imageContainer}
           style={{
-            backgroundColor: userDisplayDataMap[currentUser ?? '']?.backgroundColor || 'blue',
+            backgroundColor: userDisplayData?.backgroundColor || 'blue',
           }}
         >
-          {userDisplayDataMap[currentUser ?? '']?.initials}
+          {userDisplayData?.initials}
         </div>
       </Button>
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'basic-button',

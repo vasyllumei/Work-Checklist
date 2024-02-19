@@ -9,41 +9,38 @@ import { Button } from '@/components/Button';
 import styles from './Select.module.css';
 import { useState } from 'react';
 
-interface Option {
+export interface Option {
   value: string;
   label: string;
 }
 
 interface SelectProps {
-  value: string;
+  value: string | string[];
   options: Option[];
   onChange: (value: string | string[]) => void;
   label: string;
-  multiple: boolean;
-  applyFilters?: any;
+  multiple?: boolean;
 }
 
-export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple, applyFilters }) => {
+export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
   const handleChange = (event: SelectChangeEvent<typeof selectedProp>) => {
     const {
       target: { value },
     } = event;
-    setSelectedProp(typeof value === 'string' ? value.split(',') : value);
+    setSelectedProp(_prevSelected => {
+      if (typeof value === 'string') {
+        return [value];
+      } else {
+        return value;
+      }
+    });
   };
 
   const handleResetCheckbox = () => {
     setSelectedProp([]);
   };
-  const handleApplyFilters = () => {
-    console.log('Applying filters...');
-    console.log('Selected values:', selectedProp);
 
-    // Check if selectedProp is non-empty before applying filters
-    if (applyFilters) {
-      applyFilters(selectedProp, false);
-    }
-  };
   return (
     <Box>
       {multiple ? (
@@ -67,7 +64,7 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
             <Divider />
             <div className={styles.multiSelectButton}>
               <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
-              <Button text="Apply" onClick={handleApplyFilters} size="small" />
+              <Button text="Apply" onClick={() => onChange(selectedProp)} size="small" />
             </div>
           </Select>
         </FormControl>
@@ -80,7 +77,6 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
             value={value || ''}
             label={label}
             onChange={e => onChange(e.target.value)}
-            multiple={false}
           >
             {options.map(option => (
               <MenuItem key={option.value} value={option.value}>

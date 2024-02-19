@@ -9,6 +9,7 @@ import { DropResult } from 'react-beautiful-dnd';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
+import { Option } from '@/components/Select/Select';
 
 const BUTTON_STATE_COLORS = {
   Updates: BLUE_COLOR,
@@ -43,8 +44,11 @@ interface FormikValues {
   editMode: boolean;
 }
 export default interface KanbanContextProps {
-  usersList: any;
-  applyFilters: any;
+  usersList: Option[];
+  setSelectedAssignedTo: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedButtonState: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedAssignedTo: string[];
+  selectedButtonState: string[];
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
@@ -93,7 +97,8 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
-
+  const [selectedAssignedTo, setSelectedAssignedTo] = useState<string[]>([]);
+  const [selectedButtonState, setSelectedButtonState] = useState<string[]>([]);
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
@@ -117,35 +122,38 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       }
     },
   });
-  const applyFilters = (data: TaskType[], assignedTo: string[], buttonState: string[], multiple: boolean) => {
-    console.log('assignedTo:', assignedTo);
-    console.log('buttonState:', buttonState);
 
-    return data.filter(task => {
-      const isAssignedToMatch =
-        (multiple &&
-          (assignedTo.length === 0 || (!assignedTo.includes(task.assignedTo || '') && task.assignedTo !== ''))) ||
-        (!multiple &&
-          (assignedTo.length === 0 || (assignedTo.includes(task.assignedTo || '') && task.assignedTo !== '')));
-      const isButtonStateMatch = !buttonState || !task?.buttonState || !buttonState.includes(task.buttonState);
-
-      console.log('isAssignedToMatch:', isAssignedToMatch);
-      console.log('isButtonStateMatch:', isButtonStateMatch);
-
-      return isAssignedToMatch && isButtonStateMatch;
-    });
-  };
   useEffect(() => {
+    console.log('Selected Assigned To:', selectedAssignedTo);
+    console.log('Selected Button State:', selectedButtonState);
     fetchData();
     fetchUsers();
-  }, [searchText]);
+  }, [searchText, selectedButtonState, selectedAssignedTo]);
   const fetchData = async () => {
     try {
+      console.log('Before fetching data');
+
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
 
+      console.log('Fetched columns and tasks data');
+
+      const filteredTasks = tasksData.filter(task => {
+        const assignedToFilter = selectedAssignedTo.length === 0 || selectedAssignedTo.includes(task.buttonState);
+
+        console.log('Task Assigned To:', task.assignedTo);
+
+        const buttonStateFilter = selectedButtonState.length === 0 || selectedButtonState.includes(task.buttonState);
+
+        return assignedToFilter && buttonStateFilter;
+      });
+
+      console.log('filteredTasks', filteredTasks);
+
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      const sortedTasks = tasksData.sort((a: TaskType, b: TaskType) => a.order - b.order);
+      const sortedTasks = filteredTasks.sort((a, b) => a.order - b.order);
+
+      console.log('sortedTasks', sortedTasks);
 
       setColumns(sortedColumns);
       setTasks(sortedTasks);
@@ -375,7 +383,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   };
 
   const usersList = users.map((user: UserType) => ({
-    value: user.id ? user.id.toString() : '',
+    value: user.id,
     label: `${user.firstName} ${user.lastName}`,
   }));
 
@@ -407,10 +415,13 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     isEditMode,
     stopEditingTask,
     onDragEnd,
+    selectedAssignedTo,
+    setSelectedAssignedTo,
+    selectedButtonState,
+    setSelectedButtonState,
     formik,
     fetchUsers,
     usersList,
-    applyFilters,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;

@@ -36,14 +36,12 @@ export const TaskEditor = () => {
         value={formik.values.assignedTo}
         onChange={value => formik.setFieldValue('assignedTo', value)}
         options={usersList}
-        multiple={false}
       />
       <SelectComponent
         label="Edit task stage"
         value={formik.values.buttonState}
         onChange={value => formik.setFieldValue('buttonState', value)}
         options={BUTTON_STATES}
-        multiple={false}
       />
       <div className={styles.taskButtonContainer}>
         <Button text="Cancel" onClick={stopEditingTask} size={'small'} outlined={true} />

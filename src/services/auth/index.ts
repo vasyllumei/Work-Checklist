@@ -1,5 +1,5 @@
 import { api } from '@/services/apiService';
-import { Login, LoginResponse, Auth, AuthResponse } from '@/types/Auth';
+import { Login, LoginResponse, AuthResponse, Auth } from '@/types/Auth';
 import Cookies from 'js-cookie';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
 
@@ -7,7 +7,16 @@ export const signUp = async ({ email, password, lastName, firstName }: Auth): Pr
   try {
     const response = await api.post<AuthResponse>('/auth/signUp', { email, password, lastName, firstName });
 
-    const { token } = response.data;
+    const { token, refreshToken, user } = response.data;
+
+    localStorage.setItem(
+      'currentUser',
+      JSON.stringify({
+        user,
+        refreshToken,
+      }),
+    );
+
     Cookies.set(LOCAL_STORAGE_TOKEN, token);
 
     return response.data;
@@ -20,17 +29,18 @@ export const login = async ({ email, password }: Login): Promise<LoginResponse> 
   try {
     const response = await api.post<LoginResponse>('/auth/login', { email, password });
 
-    const { token, refreshToken, role, userId, iconColor } = response.data;
-    Cookies.set(LOCAL_STORAGE_TOKEN, token);
+    const { token, refreshToken, user } = response.data;
+
     localStorage.setItem(
       'currentUser',
       JSON.stringify({
-        userId,
-        role,
-        iconColor,
+        user,
         refreshToken,
       }),
     );
+
+    Cookies.set(LOCAL_STORAGE_TOKEN, token);
+
     return response.data;
   } catch (error) {
     throw error;
