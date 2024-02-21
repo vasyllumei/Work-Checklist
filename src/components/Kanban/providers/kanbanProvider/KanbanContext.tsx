@@ -99,6 +99,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [searchText, setSearchText] = useState<string>('');
   const [selectedAssignedTo, setSelectedAssignedTo] = useState<string[]>([]);
   const [selectedButtonState, setSelectedButtonState] = useState<string[]>([]);
+
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
@@ -124,42 +125,20 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   });
 
   useEffect(() => {
-    console.log('Selected Assigned To:', selectedAssignedTo);
-    console.log('Selected Button State:', selectedButtonState);
     fetchData();
     fetchUsers();
-  }, [searchText, selectedButtonState, selectedAssignedTo]);
+  }, []);
   const fetchData = async () => {
     try {
-      console.log('Before fetching data');
-
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
 
-      console.log('Fetched columns and tasks data');
-
-      const filteredTasks = tasksData.filter(task => {
-        const assignedToFilter = selectedAssignedTo.length === 0 || selectedAssignedTo.includes(task.buttonState);
-
-        console.log('Task Assigned To:', task.assignedTo);
-
-        const buttonStateFilter = selectedButtonState.length === 0 || selectedButtonState.includes(task.buttonState);
-
-        return assignedToFilter && buttonStateFilter;
-      });
-
-      console.log('filteredTasks', filteredTasks);
-
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      const sortedTasks = filteredTasks.sort((a, b) => a.order - b.order);
-
-      console.log('sortedTasks', sortedTasks);
+      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
 
       setColumns(sortedColumns);
       setTasks(sortedTasks);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+    } catch (error) {}
   };
 
   const handleColumnCreate = async () => {
@@ -186,7 +165,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       if (formik.isValid) {
         const taskData = {
           ...formik.values,
-          userId: localStorage.getItem('userId') || '',
+          userId: localStorage.getItem('currentUser') || '',
           assignedTo: formik.values.assignedTo || '',
         };
         await createTask(taskData);
@@ -382,7 +361,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     setSearchText && setSearchText(text);
   };
 
-  const usersList = users.map((user: UserType) => ({
+  const usersList: { value: string; label: string }[] = users.map((user: UserType) => ({
     value: user.id,
     label: `${user.firstName} ${user.lastName}`,
   }));

@@ -28,15 +28,9 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
     const {
       target: { value },
     } = event;
-    setSelectedProp(_prevSelected => {
-      if (typeof value === 'string') {
-        return [value];
-      } else {
-        return value;
-      }
-    });
-  };
 
+    setSelectedProp(Array.isArray(value) ? value : [value]);
+  };
   const handleResetCheckbox = () => {
     setSelectedProp([]);
   };
@@ -56,8 +50,8 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
             renderValue={selected => selected.join(', ')}
           >
             {options.map(option => (
-              <MenuItem key={option.value} value={option.label}>
-                <Checkbox checked={selectedProp.indexOf(option.label) > -1} />
+              <MenuItem key={option.label} value={option.value}>
+                <Checkbox checked={selectedProp.indexOf(option.value) > -1} />
                 <ListItemText primary={option.label} />
               </MenuItem>
             ))}

@@ -9,7 +9,7 @@ import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/u
 import { SelectComponent } from '@/components/Select/Select';
 
 export const CreateTaskModal = () => {
-  const { users, formik, getFieldError, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } =
+  const { usersList, formik, getFieldError, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } =
     useKanbanContext();
   const [showColumn, setShowColumn] = useState(false);
   const handleCancelTask = () => {
@@ -22,10 +22,6 @@ export const CreateTaskModal = () => {
       setShowColumn(false);
     }
   };
-  const usersList = users.map(user => ({
-    value: user.id ? user.id.toString() : '',
-    label: `${user.firstName} ${user.lastName}`,
-  }));
 
   const columnList = columns.map(column => ({
     value: column.id,
