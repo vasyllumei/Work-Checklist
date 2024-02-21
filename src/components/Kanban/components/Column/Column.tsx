@@ -26,6 +26,8 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
     isEditMode,
     handleTaskEdit,
     getButtonStyle,
+    selectedButtonState,
+    selectedAssignedTo,
     handleTaskDelete,
     searchText,
   } = useKanbanContext();
@@ -47,9 +49,16 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
 
-  const filteredTasks = searchText
-    ? tasks.filter((task: TaskType) => task.title.includes(searchText) || task.description.includes(searchText))
-    : tasks;
+  const filteredTasks = tasks
+    .filter((task: TaskType) => !searchText || task.title.includes(searchText) || task.description.includes(searchText))
+    .filter(
+      (task: TaskType) =>
+        !selectedAssignedTo.length || selectedAssignedTo.some(state => task.assignedTo.includes(state)),
+    )
+    .filter(
+      (task: TaskType) =>
+        !selectedButtonState.length || selectedButtonState.some(state => task.buttonState.includes(state)),
+    );
 
   const tasksToRender = filteredTasks.filter((task: TaskType) => task.statusId === column.id);
 

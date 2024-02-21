@@ -5,14 +5,9 @@ import styles from './TaskEditor.module.css';
 import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
-import { UserType } from '@/types/User';
-
 export const TaskEditor = () => {
-  const { users, formik, getFieldError, stopEditingTask } = useKanbanContext();
-  const usersList = users.map((user: UserType) => ({
-    value: user.id ? user.id.toString() : '',
-    label: `${user.firstName} ${user.lastName}`,
-  }));
+  const { usersList, formik, getFieldError, stopEditingTask } = useKanbanContext();
+
   return (
     <div className={styles.editingContent}>
       <TextInput

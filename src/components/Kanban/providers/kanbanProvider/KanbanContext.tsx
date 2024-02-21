@@ -1,6 +1,6 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { ColumnType } from '@/types/Column';
-import { ButtonStateType, TaskType } from '@/types/Task';
+import { TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
 import { getAllColumns, createColumn, deleteColumn, updateColumns } from '@/services/column/columnService';
 import { getAllTasks, createTask, deleteTask, updateTask, updateTasks } from '@/services/task/taskService';
@@ -9,6 +9,7 @@ import { DropResult } from 'react-beautiful-dnd';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
+import { Option } from '@/components/Select/Select';
 
 const BUTTON_STATE_COLORS = {
   Updates: BLUE_COLOR,
@@ -25,7 +26,7 @@ const initialTaskForm = {
   statusId: '',
   avatar: '',
   image: '',
-  buttonState: ButtonStateType.Pending,
+  buttonState: '',
   order: 0,
   editMode: false,
 };
@@ -38,15 +39,16 @@ interface FormikValues {
   statusId: string;
   avatar: string;
   image: string;
-  buttonState: ButtonStateType;
+  buttonState: string;
   order: number;
   editMode: boolean;
 }
 export default interface KanbanContextProps {
-  setSearchText: React.Dispatch<React.SetStateAction<string>>;
-  handleSearchText: (text: string) => void;
-  searchText: string;
-  filteredTasks: TaskType[];
+  usersList: Option[];
+  setSelectedAssignedTo: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedButtonState: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedAssignedTo: string[];
+  selectedButtonState: string[];
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
@@ -59,6 +61,8 @@ export default interface KanbanContextProps {
   setIsAddTaskModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   users: UserType[];
   setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
+  searchText: string;
+  handleSearch?: ((text: string) => void) | undefined;
   fetchData: () => void;
   fetchUsers: () => void;
   createStatusModal: () => void;
@@ -93,6 +97,8 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
+  const [selectedAssignedTo, setSelectedAssignedTo] = useState<string[]>([]);
+  const [selectedButtonState, setSelectedButtonState] = useState<string[]>([]);
 
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -117,17 +123,22 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       }
     },
   });
+
+  useEffect(() => {
+    fetchData();
+    fetchUsers();
+  }, []);
   const fetchData = async () => {
     try {
       const { data: columnsData } = await getAllColumns();
       const { data: tasksData } = await getAllTasks();
+
       const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
       const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
+
       setColumns(sortedColumns);
       setTasks(sortedTasks);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+    } catch (error) {}
   };
 
   const handleColumnCreate = async () => {
@@ -154,7 +165,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       if (formik.isValid) {
         const taskData = {
           ...formik.values,
-          userId: localStorage.getItem('userId') || '',
+          userId: localStorage.getItem('currentUser') || '',
           assignedTo: formik.values.assignedTo || '',
         };
         await createTask(taskData);
@@ -345,12 +356,15 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       console.error('Error in onDragEnd:', error);
     }
   };
-  const handleSearchText = (text: string) => {
-    setSearchText(text);
+
+  const handleSearch = (text: string) => {
+    setSearchText && setSearchText(text);
   };
-  const filteredTasks = searchText
-    ? tasks.filter(task => task.title.includes(searchText) || task.description.includes(searchText))
-    : tasks;
+
+  const usersList: { value: string; label: string }[] = users.map((user: UserType) => ({
+    value: user.id,
+    label: `${user.firstName} ${user.lastName}`,
+  }));
 
   const value = {
     columns,
@@ -365,6 +379,8 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     setIsAddTaskModalOpen,
     users,
     setUsers,
+    searchText,
+    handleSearch,
     fetchData,
     handleColumnDelete,
     handleTaskEdit,
@@ -378,12 +394,13 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     isEditMode,
     stopEditingTask,
     onDragEnd,
+    selectedAssignedTo,
+    setSelectedAssignedTo,
+    selectedButtonState,
+    setSelectedButtonState,
     formik,
     fetchUsers,
-    handleSearchText,
-    searchText,
-    filteredTasks,
-    setSearchText,
+    usersList,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;

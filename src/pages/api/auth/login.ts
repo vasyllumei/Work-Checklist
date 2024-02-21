@@ -9,6 +9,10 @@ interface ILoginRequestBody {
   password: string;
 }
 
+const generateToken = (payload: object, secret: string, expiresIn: string): string => {
+  return jwt.sign(payload, secret, { expiresIn });
+};
+
 const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed' });
@@ -33,19 +37,30 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
       return;
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET!, {
-      expiresIn: '1h',
-    });
+    const tokenPayload = {
+      userId: user._id,
+      email: user.email,
+    };
 
-    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_REFRESH_SECRET!, {
-      expiresIn: '7d',
-    });
+    const token = generateToken(tokenPayload, process.env.JWT_SECRET!, '1h');
+    const refreshToken = generateToken(tokenPayload, process.env.JWT_REFRESH_SECRET!, '7d');
 
     user.token = token;
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.status(200).json({ token, refreshToken, userId: user._id });
+    res.status(200).json({
+      user: {
+        role: user.role,
+        _id: user._id,
+        email: user.email,
+        iconColor: user.iconColor,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+      token,
+      refreshToken,
+    });
   } catch (error: any) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });

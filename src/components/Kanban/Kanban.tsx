@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from '@/components/Kanban/components/Column';
@@ -9,18 +9,28 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/';
 import { ColumnType } from '@/types/Column';
+import { SelectComponent } from '@/components/Select/Select';
+import { BUTTON_STATES } from '@/constants';
 
 export const Kanban = () => {
-  const { columns, searchText, setIsAddStatusModalOpen, fetchData, fetchUsers, onDragEnd, setIsAddTaskModalOpen } =
-    useKanbanContext();
-
-  useEffect(() => {
-    fetchData();
-    fetchUsers();
-  }, [searchText]);
+  const {
+    columns,
+    searchText,
+    handleSearch,
+    setIsAddStatusModalOpen,
+    onDragEnd,
+    setSelectedAssignedTo,
+    selectedAssignedTo,
+    setSelectedButtonState,
+    selectedButtonState,
+    usersList,
+    setIsAddTaskModalOpen,
+  } = useKanbanContext();
 
   return (
     <Layout
+      searchText={searchText}
+      handleSearch={handleSearch}
       headTitle="Kanban"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -41,6 +51,27 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
+      <div className={styles.selectContainer}>
+        <SelectComponent
+          label="Choise assigneds users"
+          value={selectedAssignedTo}
+          onChange={(selectedValues: string | string[]) =>
+            setSelectedAssignedTo(Array.isArray(selectedValues) ? selectedValues : [selectedValues])
+          }
+          options={usersList}
+          multiple
+        />
+        <SelectComponent
+          label="Choise buttons states"
+          value={selectedButtonState}
+          onChange={(selectedValues: string | string[]) =>
+            setSelectedButtonState(Array.isArray(selectedValues) ? selectedValues : [selectedValues])
+          }
+          options={BUTTON_STATES}
+          multiple
+        />
+      </div>
+
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
           {provided => (

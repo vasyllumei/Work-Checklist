@@ -1,8 +1,5 @@
-.selectLabel {
-    width: 42px;
-    height: 14px;
-    color: #2B3674;
-    font-weight: 500;
-    font-size: 17px;
-    letter-spacing: -0.05em;
+.multiSelectButton {
+  display: flex;
+  margin: 10px 20px 0 20px;
+  gap: 30px;
 }

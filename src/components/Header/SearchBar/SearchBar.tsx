@@ -1,27 +1,38 @@
 import { IconButton, InputBase } from '@mui/material';
+import React, { useEffect } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from './SearchBar.module.css';
-
-import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { useRouter } from 'next/router';
-import { ChangeEvent } from 'react';
 
-const SearchBar = () => {
-  const { handleSearchText } = useKanbanContext();
+interface SearchBarProps {
+  handleSearch?: ((text: string) => void) | undefined;
+  searchText?: string | undefined;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
   const router = useRouter();
-  const searchText = router.query.searchText ? router.query.searchText.toString() : '';
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const newText = event.target.value;
-    const currentRoute = router.pathname;
-    const updatedRoute = newText ? `${currentRoute}?searchText=${newText}` : currentRoute;
+  const handleInteraction = (text: string) => {
+    const updatedRoute = text ? `${router.pathname}?searchText=${text}` : router.pathname;
     router.replace(updatedRoute);
-    handleSearchText(newText);
+    handleSearchAndSave(text);
   };
+
+  const handleSearchAndSave = (text: string) => {
+    if (handleSearch) {
+      handleSearch(text || '');
+    }
+    localStorage.setItem('searchInputText', text);
+  };
+
+  useEffect(() => {
+    const storedText = localStorage.getItem('searchInputText');
+    storedText && handleSearchAndSave(storedText);
+  }, []);
 
   return (
     <div className={styles.searchField}>
-      <IconButton type="button" aria-label="search">
+      <IconButton type="button" aria-label="search" disabled>
         <SearchIcon />
       </IconButton>
       <InputBase
@@ -29,7 +40,7 @@ const SearchBar = () => {
         className={styles.text}
         placeholder="Search"
         value={searchText}
-        onChange={handleInputChange}
+        onChange={event => handleInteraction(event.target.value)}
       />
     </div>
   );

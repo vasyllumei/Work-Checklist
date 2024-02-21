@@ -3,6 +3,7 @@ export type UserType = {
   lastName?: string;
   email: string;
   password?: string;
+  assignedTo?: string;
   role: UserRoleType;
   id: string;
   iconColor?: string;
