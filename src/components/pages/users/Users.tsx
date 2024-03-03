@@ -22,6 +22,7 @@ import { UserActionsCell } from '@/components/pages/users/components/ActionCell/
 import styles from './Users.module.css';
 import { ValidationSchema } from '@/utils';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { Filter } from '@/components/Filter/Filter';
 const initialUserForm = {
   firstName: '',
   lastName: '',
@@ -32,6 +33,18 @@ const initialUserForm = {
   iconColor: '',
   editMode: false,
 };
+const usersFilter = [
+  {
+    name: 'role',
+    label: 'Role',
+    options: [
+      { label: 'User', value: UserRoleType.USER },
+      { label: 'Admin', value: UserRoleType.ADMIN },
+    ],
+    value: '',
+  },
+];
+
 export const Users: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -39,6 +52,9 @@ export const Users: FC = () => {
   const [isDeleteAllUsersModalOpen, setIsDeleteAllUsersModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [searchText, setSearchText] = useState<string>('');
+  const [filters, setFilters] = useState([]);
+
   const formik = useFormik({
     initialValues: initialUserForm,
     validationSchema: ValidationSchema,
@@ -237,8 +253,26 @@ export const Users: FC = () => {
     fetchUsers();
   }, []);
 
+  const filteredUsers = users.filter(
+    user =>
+      user.firstName?.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.lastName?.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchText.toLowerCase()),
+  );
+
+  const handleSearch = (text: string) => {
+    setSearchText && setSearchText(text);
+  };
+  const handleFilterChange = (filterName: string, selectedOptions: any) => {
+    if (filterName === 'role') {
+      setFilters(selectedOptions);
+      console.log('filters', filters);
+    }
+  };
   return (
     <Layout
+      searchText={searchText}
+      handleSearch={handleSearch}
       headTitle="Users"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -263,9 +297,10 @@ export const Users: FC = () => {
           onClose={handleCloseDeleteAllUsersModal}
           onDelete={async () => await handleDeleteButtonClick()}
         />
+        <Filter filters={usersFilter} handleFilterChange={handleFilterChange} />
         <DataGrid
           className={styles.dataGridContainer}
-          rows={users}
+          rows={filteredUsers}
           columns={columns}
           initialState={{
             pagination: {

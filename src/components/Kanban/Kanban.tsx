@@ -9,8 +9,8 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/';
 import { ColumnType } from '@/types/Column';
-import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
+import { Filter } from '@/components/Filter/Filter';
 
 export const Kanban = () => {
   const {
@@ -26,7 +26,27 @@ export const Kanban = () => {
     usersList,
     setIsAddTaskModalOpen,
   } = useKanbanContext();
-
+  const kanbanFilters = [
+    {
+      name: 'assignedTo',
+      label: 'assigned users',
+      options: usersList,
+      value: selectedAssignedTo,
+    },
+    {
+      name: 'buttonState',
+      label: 'buttons states',
+      options: BUTTON_STATES,
+      value: selectedButtonState,
+    },
+  ];
+  const handleFilterChange = (filterName: string, selectedOptions: any) => {
+    if (filterName === 'assignedTo') {
+      setSelectedAssignedTo(selectedOptions);
+    } else if (filterName === 'buttonState') {
+      setSelectedButtonState(selectedOptions);
+    }
+  };
   return (
     <Layout
       searchText={searchText}
@@ -51,26 +71,7 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
-      <div className={styles.selectContainer}>
-        <SelectComponent
-          label="Choise assigneds users"
-          value={selectedAssignedTo}
-          onChange={(selectedValues: string | string[]) =>
-            setSelectedAssignedTo(Array.isArray(selectedValues) ? selectedValues : [selectedValues])
-          }
-          options={usersList}
-          multiple
-        />
-        <SelectComponent
-          label="Choise buttons states"
-          value={selectedButtonState}
-          onChange={(selectedValues: string | string[]) =>
-            setSelectedButtonState(Array.isArray(selectedValues) ? selectedValues : [selectedValues])
-          }
-          options={BUTTON_STATES}
-          multiple
-        />
-      </div>
+      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} />
 
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
