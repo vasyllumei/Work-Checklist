@@ -71,7 +71,7 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
-      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} />
+      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} outsideClick={false} />
 
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">

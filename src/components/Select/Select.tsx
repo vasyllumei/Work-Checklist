@@ -7,7 +7,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Checkbox, Divider, ListItemText } from '@mui/material';
 import { Button } from '@/components/Button';
 import styles from './Select.module.css';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import useOutsideClick from '@/hooks/useOutsideClick';
 
 export interface Option {
   value: string;
@@ -20,10 +21,22 @@ interface SelectProps {
   onChange: (value: string | string[]) => void;
   label: string;
   multiple?: boolean;
+  outsideClick?: boolean;
 }
 
-export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple }) => {
+export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple, outsideClick }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const excludeRefs = [containerRef];
+
+  const handleOutsideClick = () => {
+    if (outsideClick) {
+      onChange(selectedProp);
+    }
+  };
+
+  useOutsideClick(handleOutsideClick, containerRef, excludeRefs);
+
   const handleChange = (event: SelectChangeEvent<typeof selectedProp>) => {
     const {
       target: { value },
@@ -38,7 +51,7 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
   return (
     <Box>
       {multiple ? (
-        <FormControl size="small" sx={{ m: 1, width: 300 }}>
+        <FormControl size="small" sx={{ m: 1, width: 300 }} ref={containerRef}>
           <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
           <Select
             labelId="demo-multiple-checkbox-label"
@@ -55,11 +68,16 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
                 <ListItemText primary={option.label} />
               </MenuItem>
             ))}
-            <Divider />
-            <div className={styles.multiSelectButton}>
-              <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
-              <Button text="Apply" onClick={() => onChange(selectedProp)} size="small" />
-            </div>
+
+            {outsideClick ? null : (
+              <div>
+                <Divider />
+                <div className={styles.multiSelectButton}>
+                  <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
+                  <Button text="Apply" onClick={() => onChange(selectedProp)} size="small" />
+                </div>
+              </div>
+            )}
           </Select>
         </FormControl>
       ) : (
