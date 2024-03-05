@@ -263,7 +263,6 @@ export const Users: FC = () => {
     setSearchText && setSearchText(text);
   };
   const handleFilterChange = (filterName: string, selectedOptions: any) => {
-    console.log('selectedOptions:', selectedOptions);
     setFilters(selectedOptions as string[]);
   };
 
@@ -299,7 +298,7 @@ export const Users: FC = () => {
           onClose={handleCloseDeleteAllUsersModal}
           onDelete={async () => await handleDeleteButtonClick()}
         />
-        <Filter filters={usersFilter} handleFilterChange={handleFilterChange} outsideClick />
+        <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll />
         <DataGrid
           className={styles.dataGridContainer}
           rows={filteredUsers}

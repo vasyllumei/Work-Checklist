@@ -21,33 +21,41 @@ interface SelectProps {
   onChange: (value: string | string[]) => void;
   label: string;
   multiple?: boolean;
-  outsideClick?: boolean;
+  clearAll?: boolean;
 }
 
-export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple, outsideClick }) => {
+export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple, clearAll }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const excludeRefs = [containerRef];
 
-  const handleOutsideClick = () => {
-    if (outsideClick) {
-      onChange(selectedProp);
-    }
-  };
-
-  useOutsideClick(handleOutsideClick, containerRef, excludeRefs);
-
   const handleChange = (event: SelectChangeEvent<typeof selectedProp>) => {
     const {
-      target: { value },
+      target: { value: selectedValues },
     } = event;
 
-    setSelectedProp(Array.isArray(value) ? value : [value]);
+    setSelectedProp(Array.isArray(selectedValues) ? selectedValues : [selectedValues]);
   };
+
   const handleResetCheckbox = () => {
     setSelectedProp([]);
   };
 
+  const handleApplyFilter = () => {
+    onChange(selectedProp);
+  };
+
+  const handleOutsideClick = (event: MouseEvent) => {
+    const isSelectOrCheckbox =
+      containerRef.current &&
+      (containerRef.current.contains(event.target as Node) || event.target instanceof HTMLInputElement);
+
+    if (!isSelectOrCheckbox && clearAll) {
+      handleApplyFilter();
+    }
+  };
+
+  useOutsideClick(handleOutsideClick, containerRef, excludeRefs);
   return (
     <Box>
       {multiple ? (
@@ -68,13 +76,12 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
                 <ListItemText primary={option.label} />
               </MenuItem>
             ))}
-
-            {outsideClick ? null : (
+            {clearAll ? null : (
               <div>
                 <Divider />
                 <div className={styles.multiSelectButton}>
                   <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
-                  <Button text="Apply" onClick={() => onChange(selectedProp)} size="small" />
+                  <Button text="Apply" onClick={handleApplyFilter} size="small" />
                 </div>
               </div>
             )}

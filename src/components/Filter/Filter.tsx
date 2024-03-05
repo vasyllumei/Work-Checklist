@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Option, SelectComponent } from '@/components/Select/Select';
 import styles from './Filter.module.css';
 import { Button } from '@/components/Button';
 
-export default interface Filter {
+export interface Filter {
   name: string;
   label: string;
   options: Option[];
@@ -13,10 +13,17 @@ export default interface Filter {
 interface FilterProps {
   filters: Filter[];
   handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
-  outsideClick: boolean;
+  clearAll: boolean;
 }
 
-export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, outsideClick }) => {
+export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll }) => {
+  const [resetKey, setResetKey] = useState(0);
+
+  const handleClearAll = () => {
+    filters.forEach(filter => handleFilterChange(filter.name, []));
+    setResetKey(prevKey => prevKey + 1);
+  };
+
   return (
     <div className={styles.mainFilterBox}>
       <div className={styles.filterContainer}>
@@ -30,12 +37,13 @@ export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, outsideCl
                 handleFilterChange(filter.name, selectedOptions);
               }}
               multiple
-              outsideClick={outsideClick}
+              clearAll={clearAll}
+              key={resetKey}
             />
           </div>
         ))}
       </div>
-      {outsideClick ? <Button text="Clear" onClick={() => ''} size="small" outlined={true} /> : null}
+      {clearAll ? <Button text="Clear" onClick={handleClearAll} size="small" outlined={true} /> : null}
     </div>
   );
 };

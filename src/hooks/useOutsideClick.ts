@@ -1,6 +1,6 @@
 import { useEffect, RefObject } from 'react';
 
-type Callback = () => void;
+type Callback = (event: MouseEvent) => void;
 
 const useOutsideClick = (
   callback: Callback,
@@ -14,7 +14,7 @@ const useOutsideClick = (
         !containerRef.current.contains(event.target as Node) &&
         !excludeRefs.some(ref => ref.current && ref.current.contains(event.target as Node))
       ) {
-        callback();
+        callback(event);
       }
     };
 
