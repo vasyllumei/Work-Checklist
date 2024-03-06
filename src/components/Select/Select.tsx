@@ -21,10 +21,17 @@ interface SelectProps {
   onChange: (value: string | string[]) => void;
   label: string;
   multiple?: boolean;
-  clearAll?: boolean;
+  applyOnChange?: boolean;
 }
 
-export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple, clearAll }) => {
+export const SelectComponent: React.FC<SelectProps> = ({
+  value,
+  options,
+  onChange,
+  label,
+  multiple,
+  applyOnChange,
+}) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const excludeRefs = [containerRef];
@@ -50,7 +57,7 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
       containerRef.current &&
       (containerRef.current.contains(event.target as Node) || event.target instanceof HTMLInputElement);
 
-    if (!isSelectOrCheckbox && clearAll) {
+    if (!isSelectOrCheckbox && applyOnChange) {
       handleApplyFilter();
     }
   };
@@ -76,7 +83,7 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
                 <ListItemText primary={option.label} />
               </MenuItem>
             ))}
-            {clearAll ? null : (
+            {applyOnChange ? null : (
               <div>
                 <Divider />
                 <div className={styles.multiSelectButton}>

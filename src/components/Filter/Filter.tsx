@@ -14,9 +14,10 @@ interface FilterProps {
   filters: Filter[];
   handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
   clearAll: boolean;
+  applyOnChange?: boolean;
 }
 
-export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll }) => {
+export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll, applyOnChange }) => {
   const [resetKey, setResetKey] = useState(0);
 
   const handleClearAll = () => {
@@ -37,13 +38,13 @@ export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll 
                 handleFilterChange(filter.name, selectedOptions);
               }}
               multiple
-              clearAll={clearAll}
               key={resetKey}
+              applyOnChange={applyOnChange}
             />
           </div>
         ))}
       </div>
-      {clearAll ? <Button text="Clear" onClick={handleClearAll} size="small" outlined={true} /> : null}
+      {!clearAll ? <Button text="Clear" onClick={handleClearAll} size="small" outlined={true} /> : null}
     </div>
   );
 };

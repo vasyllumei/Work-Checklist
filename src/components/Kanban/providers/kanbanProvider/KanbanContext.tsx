@@ -75,7 +75,7 @@ export default interface KanbanContextProps {
     errors: Record<string, string>;
     setValues: (values: FormikValues) => void;
     resetForm: () => void;
-    setFieldValue: (fieldName: string, value: any) => void;
+    setFieldValue: (fieldName: string, value: string | string[]) => void;
     handleSubmit: () => void;
   };
   closeAddTaskModal: () => void;

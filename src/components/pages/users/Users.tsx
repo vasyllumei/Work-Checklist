@@ -262,7 +262,7 @@ export const Users: FC = () => {
   const handleSearch = (text: string) => {
     setSearchText && setSearchText(text);
   };
-  const handleFilterChange = (filterName: string, selectedOptions: any) => {
+  const handleFilterChange = (filterName: string, selectedOptions: string | string[]) => {
     setFilters(selectedOptions as string[]);
   };
 
