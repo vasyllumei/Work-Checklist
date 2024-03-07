@@ -268,7 +268,7 @@ export const Users: FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [filters]);
+  }, []);
 
   return (
     <Layout
@@ -298,7 +298,7 @@ export const Users: FC = () => {
           onClose={handleCloseDeleteAllUsersModal}
           onDelete={async () => await handleDeleteButtonClick()}
         />
-        <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll />
+        <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll={false} />
         <DataGrid
           className={styles.dataGridContainer}
           rows={filteredUsers}

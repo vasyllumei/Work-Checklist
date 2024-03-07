@@ -1,6 +1,7 @@
 .filterContainer {
     display: flex;
     width: 100%;
+
 }
 .mainFilterBox {
     display: flex;

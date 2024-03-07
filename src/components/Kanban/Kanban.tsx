@@ -27,27 +27,27 @@ export const Kanban = () => {
     setIsAddTaskModalOpen,
   } = useKanbanContext();
   enum Filters {
-    selectedAssignedTo = 'assignedTo',
-    selectedButtonState = 'buttonState',
+    ASSIGNED_TO = 'assignedTo',
+    BUTTON_STATE = 'buttonState',
   }
   const kanbanFilters = [
     {
-      name: Filters.selectedAssignedTo,
+      name: Filters.ASSIGNED_TO,
       label: 'assigned users',
       options: usersList,
       value: selectedAssignedTo,
     },
     {
-      name: Filters.selectedButtonState,
+      name: Filters.BUTTON_STATE,
       label: 'buttons states',
       options: BUTTON_STATES,
       value: selectedButtonState,
     },
   ];
   const handleFilterChange = (filterName: string, selectedOptions: string | string[]) => {
-    if (filterName === 'assignedTo') {
+    if (filterName === Filters.ASSIGNED_TO) {
       setSelectedAssignedTo(Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]);
-    } else if (filterName === 'buttonState') {
+    } else if (filterName === Filters.BUTTON_STATE) {
       setSelectedButtonState(Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]);
     }
   };
@@ -76,7 +76,7 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
-      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} clearAll={false} applyOnChange />
+      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} clearAll applyOnChange />
 
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
