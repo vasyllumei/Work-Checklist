@@ -9,7 +9,7 @@ const StyledBox = ({ children }) => {
       backgroundColor: 'rgba(67, 24, 254, 100)',
       color: 'rgba(255,255,255,100)',
     },
-    '.css-acpdh7-MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer': {
+    '.css-d2yw5i-MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer': {
       backgroundColor: 'rgba(67, 24, 254, 100)',
     },
     '.css-i4bv87-MuiSvgIcon-root': {

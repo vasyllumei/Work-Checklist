@@ -12,7 +12,7 @@ const RouteGuard: FC<RouteGuardProps> = ({ children }) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   const isPublicRoute = (path: string): boolean => {
-    const publicRoutes = ['/login', '/signUp', '/'];
+    const publicRoutes = ['/login', '/signUp'];
     return publicRoutes.includes(path);
   };
 

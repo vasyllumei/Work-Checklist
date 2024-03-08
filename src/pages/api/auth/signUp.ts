@@ -3,7 +3,7 @@ import User, { UserDocumentType } from '@/models/User';
 import { hash } from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import { getRandomColor } from '@/utils';
-import jwt from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 
 interface ISignUpRequestBody {
   email: string;
@@ -36,11 +36,20 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
 
     newUser.iconColor = getRandomColor(email);
 
-    const token = jwt.sign({ userId: newUser._id, email: newUser.email }, process.env.JWT_SECRET!, {
+    const jwtSecret = process.env.JWT_SECRET;
+    const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
+
+    if (!jwtSecret || !jwtRefreshSecret) {
+      console.error('JWT secrets are not defined');
+      res.status(500).json({ message: 'Internal server error' });
+      return;
+    }
+
+    const token = sign({ userId: newUser._id, email: newUser.email }, jwtSecret, {
       expiresIn: '1h',
     });
 
-    const refreshToken = jwt.sign({ userId: newUser._id, email: newUser.email }, process.env.JWT_REFRESH_SECRET!, {
+    const refreshToken = sign({ userId: newUser._id, email: newUser.email }, jwtRefreshSecret, {
       expiresIn: '7d',
     });
 

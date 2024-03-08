@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import User, { UserDocumentType } from '../../../models/User';
 import { compare } from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 import dbConnect from '@/lib/dbConnect';
 
 interface ILoginRequestBody {
@@ -10,7 +10,7 @@ interface ILoginRequestBody {
 }
 
 const generateToken = (payload: object, secret: string, expiresIn: string): string => {
-  return jwt.sign(payload, secret, { expiresIn });
+  return sign(payload, secret, { expiresIn });
 };
 
 const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
@@ -42,8 +42,17 @@ const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<v
       email: user.email,
     };
 
-    const token = generateToken(tokenPayload, process.env.JWT_SECRET!, '1h');
-    const refreshToken = generateToken(tokenPayload, process.env.JWT_REFRESH_SECRET!, '7d');
+    const jwtSecret = process.env.JWT_SECRET;
+    const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
+
+    if (!jwtSecret || !jwtRefreshSecret) {
+      console.error('JWT secrets are not defined');
+      res.status(500).json({ message: 'Internal server error' });
+      return;
+    }
+
+    const token = generateToken(tokenPayload, jwtSecret, '1h');
+    const refreshToken = generateToken(tokenPayload, jwtRefreshSecret, '7d');
 
     user.token = token;
     user.refreshToken = refreshToken;

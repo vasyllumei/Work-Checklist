@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import jwt from 'jsonwebtoken';
+import { verify } from 'jsonwebtoken';
 
 interface DecodedToken {
   userId: string;
@@ -27,7 +27,7 @@ const authenticateToken =
     }
 
     try {
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
+      const decodedToken = verify(token, process.env.JWT_SECRET as string) as DecodedToken;
       req.userId = decodedToken.userId;
       await handler(req, res);
       console.log('User authenticated:', decodedToken.userId);

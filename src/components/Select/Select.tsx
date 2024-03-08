@@ -7,7 +7,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Checkbox, Divider, ListItemText } from '@mui/material';
 import { Button } from '@/components/Button';
 import styles from './Select.module.css';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import useOutsideClick from '@/hooks/useOutsideClick';
 
 export interface Option {
   value: string;
@@ -20,25 +21,52 @@ interface SelectProps {
   onChange: (value: string | string[]) => void;
   label: string;
   multiple?: boolean;
+  applyOnChange?: boolean;
 }
 
-export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChange, label, multiple }) => {
+export const SelectComponent: React.FC<SelectProps> = ({
+  value,
+  options,
+  onChange,
+  label,
+  multiple,
+  applyOnChange,
+}) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const excludeRefs = [containerRef];
+
   const handleChange = (event: SelectChangeEvent<typeof selectedProp>) => {
     const {
-      target: { value },
+      target: { value: selectedValues },
     } = event;
 
-    setSelectedProp(Array.isArray(value) ? value : [value]);
+    setSelectedProp(Array.isArray(selectedValues) ? selectedValues : [selectedValues]);
   };
+
   const handleResetCheckbox = () => {
     setSelectedProp([]);
   };
 
+  const handleApplyFilter = () => {
+    onChange(selectedProp);
+  };
+
+  const handleOutsideClick = (event: MouseEvent) => {
+    const isSelectOrCheckbox =
+      containerRef.current &&
+      (containerRef.current.contains(event.target as Node) || event.target instanceof HTMLInputElement);
+
+    if (!isSelectOrCheckbox && applyOnChange) {
+      handleApplyFilter();
+    }
+  };
+
+  useOutsideClick(handleOutsideClick, containerRef, excludeRefs);
   return (
     <Box>
       {multiple ? (
-        <FormControl size="small" sx={{ m: 1, width: 300 }}>
+        <FormControl size="small" sx={{ m: 1, width: 300 }} ref={containerRef}>
           <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
           <Select
             labelId="demo-multiple-checkbox-label"
@@ -55,11 +83,15 @@ export const SelectComponent: React.FC<SelectProps> = ({ value, options, onChang
                 <ListItemText primary={option.label} />
               </MenuItem>
             ))}
-            <Divider />
-            <div className={styles.multiSelectButton}>
-              <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
-              <Button text="Apply" onClick={() => onChange(selectedProp)} size="small" />
-            </div>
+            {applyOnChange ? null : (
+              <div>
+                <Divider />
+                <div className={styles.multiSelectButton}>
+                  <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
+                  <Button text="Apply" onClick={handleApplyFilter} size="small" />
+                </div>
+              </div>
+            )}
           </Select>
         </FormControl>
       ) : (

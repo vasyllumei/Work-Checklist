@@ -22,6 +22,7 @@ import { UserActionsCell } from '@/components/pages/users/components/ActionCell/
 import styles from './Users.module.css';
 import { ValidationSchema } from '@/utils';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { Filter } from '@/components/Filter/Filter';
 const initialUserForm = {
   firstName: '',
   lastName: '',
@@ -32,6 +33,7 @@ const initialUserForm = {
   iconColor: '',
   editMode: false,
 };
+
 export const Users: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -39,6 +41,8 @@ export const Users: FC = () => {
   const [isDeleteAllUsersModalOpen, setIsDeleteAllUsersModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [searchText, setSearchText] = useState<string>('');
+  const [filters, setFilters] = useState<string[]>([]);
   const formik = useFormik({
     initialValues: initialUserForm,
     validationSchema: ValidationSchema,
@@ -54,6 +58,7 @@ export const Users: FC = () => {
       }
     },
   });
+
   const isEditMode = formik.values.editMode;
   const columns: GridColDef[] = [
     {
@@ -127,6 +132,17 @@ export const Users: FC = () => {
           userIdToDelete={userIdToDelete}
         />
       ),
+    },
+  ];
+  const usersFilter = [
+    {
+      name: 'role',
+      label: 'Role',
+      options: [
+        { label: 'User', value: UserRoleType.USER },
+        { label: 'Admin', value: UserRoleType.ADMIN },
+      ],
+      value: filters,
     },
   ];
   const handleUserCreate = async () => {
@@ -233,12 +249,31 @@ export const Users: FC = () => {
       console.error('Error retrieving the list of users:', error);
     }
   };
+
+  const filteredUsers = users
+    .filter(
+      user =>
+        (user.firstName && user.firstName.toLowerCase().includes(searchText.toLowerCase())) ||
+        (user.lastName && user.lastName.toLowerCase().includes(searchText.toLowerCase())) ||
+        user.email.toLowerCase().includes(searchText.toLowerCase()),
+    )
+    .filter(user => (filters.length > 0 ? filters.includes(user.role) : true));
+
+  const handleSearch = (text: string) => {
+    setSearchText && setSearchText(text);
+  };
+  const handleFilterChange = (filterName: string, selectedOptions: string | string[]) => {
+    setFilters(selectedOptions as string[]);
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
 
   return (
     <Layout
+      searchText={searchText}
+      handleSearch={handleSearch}
       headTitle="Users"
       breadcrumbs={[
         { title: 'Dashboard', link: '/' },
@@ -263,9 +298,10 @@ export const Users: FC = () => {
           onClose={handleCloseDeleteAllUsersModal}
           onDelete={async () => await handleDeleteButtonClick()}
         />
+        <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll={false} />
         <DataGrid
           className={styles.dataGridContainer}
-          rows={users}
+          rows={filteredUsers}
           columns={columns}
           initialState={{
             pagination: {
