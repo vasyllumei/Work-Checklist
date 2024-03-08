@@ -8,16 +8,16 @@ export interface Filter {
   label: string;
   options: Option[];
   value: string | string[];
+  applyOnChange?: boolean;
 }
 
 interface FilterProps {
   filters: Filter[];
   handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
   clearAll?: boolean;
-  applyOnChange?: boolean;
 }
 
-export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll = true, applyOnChange }) => {
+export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll = true }) => {
   const [resetKey, setResetKey] = useState(0);
 
   const handleClearAll = () => {
@@ -34,12 +34,12 @@ export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll 
               options={filter.options}
               value={filter.value}
               label={filter.label}
+              applyOnChange={filter.applyOnChange}
               onChange={selectedOptions => {
                 handleFilterChange(filter.name, selectedOptions);
               }}
               multiple
               key={resetKey}
-              applyOnChange={applyOnChange}
             />
           </div>
         ))}

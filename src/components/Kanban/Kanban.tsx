@@ -36,12 +36,14 @@ export const Kanban = () => {
       label: 'assigned users',
       options: usersList,
       value: selectedAssignedTo,
+      applyOnChange: true,
     },
     {
       name: Filters.BUTTON_STATE,
       label: 'buttons states',
       options: BUTTON_STATES,
       value: selectedButtonState,
+      applyOnChange: true,
     },
   ];
   const handleFilterChange = (filterName: string, selectedOptions: string | string[]) => {
@@ -76,7 +78,7 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
-      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} clearAll applyOnChange />
+      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} clearAll />
 
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
