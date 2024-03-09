@@ -33,9 +33,9 @@ export const SelectComponent: React.FC<SelectProps> = ({
   applyOnChange,
 }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const excludeRefs = [containerRef];
-
   const handleChange = (event: SelectChangeEvent<typeof selectedProp>) => {
     const {
       target: { value: selectedValues },
@@ -43,13 +43,19 @@ export const SelectComponent: React.FC<SelectProps> = ({
 
     setSelectedProp(Array.isArray(selectedValues) ? selectedValues : [selectedValues]);
   };
-
+  const handleOpenSelect = () => {
+    setIsSelectOpen(true);
+  };
+  const handleCloseSelect = () => {
+    setIsSelectOpen(false);
+  };
   const handleResetCheckbox = () => {
     setSelectedProp([]);
   };
 
   const handleApplyFilter = () => {
     onChange(selectedProp);
+    handleCloseSelect();
   };
 
   const handleOutsideClick = (event: MouseEvent) => {
@@ -76,6 +82,9 @@ export const SelectComponent: React.FC<SelectProps> = ({
             value={selectedProp}
             onChange={handleChange}
             renderValue={selected => selected.join(', ')}
+            open={isSelectOpen}
+            onOpen={handleOpenSelect}
+            onClose={handleCloseSelect}
           >
             {options.map(option => (
               <MenuItem key={option.label} value={option.value}>

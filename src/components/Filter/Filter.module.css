@@ -6,4 +6,7 @@
 .mainFilterBox {
     display: flex;
     align-items: center;
+    width: 100%;
+    border: 1px solid rgba(224, 229, 242, 1);
+    margin-bottom: 10px;
 }
