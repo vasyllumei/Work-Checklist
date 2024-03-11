@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, FC } from 'react';
 import dynamic from 'next/dynamic';
-import { textAreaConfig } from './textAreaConfig';
+import { textAreaConfig } from '@/components/TextInput/TextArea/textAreaConfig';
 
 interface TextAreaProps {
   onChange: (value: string) => void;
