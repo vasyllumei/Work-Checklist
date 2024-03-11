@@ -46,7 +46,7 @@ export function TextInput({
       )}
       {label && <label className={styles.inputLabel}>{label}</label>}
       {isEditing ? (
-        <TextArea placeholder="Enter text here..." className="custom-textarea" onChange={onChange} />
+        <TextArea onChange={onChange} value={value || ''} />
       ) : (
         <input
           className={classNames(styles.input, { [styles.inputError]: error })}

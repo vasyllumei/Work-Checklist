@@ -2,8 +2,6 @@
     display: flex;
     align-items: flex-start; /*important for correct drag and drop work*/
     max-height: 1077px;
-}
-.mainContainer > :not(:first-child):not(:last-child) {
     justify-content: space-between;
 }
 

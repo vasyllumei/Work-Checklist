@@ -1,37 +1,31 @@
 import React, { useState, useRef, useMemo, FC } from 'react';
-interface TextAreaProps {
-  placeholder?: string;
-  className?: string;
-  onChange: (value: string) => void;
-}
 import dynamic from 'next/dynamic';
+import { textAreaConfig } from './textAreaConfig';
 
-const DynamicJoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
+interface TextAreaProps {
+  onChange: (value: string) => void;
+  value: string | number;
+}
 
-const TextArea: FC<TextAreaProps> = ({ placeholder, className, onChange }) => {
+const DynamicJoditEditor = dynamic(() => import('jodit-react').then(module => module.default), { ssr: false });
+
+const TextArea: FC<TextAreaProps> = ({ onChange, value }) => {
   const editor = useRef(null);
-  const [content, setContent] = useState('');
-
-  const config = useMemo(
-    () => ({
-      readonly: false,
-      placeholder: placeholder || 'Start typing...',
-    }),
-    [placeholder],
-  );
+  const [content, setContent] = useState(value.toString());
+  const config = useMemo(() => textAreaConfig(), []);
 
   return (
-    <DynamicJoditEditor
-      ref={editor}
-      value={content}
-      config={config}
-      onBlur={newContent => setContent(newContent)}
-      onChange={newContent => {
-        setContent(newContent);
-        onChange(newContent);
-      }}
-      className={className}
-    />
+    <div>
+      <DynamicJoditEditor
+        ref={editor}
+        value={content}
+        config={config}
+        onBlur={newContent => setContent(newContent)}
+        onChange={newContent => {
+          onChange(newContent);
+        }}
+      />
+    </div>
   );
 };
 

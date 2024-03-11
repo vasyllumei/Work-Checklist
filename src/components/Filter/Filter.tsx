@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { Option, SelectComponent } from '@/components/Select/Select';
 import styles from './Filter.module.css';
 import { Button } from '@/components/Button';
+import { useTranslation } from 'react-i18next';
 
 export interface Filter {
   name: string;
@@ -19,6 +20,7 @@ interface FilterProps {
 
 export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll = true }) => {
   const [resetKey, setResetKey] = useState(0);
+  const { t } = useTranslation();
 
   const handleClearAll = () => {
     filters.forEach(filter => handleFilterChange(filter.name, []));
@@ -44,7 +46,7 @@ export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll 
           </div>
         ))}
       </div>
-      {clearAll && <Button text="Clear" onClick={handleClearAll} size="small" outlined={true} />}
+      {clearAll && <Button text={t('clear')} onClick={handleClearAll} size="small" outlined={true} />}
     </div>
   );
 };
