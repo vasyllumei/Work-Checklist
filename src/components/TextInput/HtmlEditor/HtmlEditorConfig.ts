@@ -1,4 +1,4 @@
-export const textAreaConfig = () => ({
+export const htmlEditorConfig = () => ({
   readonly: false,
   placeholder: 'Start typing...',
   placeholderStyle: { color: 'red' },

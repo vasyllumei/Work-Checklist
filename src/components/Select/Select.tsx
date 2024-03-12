@@ -13,6 +13,7 @@ import useOutsideClick from '@/hooks/useOutsideClick';
 export interface Option {
   value: string;
   label: string;
+  flag?: string;
 }
 
 interface SelectProps {
@@ -22,6 +23,9 @@ interface SelectProps {
   label: string;
   multiple?: boolean;
   applyOnChange?: boolean;
+  showFlags?: boolean;
+  labelId?: string;
+  id?: string;
 }
 
 export const SelectComponent: React.FC<SelectProps> = ({
@@ -31,6 +35,9 @@ export const SelectComponent: React.FC<SelectProps> = ({
   label,
   multiple,
   applyOnChange,
+  showFlags,
+  labelId,
+  id,
 }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -104,18 +111,12 @@ export const SelectComponent: React.FC<SelectProps> = ({
           </Select>
         </FormControl>
       ) : (
-        <FormControl size="small" sx={{ m: 1, width: 250 }}>
-          <InputLabel id="demo-simple-select-label">{label}</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select-autowidth"
-            value={value || ''}
-            label={label}
-            onChange={e => onChange(e.target.value)}
-          >
-            {options.map(option => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
+        <FormControl size="small" sx={{ m: 1, width: showFlags ? 80 : 250 }}>
+          <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
+          <Select labelId={labelId} id={id} value={value || ''} label={label} onChange={e => onChange(e.target.value)}>
+            {options.map(({ value, label, flag: Flag }) => (
+              <MenuItem key={value} value={value}>
+                {showFlags && Flag && <Flag />} {label}
               </MenuItem>
             ))}
           </Select>

@@ -1,18 +1,18 @@
 import React, { useState, useRef, useMemo, FC } from 'react';
 import dynamic from 'next/dynamic';
-import { textAreaConfig } from '@/components/TextInput/TextArea/textAreaConfig';
+import { htmlEditorConfig } from '@/components/TextInput/HtmlEditor/HtmlEditorConfig';
 
-interface TextAreaProps {
+interface HtmlEditorProps {
   onChange: (value: string) => void;
   value: string | number;
 }
 
 const DynamicJoditEditor = dynamic(() => import('jodit-react').then(module => module.default), { ssr: false });
 
-const TextArea: FC<TextAreaProps> = ({ onChange, value }) => {
+const HtmlEditor: FC<HtmlEditorProps> = ({ onChange, value }) => {
   const editor = useRef(null);
   const [content, setContent] = useState(value.toString());
-  const config = useMemo(() => textAreaConfig(), []);
+  const config = useMemo(() => htmlEditorConfig(), []);
 
   return (
     <div>
@@ -29,4 +29,4 @@ const TextArea: FC<TextAreaProps> = ({ onChange, value }) => {
   );
 };
 
-export default TextArea;
+export default HtmlEditor;

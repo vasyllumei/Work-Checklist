@@ -6,6 +6,8 @@ import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
 import { login } from '@/services/auth';
 import Cookies from 'js-cookie';
+import { LanguageMenu } from '@/components/Header/LanguageMenu';
+import { useTranslation } from 'react-i18next';
 
 interface ErrorType {
   [key: string]: string;
@@ -17,6 +19,7 @@ export const Login: FC = () => {
   const [errors, setErrors] = useState<ErrorType>({});
   const [touchedFields, setTouchFields] = useState<{ [key: string]: boolean }>({});
   const [loginError, setLoginError] = useState('');
+  const { t } = useTranslation();
 
   const inputHandler = (name: string, value: string) => {
     setValue(prevValue => ({ ...prevValue, [name]: value }));
@@ -77,22 +80,18 @@ export const Login: FC = () => {
     <div className={styles.container}>
       <div className={styles.leftContainer}>
         <div className={styles.form}>
-          <div className={styles.backLink}>
-            <a className={styles.backDashboard} href="/">
-              &#8249; Back to dashboard
-            </a>
-          </div>
+          <div className={styles.backLink} />
+
           <div>
-            <div className={styles.headText}> Sign In </div>
-            <div className={styles.frontText}>Enter your email and password to sign in!</div>
+            <div className={styles.headText}> {t('signIn')} </div>
+            <div className={styles.frontText}>{t('enterEmail')}</div>
             <div className={styles.lineGroup}>
               <hr className={styles.lineForm} />
-              <div className={styles.orForm}>or</div>
               <hr className={styles.lineForm} />
             </div>
 
             <TextInput
-              label="Email"
+              label={t('userEmail')}
               type="email"
               onBlur={() => setTouchFields(prev => ({ ...prev, email: true }))}
               name="email"
@@ -102,13 +101,13 @@ export const Login: FC = () => {
               error={touchedFields.email ? errors.email : ''}
             />
             <TextInput
-              label="Password"
+              label={t('userPassword')}
               type="password"
               onBlur={() => setTouchFields(prev => ({ ...prev, password: true }))}
               name="password"
               value={value.password || ''}
               onChange={newValue => inputHandler('password', newValue)}
-              placeholder={'Min. 5 characters'}
+              placeholder={t('minLength')}
               error={touchedFields.password ? errors.password : ''}
             />
             {loginError && <div className={styles.loginError}>{loginError}</div>}
@@ -121,17 +120,17 @@ export const Login: FC = () => {
                   onChange={handleRememberMe}
                   name="remember"
                 />
-                Keep me logged in
+                {t('keepLogged')}
               </label>
               <a className={styles.authLink} href="/signup">
-                Forget password?
+                {t('forgetPassword')}
               </a>
             </div>
-            <Button disabled={signInDisabled} text="Sign In" onClick={handleLogin} size={'medium'} />
+            <Button disabled={signInDisabled} text={t('signIn')} onClick={handleLogin} size={'medium'} />
             <div className={styles.forgotText}>
-              Not registered yet?
+              {t('notRegistered')}
               <a className={styles.authLink} href="/signUp" onClick={() => router.push('/signUp')}>
-                Create an Account
+                {t('createAccount')}
               </a>
             </div>
           </div>
@@ -153,7 +152,7 @@ export const Login: FC = () => {
           <footer>
             <ul className={styles.rightFooter}>
               <li>
-                <a>Marketplace</a>
+                <LanguageMenu />
               </li>
               <li>
                 <a>License</a>

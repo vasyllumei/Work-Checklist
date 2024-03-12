@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './TextInput.module.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import classNames from 'classnames';
-import TextArea from '@/components/TextInput/TextArea/TextArea';
+import HtmlEditor from '@/components/TextInput/HtmlEditor/HtmlEditor';
 
 interface TextInputProps {
   name?: string;
@@ -46,7 +46,7 @@ export function TextInput({
       )}
       {label && <label className={styles.inputLabel}>{label}</label>}
       {isEditing ? (
-        <TextArea onChange={onChange} value={value || ''} />
+        <HtmlEditor onChange={onChange} value={value || ''} />
       ) : (
         <input
           className={classNames(styles.input, { [styles.inputError]: error })}

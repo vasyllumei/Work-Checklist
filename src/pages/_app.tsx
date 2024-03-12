@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/system';
 import React from 'react';
 import { CssBaseline } from '@mui/material';
 import RouteGuard from '@/components/AuthenticatedRoute/AuthenticatedRoute';
-import './../utils/i18n';
+import '../utils/languageSetup';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
