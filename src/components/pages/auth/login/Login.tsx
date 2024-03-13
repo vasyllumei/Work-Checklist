@@ -80,8 +80,9 @@ export const Login: FC = () => {
     <div className={styles.container}>
       <div className={styles.leftContainer}>
         <div className={styles.form}>
+          {' '}
+          <LanguageMenu />
           <div className={styles.backLink} />
-
           <div>
             <div className={styles.headText}> {t('signIn')} </div>
             <div className={styles.frontText}>{t('enterEmail')}</div>
@@ -135,10 +136,7 @@ export const Login: FC = () => {
             </div>
           </div>
           <footer>
-            <div className={styles.leftFooter}>
-              {' '}
-              © 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!
-            </div>
+            <div className={styles.leftFooter}>© 2022 Horizon UI. All Rights Reserved. Made with love by Simmmple!</div>
           </footer>
         </div>
       </div>
@@ -152,7 +150,7 @@ export const Login: FC = () => {
           <footer>
             <ul className={styles.rightFooter}>
               <li>
-                <LanguageMenu />
+                <a>Marketplace</a>
               </li>
               <li>
                 <a>License</a>

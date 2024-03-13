@@ -1,4 +1,4 @@
-const enTranslationsJSON = `{
+{
   "firstName": "Enter your first name",
   "lastName": "Enter your last name",
   "email": "Invalid email",
@@ -21,6 +21,5 @@ const enTranslationsJSON = `{
   "buttonsStates": "buttons states",
   "clear": "Clear",
   "search": "Search"
-}`;
+}
 
-export const enTranslations = JSON.parse(enTranslationsJSON);

@@ -13,19 +13,19 @@ import useOutsideClick from '@/hooks/useOutsideClick';
 export interface Option {
   value: string;
   label: string;
-  flag?: string;
+  leftIcon?: string;
 }
 
 interface SelectProps {
-  value: string | string[];
+  value?: string | string[];
   options: Option[];
   onChange: (value: string | string[]) => void;
   label: string;
   multiple?: boolean;
   applyOnChange?: boolean;
-  showFlags?: boolean;
   labelId?: string;
   id?: string;
+  sx?: any;
 }
 
 export const SelectComponent: React.FC<SelectProps> = ({
@@ -35,9 +35,9 @@ export const SelectComponent: React.FC<SelectProps> = ({
   label,
   multiple,
   applyOnChange,
-  showFlags,
   labelId,
   id,
+  sx,
 }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -111,12 +111,24 @@ export const SelectComponent: React.FC<SelectProps> = ({
           </Select>
         </FormControl>
       ) : (
-        <FormControl size="small" sx={{ m: 1, width: showFlags ? 80 : 250 }}>
-          <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
-          <Select labelId={labelId} id={id} value={value || ''} label={label} onChange={e => onChange(e.target.value)}>
-            {options.map(({ value, label, flag: Flag }) => (
+        <FormControl size="small" className={styles.formControl}>
+          <InputLabel>{label}</InputLabel>
+          <Select
+            labelId={labelId}
+            id={id}
+            value={value || ''}
+            label={label}
+            onChange={e => onChange(e.target.value)}
+            sx={sx}
+          >
+            {options.map(({ value, label, leftIcon: LeftIcon }) => (
               <MenuItem key={value} value={value}>
-                {showFlags && Flag && <Flag />} {label}
+                {LeftIcon && (
+                  <div className={styles.iconContainer}>
+                    <LeftIcon />
+                  </div>
+                )}
+                {label}
               </MenuItem>
             ))}
           </Select>

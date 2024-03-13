@@ -14,9 +14,15 @@ export const LanguageMenu = () => {
 
   return (
     <SelectComponent
-      showFlags
-      label="Select assigned  user"
-      value={i18n.language || ''}
+      sx={{
+        boxShadow: 'none',
+        '.MuiOutlinedInput-notchedOutline': { border: 0 },
+        width: '100px',
+        '& .MuiSvgIcon-root': {
+          visibility: 'hidden',
+        },
+      }}
+      label="Language"
       onChange={handleLanguageChange}
       options={languageList}
     />

@@ -1,4 +1,4 @@
-const uaTranslationsJSON = `{
+ {
   "firstName": "Введіть ваше ім'я",
   "lastName": "Введіть ваше прізвище",
   "email": "Невірна електронна пошта",
@@ -21,6 +21,4 @@ const uaTranslationsJSON = `{
   "buttonsStates": "стани кнопок",
   "clear": "Очистити",
   "search": "Пошук"
-}`;
-
-export const uaTranslations = JSON.parse(uaTranslationsJSON);
+}
