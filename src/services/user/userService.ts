@@ -1,11 +1,34 @@
 import { UserType } from '@/types/User';
 import { api, ResponseType } from '@/services/apiService';
 
-export const getAllUsers = async (): Promise<ResponseType<UserType[]>> =>
-  await api.get<ResponseType<UserType[]>>('/users/getAllUsers').then(resolve => resolve.data);
+interface GetAllUsersParams {
+  skip?: number;
+  limit?: number;
+  role?: string;
+  search?: string;
+  sort?: string;
+  filter?: string;
+}
 
-export const createUser = async (userData: UserType): Promise<ResponseType<UserType>> =>
-  await api.post<ResponseType<UserType>>('/users/createUser', userData).then(resolve => resolve.data);
+export const getAllUsers = async (params?: GetAllUsersParams): Promise<ResponseType<UserType[]>> => {
+  try {
+    const response = await api.get<ResponseType<UserType[]>>('/users/getAllUsers', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    throw error;
+  }
+};
+
+export const createUser = async (userData: UserType): Promise<ResponseType<UserType>> => {
+  try {
+    const response = await api.post<ResponseType<UserType>>('/users/createUser', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
+};
 
 export const deleteUser = async (userId: string): Promise<{ success: boolean }> => {
   try {
@@ -16,6 +39,7 @@ export const deleteUser = async (userId: string): Promise<{ success: boolean }> 
     throw error;
   }
 };
+
 export const deleteAllUsers = async (userIds: string[]): Promise<ResponseType<{ success: boolean }>> => {
   try {
     const response = await api.delete<ResponseType<{ success: boolean }>>('/users/deleteAllUsers', {
@@ -27,5 +51,13 @@ export const deleteAllUsers = async (userIds: string[]): Promise<ResponseType<{ 
     throw error;
   }
 };
-export const updateUser = async (userId: string, userData: UserType): Promise<UserType> =>
-  await api.put<UserType>(`/users/updateUser?id=${userId}`, userData).then(resolve => resolve.data);
+
+export const updateUser = async (userId: string, userData: UserType): Promise<UserType> => {
+  try {
+    const response = await api.put<UserType>(`/users/updateUser?id=${userId}`, userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};

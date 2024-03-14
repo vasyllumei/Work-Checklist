@@ -11,12 +11,37 @@ async function getAllUsers(req: NextApiRequest, res: NextApiResponse) {
   try {
     await dbConnect();
 
-    const users: UserDocumentType[] = await User.find({}, '-password -__v');
+    const { role, search } = req.query;
+
+    console.log('Role:', role);
+    console.log('Search:', search);
+
+    const filter: any = {};
+
+    if (role) {
+      filter.role = role;
+    }
+
+    if (search) {
+      filter.$or = [
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    console.log('Filter:', filter);
+
+    const users: UserDocumentType[] = await User.find(filter, '-password -__v');
+
+    console.log('Users:', users);
 
     const data = users.map((user: UserDocumentType) => {
       const { _id, firstName, lastName, email, role, iconColor } = user;
       return { id: _id, firstName, lastName, email, role, iconColor };
     });
+
+    console.log('Data:', data);
 
     res.status(200).json({ data });
   } catch (error) {

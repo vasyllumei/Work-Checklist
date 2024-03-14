@@ -242,7 +242,12 @@ export const Users: FC = () => {
   };
   const fetchUsers = async () => {
     try {
-      const fetchedUsersData = await getAllUsers();
+      const fetchedUsersData = await getAllUsers({
+        skip: 0,
+        limit: 10,
+        filter: 'role=admin',
+        sort: '+id',
+      });
       const fetchedUsers: UserType[] = fetchedUsersData.data;
       setUsers(fetchedUsers);
     } catch (error) {
