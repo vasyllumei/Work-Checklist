@@ -11,6 +11,7 @@ import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/'
 import { ColumnType } from '@/types/Column';
 import { BUTTON_STATES } from '@/constants';
 import { Filter } from '@/components/Filter/Filter';
+import { useTranslation } from 'react-i18next';
 
 export const Kanban = () => {
   const {
@@ -26,6 +27,8 @@ export const Kanban = () => {
     usersList,
     setIsAddTaskModalOpen,
   } = useKanbanContext();
+  const { t } = useTranslation();
+
   enum Filters {
     ASSIGNED_TO = 'assignedTo',
     BUTTON_STATE = 'buttonState',
@@ -33,14 +36,14 @@ export const Kanban = () => {
   const kanbanFilters = [
     {
       name: Filters.ASSIGNED_TO,
-      label: 'assigned users',
+      label: t('assignedUsers'),
       options: usersList,
       value: selectedAssignedTo,
       applyOnChange: true,
     },
     {
       name: Filters.BUTTON_STATE,
-      label: 'buttons states',
+      label: t('buttonsStates'),
       options: BUTTON_STATES,
       value: selectedButtonState,
       applyOnChange: true,
@@ -58,28 +61,27 @@ export const Kanban = () => {
     <Layout
       searchText={searchText}
       handleSearch={handleSearch}
-      headTitle="Kanban"
+      headTitle={t('kanban')}
       breadcrumbs={[
-        { title: 'Dashboard', link: '/' },
-        { title: 'Kanban', link: '/kanban' },
+        { title: t('dashboard'), link: '/' },
+        { title: t('kanban'), link: '/kanban' },
       ]}
     >
       <div className={styles.addStatusButton}>
         <Button
-          text="Add status"
+          text={t('addStatus')}
           onClick={() => setIsAddStatusModalOpen(true)}
           className={styles.newStatusButton}
           size={'small'}
         />
         <Button
-          text="Add task"
+          text={t('addTask')}
           onClick={() => setIsAddTaskModalOpen(true)}
           className={styles.newTaskButton}
           size={'small'}
         />
       </div>
       <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} clearAll />
-
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
           {provided => (

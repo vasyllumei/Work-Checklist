@@ -242,7 +242,12 @@ export const Users: FC = () => {
   };
   const fetchUsers = async () => {
     try {
-      const fetchedUsersData = await getAllUsers();
+      const fetchedUsersData = await getAllUsers({
+        skip: 0,
+        limit: 10,
+        filter: 'role=admin',
+        sort: '+id',
+      });
       const fetchedUsers: UserType[] = fetchedUsersData.data;
       setUsers(fetchedUsers);
     } catch (error) {
@@ -281,24 +286,24 @@ export const Users: FC = () => {
       ]}
     >
       <StyledBox>
-        {selectedRows && selectedRows.length > 0 ? (
-          <div className={styles.deleteAllUserContainer}>
-            <Button
-              onClick={() => handleOpenDeleteAllUsersModal(selectedRows.map(String))}
-              text="Delete selected users"
-              size={'small'}
-            />
-          </div>
-        ) : null}
-
         <DeleteModal
           title="Delete Selected Users"
           item={`selected users`}
           isOpen={isDeleteAllUsersModalOpen}
           onClose={handleCloseDeleteAllUsersModal}
           onDelete={async () => await handleDeleteButtonClick()}
-        />
-        <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll={false} />
+        />{' '}
+        <div className={styles.deleteAllUsersContainer}>
+          <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll={false} />
+          {selectedRows && selectedRows.length > 0 ? (
+            <Button
+              onClick={() => handleOpenDeleteAllUsersModal(selectedRows.map(String))}
+              text="Delete selected users"
+              size={'small'}
+              className={styles.allUsersContainer}
+            />
+          ) : null}
+        </div>
         <DataGrid
           className={styles.dataGridContainer}
           rows={filteredUsers}

@@ -242,7 +242,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   };
 
   const onAddNewTask = (columnId?: string) => {
-    formik.resetForm();
     setIsAddTaskModalOpen(true);
 
     if (columnId) {
@@ -263,6 +262,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
 
   const stopEditingTask = () => {
     formik.setFieldValue('editMode', false);
+    formik.resetForm();
   };
 
   const fetchUsers = async () => {

@@ -1,0 +1,16 @@
+export const htmlEditorConfig = () => ({
+  readonly: false,
+  placeholder: 'Start typing...',
+  placeholderStyle: { color: 'red' },
+  style: { font: '14px sans-serif', fontWeight: '500' },
+  useSearch: false,
+  iframe: true,
+  spellcheck: true,
+  enableDragAndDropFileToEditor: true,
+  toolbarAdaptive: false,
+  buttons: 'bold,italic,underline,strikethrough,ul,ol,font,fontsize,brush,file,image',
+  showCharsCounter: false,
+  showWordsCounter: false,
+  showXPathInStatusbar: false,
+  addNewLine: false,
+});

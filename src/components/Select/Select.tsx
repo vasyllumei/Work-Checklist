@@ -13,15 +13,19 @@ import useOutsideClick from '@/hooks/useOutsideClick';
 export interface Option {
   value: string;
   label: string;
+  leftIcon?: string;
 }
 
 interface SelectProps {
-  value: string | string[];
+  value?: string | string[];
   options: Option[];
   onChange: (value: string | string[]) => void;
   label: string;
   multiple?: boolean;
   applyOnChange?: boolean;
+  labelId?: string;
+  id?: string;
+  sx?: any;
 }
 
 export const SelectComponent: React.FC<SelectProps> = ({
@@ -31,11 +35,14 @@ export const SelectComponent: React.FC<SelectProps> = ({
   label,
   multiple,
   applyOnChange,
+  labelId,
+  id,
+  sx,
 }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const excludeRefs = [containerRef];
-
   const handleChange = (event: SelectChangeEvent<typeof selectedProp>) => {
     const {
       target: { value: selectedValues },
@@ -43,13 +50,19 @@ export const SelectComponent: React.FC<SelectProps> = ({
 
     setSelectedProp(Array.isArray(selectedValues) ? selectedValues : [selectedValues]);
   };
-
+  const handleOpenSelect = () => {
+    setIsSelectOpen(true);
+  };
+  const handleCloseSelect = () => {
+    setIsSelectOpen(false);
+  };
   const handleResetCheckbox = () => {
     setSelectedProp([]);
   };
 
   const handleApplyFilter = () => {
     onChange(selectedProp);
+    handleCloseSelect();
   };
 
   const handleOutsideClick = (event: MouseEvent) => {
@@ -76,6 +89,9 @@ export const SelectComponent: React.FC<SelectProps> = ({
             value={selectedProp}
             onChange={handleChange}
             renderValue={selected => selected.join(', ')}
+            open={isSelectOpen}
+            onOpen={handleOpenSelect}
+            onClose={handleCloseSelect}
           >
             {options.map(option => (
               <MenuItem key={option.label} value={option.value}>
@@ -95,18 +111,24 @@ export const SelectComponent: React.FC<SelectProps> = ({
           </Select>
         </FormControl>
       ) : (
-        <FormControl size="small" sx={{ m: 1, width: 250 }}>
-          <InputLabel id="demo-simple-select-label">{label}</InputLabel>
+        <FormControl size="small" className={styles.formControl}>
+          <InputLabel>{label}</InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select-autowidth"
+            labelId={labelId}
+            id={id}
             value={value || ''}
             label={label}
             onChange={e => onChange(e.target.value)}
+            sx={sx}
           >
-            {options.map(option => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
+            {options.map(({ value, label, leftIcon: LeftIcon }) => (
+              <MenuItem key={value} value={value}>
+                {LeftIcon && (
+                  <div className={styles.iconContainer}>
+                    <LeftIcon />
+                  </div>
+                )}
+                {label}
               </MenuItem>
             ))}
           </Select>

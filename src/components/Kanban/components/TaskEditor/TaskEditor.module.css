@@ -5,10 +5,12 @@
     margin-bottom: 20px;
 }
 .taskButtonContainer {
-     display: flex;
-     margin-top: 50px;
-     gap: 30px;
- }
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
 
 .buttonColorContainer{
     margin-top: 30px;

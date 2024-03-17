@@ -7,6 +7,7 @@ import { signUp } from '@/services/auth';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
+import { useTranslation } from 'react-i18next';
 
 interface ErrorType {
   [key: string]: string;
@@ -18,16 +19,16 @@ export const SignUp: FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<ErrorType>({});
   const [signUpError, setSignUpError] = useState('');
-
+  const { t } = useTranslation();
   const inputHandler = (name: string, inputValue: string) => {
     const trimmedValue = inputValue.trim();
     setValues(prevValue => ({ ...prevValue, [name]: trimmedValue }));
 
     const errorMessages: ErrorType = {
-      firstName: 'Enter your first name',
-      lastName: 'Enter your last name',
-      email: 'Invalid email',
-      password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
+      firstName: t('firstName'),
+      lastName: t('lastName'),
+      email: t('email'),
+      password: t('password'),
     };
 
     const inputValid = validateInput(trimmedValue, name);

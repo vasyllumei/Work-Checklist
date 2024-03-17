@@ -8,11 +8,10 @@
     display: flex;
     justify-content:left ;
 }
-.deleteAllUserContainer{
+.deleteAllUsersContainer{
     display: flex;
-    justify-content: flex-end;
-    margin: 0 30px 5px 0;
-    height: 40px;
+    justify-content:space-between;
+align-items: center;
 }
 .mainContainer {
     display: flex;

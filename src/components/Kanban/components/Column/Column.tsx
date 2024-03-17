@@ -12,6 +12,7 @@ import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { ColumnType } from '@/types/Column';
 import { UserType } from '@/types/User';
+import parse from 'html-react-parser';
 interface ColumnProps {
   column: ColumnType;
   index: number;
@@ -142,7 +143,7 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
                                   />
                                 </div>
                               </div>
-                              <p>{task.description}</p>
+                              <div>{parse(task.description)}</div>
                             </div>
                           )}
                           {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
