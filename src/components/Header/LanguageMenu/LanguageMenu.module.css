@@ -1,4 +1,8 @@
-.languageContainer {
-    width: 40px;
-}
+.iconContainer{
+   display: flex;
+    gap: 5px;
 
+}
+.mainContainer{
+    width: 50px;
+}

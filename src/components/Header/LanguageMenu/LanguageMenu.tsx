@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SelectComponent } from '@/components/Select/Select';
 import { languageList } from '@/utils/languageList';
-
+import styles from './LanguageMenu.module.css';
 export const LanguageMenu = () => {
   const { i18n } = useTranslation();
 
@@ -11,7 +11,11 @@ export const LanguageMenu = () => {
       i18n.changeLanguage(language);
     }
   };
+  const currentLanguageObject = languageList.find(lang => lang.value === i18n.language);
 
+  const currentLanguageWithIcon = currentLanguageObject
+    ? { ...currentLanguageObject, LeftIcon: currentLanguageObject.leftIcon, label: currentLanguageObject.label }
+    : null;
   return (
     <SelectComponent
       sx={{
@@ -22,7 +26,16 @@ export const LanguageMenu = () => {
           visibility: 'hidden',
         },
       }}
-      label="Language"
+      label={
+        currentLanguageWithIcon ? (
+          <div className={styles.mainContainer}>
+            <div className={styles.iconContainer}>
+              <currentLanguageWithIcon.LeftIcon />
+              {currentLanguageObject?.label}
+            </div>
+          </div>
+        ) : null
+      }
       onChange={handleLanguageChange}
       options={languageList}
     />
