@@ -4,7 +4,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { Checkbox, Divider, ListItemText } from '@mui/material';
+import { Checkbox, Divider, ListItemText, SxProps } from '@mui/material';
 import { Button } from '@/components/Button';
 import styles from './Select.module.css';
 import { useRef, useState } from 'react';
@@ -20,12 +20,12 @@ interface SelectProps {
   value?: string | string[];
   options: Option[];
   onChange: (value: string | string[]) => void;
-  label: string;
+  label: React.ReactNode;
   multiple?: boolean;
   applyOnChange?: boolean;
   labelId?: string;
   id?: string;
-  sx?: any;
+  sx?: SxProps;
 }
 
 export const SelectComponent: React.FC<SelectProps> = ({
