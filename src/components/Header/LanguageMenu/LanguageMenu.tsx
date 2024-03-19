@@ -13,9 +13,9 @@ export const LanguageMenu = () => {
   };
   const currentLanguageObject = languageList.find(lang => lang.value === i18n.language);
 
-  const currentLanguageWithIcon = currentLanguageObject
-    ? { ...currentLanguageObject, LeftIcon: currentLanguageObject.leftIcon, label: currentLanguageObject.label }
-    : null;
+  if (!currentLanguageObject) {
+    return null;
+  }
   return (
     <SelectComponent
       sx={{
@@ -27,14 +27,12 @@ export const LanguageMenu = () => {
         },
       }}
       label={
-        currentLanguageWithIcon ? (
-          <div className={styles.mainContainer}>
-            <div className={styles.iconContainer}>
-              <currentLanguageWithIcon.LeftIcon />
-              {currentLanguageObject?.label}
-            </div>
+        <div className={styles.mainContainer}>
+          <div className={styles.iconContainer}>
+            <currentLanguageObject.leftIcon />
+            {currentLanguageObject?.label}
           </div>
-        ) : null
+        </div>
       }
       onChange={handleLanguageChange}
       options={languageList}
