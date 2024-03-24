@@ -1,57 +1,32 @@
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/router';
 import styles from './Login.module.css';
-import { validateInput } from '@/utils';
+import { loginValidationSchema } from '@/utils';
 import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
 import { login } from '@/services/auth';
 import Cookies from 'js-cookie';
 import { LanguageMenu } from '@/components/Header/LanguageMenu';
 import { useTranslation } from 'react-i18next';
+import { useFormik } from 'formik';
+import { getFieldError } from '@/utils/index';
 
-interface ErrorType {
-  [key: string]: string;
-}
+const initialLoginForm = {
+  email: '',
+  password: '',
+  loginError: '',
+};
 
 export const Login: FC = () => {
-  const [value, setValue] = useState<{ [key: string]: string }>({});
   const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState<ErrorType>({});
-  const [touchedFields, setTouchFields] = useState<{ [key: string]: boolean }>({});
-  const [loginError, setLoginError] = useState('');
   const { t } = useTranslation();
-
-  const inputHandler = (name: string, value: string) => {
-    setValue(prevValue => ({ ...prevValue, [name]: value }));
-
-    if (name === 'email') {
-      if (!validateInput(value, name) && value !== '') {
-        setErrors(prevState => ({
-          ...prevState,
-          email: 'Invalid Email',
-        }));
-      } else {
-        setErrors(prevState => {
-          const updatedErrors = { ...prevState };
-          delete updatedErrors[name];
-          return updatedErrors;
-        });
-      }
-    } else if (name === 'password') {
-      if (!validateInput(value, name) && value !== '') {
-        setErrors(prevState => ({
-          ...prevState,
-          password: 'Password must have 5-12 characters, special symbol, and uppercase letter',
-        }));
-      } else {
-        setErrors(prevState => {
-          const updatedErrors = { ...prevState };
-          delete updatedErrors[name];
-          return updatedErrors;
-        });
-      }
-    }
-  };
+  const formik = useFormik({
+    initialValues: initialLoginForm,
+    validationSchema: loginValidationSchema,
+    onSubmit: async () => {
+      await handleLogin();
+    },
+  });
 
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
@@ -65,16 +40,14 @@ export const Login: FC = () => {
   const router = useRouter();
   const handleLogin = async () => {
     try {
-      await login({ email: value.email, password: value.password });
+      await login({ email: formik.values.email, password: formik.values.password });
       await router.push('/');
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
-        setLoginError(error.response.data.message);
+        formik.setErrors({ loginError: error.response.data.message });
       }
     }
   };
-
-  const signInDisabled = !value.email || !value.password || Object.keys(errors).length !== 0;
 
   return (
     <div className={styles.container}>
@@ -94,24 +67,23 @@ export const Login: FC = () => {
             <TextInput
               label={t('userEmail')}
               type="email"
-              onBlur={() => setTouchFields(prev => ({ ...prev, email: true }))}
               name="email"
-              value={value.email || ''}
-              onChange={newValue => inputHandler('email', newValue)}
+              value={formik.values.email || ''}
+              onChange={value => formik.setFieldValue('email', value)}
               placeholder="mail@simmmple.com"
-              error={touchedFields.email ? errors.email : ''}
+              error={getFieldError('email', formik.touched, formik.errors)}
             />
             <TextInput
               label={t('userPassword')}
               type="password"
-              onBlur={() => setTouchFields(prev => ({ ...prev, password: true }))}
               name="password"
-              value={value.password || ''}
-              onChange={newValue => inputHandler('password', newValue)}
+              value={formik.values.password || ''}
+              onChange={value => formik.setFieldValue('password', value)}
               placeholder={t('minLength')}
-              error={touchedFields.password ? errors.password : ''}
+              error={getFieldError('password', formik.touched, formik.errors)}
             />
-            {loginError && <div className={styles.loginError}>{loginError}</div>}
+
+            {formik.errors.loginError && <div className={styles.loginError}>{formik.errors.loginError}</div>}
             <div className={styles.checkboxContainer}>
               <label>
                 <input
@@ -127,7 +99,7 @@ export const Login: FC = () => {
                 {t('forgetPassword')}
               </a>
             </div>
-            <Button disabled={signInDisabled} text={t('signIn')} onClick={handleLogin} size={'medium'} />
+            <Button text={t('signIn')} onClick={formik.handleSubmit} size={'medium'} />
             <div className={styles.forgotText}>
               {t('notRegistered')}
               <a className={styles.authLink} href="/signUp" onClick={() => router.push('/signUp')}>

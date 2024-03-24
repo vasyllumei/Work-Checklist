@@ -37,6 +37,7 @@ const handleCreateUser = async (req: NextApiRequest, res: NextApiResponse): Prom
     const savedUser = await newUser.save();
 
     res.status(201).json({ user: savedUser });
+    console.log('user', savedUser);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });

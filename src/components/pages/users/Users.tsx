@@ -15,14 +15,15 @@ import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { TextInput } from '../../TextInput';
 import { Button } from '@/components/Button';
 import { Layout } from '@/components/Layout/Layout';
-import { UserType, UserRoleType } from '@/types/User';
-import { createUser, deleteUser, updateUser, getAllUsers, deleteAllUsers } from '@/services/user/userService';
+import { UserRoleType, UserType } from '@/types/User';
+import { createUser, deleteAllUsers, deleteUser, getAllUsers, updateUser } from '@/services/user/userService';
 import { useFormik } from 'formik';
 import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
 import styles from './Users.module.css';
-import { ValidationSchema } from '@/utils';
+import { addEditUserValidationSchema, getFieldError } from '@/utils';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
 import { Filter } from '@/components/Filter/Filter';
+
 const initialUserForm = {
   firstName: '',
   lastName: '',
@@ -32,6 +33,7 @@ const initialUserForm = {
   id: '',
   iconColor: '',
   editMode: false,
+  createUserError: '',
 };
 
 export const Users: FC = () => {
@@ -45,7 +47,7 @@ export const Users: FC = () => {
   const [filters, setFilters] = useState<string[]>([]);
   const formik = useFormik({
     initialValues: initialUserForm,
-    validationSchema: ValidationSchema,
+    validationSchema: addEditUserValidationSchema,
     onSubmit: async () => {
       try {
         if (formik.values.id) {
@@ -67,7 +69,7 @@ export const Users: FC = () => {
       headerClassName: 'theme--header',
       headerAlign: 'center',
       align: 'center',
-      width: 70,
+      width: 250,
     },
     {
       field: 'firstName',
@@ -130,6 +132,8 @@ export const Users: FC = () => {
           handleUserDelete={handleUserDelete}
           isDeleteModalOpen={isDeleteModalOpen}
           userIdToDelete={userIdToDelete}
+          isSuperAdmin={isSuperAdmin}
+          currentUserId={currentUserId}
         />
       ),
     },
@@ -147,14 +151,12 @@ export const Users: FC = () => {
   ];
   const handleUserCreate = async () => {
     try {
-      if (formik.isValid) {
-        await createUser(formik.values);
-        await fetchUsers();
-        handleDialogClose();
-      }
+      await createUser(formik.values);
+      await fetchUsers();
+      handleDialogClose();
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
-        console.error('Error creating the user:', error);
+        formik.setErrors({ createUserError: error.response.data.message });
       }
     }
   };
@@ -231,15 +233,7 @@ export const Users: FC = () => {
   const handleCloseDeleteAllUsersModal = () => {
     setIsDeleteAllUsersModalOpen(false);
   };
-  const getError = (fieldName: string): string | undefined => {
-    const touchedField = formik.touched[fieldName as keyof typeof formik.touched];
-    const errorField = formik.errors[fieldName as keyof typeof formik.errors];
 
-    if (touchedField && errorField) {
-      return errorField;
-    }
-    return undefined;
-  };
   const fetchUsers = async () => {
     try {
       const fetchedUsersData = await getAllUsers({
@@ -275,6 +269,10 @@ export const Users: FC = () => {
     fetchUsers();
   }, []);
 
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const isSuperAdmin = currentUser?.user.role === UserRoleType.SUPER_ADMIN;
+  const currentUserId = currentUser?.user?._id;
+
   return (
     <Layout
       searchText={searchText}
@@ -295,7 +293,7 @@ export const Users: FC = () => {
         />{' '}
         <div className={styles.deleteAllUsersContainer}>
           <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll={false} />
-          {selectedRows && selectedRows.length > 0 ? (
+          {isSuperAdmin && selectedRows && selectedRows.length > 0 ? (
             <Button
               onClick={() => handleOpenDeleteAllUsersModal(selectedRows.map(String))}
               text="Delete selected users"
@@ -318,13 +316,14 @@ export const Users: FC = () => {
           pageSizeOptions={[5]}
           disableRowSelectionOnClick
           getRowId={(row: UserType) => row.id}
-          checkboxSelection
+          checkboxSelection={isSuperAdmin}
+          isRowSelectable={params => params.row.id !== currentUserId}
           onRowSelectionModelChange={ids => {
             setSelectedRows(ids as string[]);
           }}
         ></DataGrid>
         <Grid className={styles.gridContainer}>
-          <Button onClick={handleDialogOpen} text="Add User" size={'small'} />
+          {isSuperAdmin && <Button onClick={handleDialogOpen} text="Add User" size={'small'} />}
         </Grid>
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
           <DialogTitle>{!isEditMode ? 'Add new user' : 'Edit existing user'}</DialogTitle>
@@ -343,7 +342,7 @@ export const Users: FC = () => {
                   formik.setFieldValue('firstName', value);
                 }}
                 placeholder="Enter first name"
-                error={getError('firstName')}
+                error={getFieldError('firstName', formik.touched, formik.errors)}
               />
             </div>
             <div>
@@ -355,7 +354,7 @@ export const Users: FC = () => {
                   formik.setFieldValue('lastName', value);
                 }}
                 placeholder="Enter last name"
-                error={getError('lastName')}
+                error={getFieldError('lastName', formik.touched, formik.errors)}
               />
             </div>
             <div>
@@ -366,7 +365,7 @@ export const Users: FC = () => {
                 value={formik.values.email || ''}
                 onChange={value => formik.setFieldValue('email', value)}
                 placeholder="Enter email address"
-                error={getError('email')}
+                error={getFieldError('email', formik.touched, formik.errors)}
                 disabled={isEditMode}
               />
             </div>
@@ -378,7 +377,7 @@ export const Users: FC = () => {
                 value={formik.values.password || ''}
                 onChange={value => formik.setFieldValue('password', value)}
                 placeholder="Enter password"
-                error={getError('password')}
+                error={getFieldError('password', formik.touched, formik.errors)}
               />
             )}
             <FormControl variant="standard" sx={{ m: 2, minWidth: 300 }}>
@@ -391,6 +390,11 @@ export const Users: FC = () => {
                 <MenuItem value={UserRoleType.USER}>User</MenuItem>
                 <MenuItem value={UserRoleType.ADMIN}>Admin</MenuItem>
               </Select>
+              {formik.errors.createUserError && (
+                <div className={styles.createUserError}>
+                  {getFieldError('createUserError', formik.touched, formik.errors)}
+                </div>
+              )}
             </FormControl>
           </DialogContent>
           <DialogActions>

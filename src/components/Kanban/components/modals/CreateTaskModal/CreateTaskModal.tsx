@@ -3,7 +3,6 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal.module.css';
-
 import { BUTTON_STATES } from '@/constants';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { SelectComponent } from '@/components/Select/Select';
