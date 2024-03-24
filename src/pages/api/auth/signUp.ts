@@ -19,12 +19,10 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
   }
 
   const { email, password, firstName, lastName } = req.body as ISignUpRequestBody;
-
   try {
     await dbConnect();
 
     const existingUser: UserDocumentType | null = await User.findOne({ email });
-
     if (existingUser) {
       res.status(409).json({ message: 'User already exists' });
       return;
@@ -40,11 +38,9 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
     const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
 
     if (!jwtSecret || !jwtRefreshSecret) {
-      console.error('JWT secrets are not defined');
       res.status(500).json({ message: 'Internal server error' });
       return;
     }
-
     const token = sign({ userId: newUser._id, email: newUser.email }, jwtSecret, {
       expiresIn: '1h',
     });
@@ -55,13 +51,11 @@ const handleSignUp = async (req: NextApiRequest, res: NextApiResponse): Promise<
 
     newUser.token = token;
     newUser.refreshToken = refreshToken;
-
     const savedUser: UserDocumentType = await newUser.save();
 
-    res.status(200).json({ token, refreshToken, userId: savedUser._id });
+    res.status(200).json({ token, refreshToken, user: savedUser });
   } catch (error: any) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Something went wrong', error: error.message });
+    res.status(500).json({ message: 'An error occurred while sign up. Please try again later.', error: error.message });
   }
 };
 

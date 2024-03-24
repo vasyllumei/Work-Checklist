@@ -36,7 +36,7 @@ const UserSchema = new Schema<UserDocumentType>(
     },
     role: {
       type: String,
-      enum: [UserRoleType.ADMIN, UserRoleType.USER],
+      enum: [UserRoleType.ADMIN, UserRoleType.USER, UserRoleType.SUPER_ADMIN],
       default: UserRoleType.USER,
     },
     iconColor: {

@@ -23,8 +23,8 @@ export const UserMenu: React.FC = () => {
     if (currentUserString) {
       const currentUser = JSON.parse(currentUserString);
 
-      const initials = `${currentUser.user.firstName?.[0] ?? ''}${currentUser.user.lastName?.[0] ?? ''}`;
-      const backgroundColor = currentUser.user.iconColor ?? 'blue';
+      const initials = `${currentUser.user?.firstName?.[0] ?? ''}${currentUser.user?.lastName?.[0] ?? ''}`;
+      const backgroundColor = currentUser.user?.iconColor ?? 'blue';
 
       setUserDisplayData({ initials, backgroundColor });
     }

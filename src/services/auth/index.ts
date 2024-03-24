@@ -8,11 +8,11 @@ export const signUp = async ({ email, password, lastName, firstName }: Auth): Pr
     const response = await api.post<AuthResponse>('/auth/signUp', { email, password, lastName, firstName });
 
     const { token, refreshToken, user } = response.data;
-
     localStorage.setItem(
       'currentUser',
       JSON.stringify({
         user,
+        token,
         refreshToken,
       }),
     );
@@ -21,6 +21,7 @@ export const signUp = async ({ email, password, lastName, firstName }: Auth): Pr
 
     return response.data;
   } catch (error) {
+    console.error('Error during sign up:', error);
     throw error;
   }
 };
@@ -28,13 +29,12 @@ export const signUp = async ({ email, password, lastName, firstName }: Auth): Pr
 export const login = async ({ email, password }: Login): Promise<LoginResponse> => {
   try {
     const response = await api.post<LoginResponse>('/auth/login', { email, password });
-
     const { token, refreshToken, user } = response.data;
-
     localStorage.setItem(
       'currentUser',
       JSON.stringify({
         user,
+        token,
         refreshToken,
       }),
     );
@@ -43,6 +43,7 @@ export const login = async ({ email, password }: Login): Promise<LoginResponse> 
 
     return response.data;
   } catch (error) {
+    console.error('Error during login:', error);
     throw error;
   }
 };

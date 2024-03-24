@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Grid, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,26 +14,29 @@ interface UserActionsCellProps {
   handleUserDelete: (userId: string) => Promise<void>;
   isDeleteModalOpen: boolean;
   userIdToDelete: string;
+  isSuperAdmin: boolean;
+  currentUserId: string;
 }
 
-export const UserActionsCell: React.FC<UserActionsCellProps> = ({
+export const UserActionsCell: FC<UserActionsCellProps> = ({
   row,
   handleUserEdit,
   handleOpenDeleteModal,
   handleCloseDeleteModal,
   handleUserDelete,
-  userIdToDelete,
   isDeleteModalOpen,
-}) => (
-  <Grid container justifyContent="center" spacing={2}>
-    <>
+  userIdToDelete,
+  isSuperAdmin,
+  currentUserId,
+}) => {
+  if (!isSuperAdmin || currentUserId === row.id) {
+    return <div>-</div>;
+  }
+
+  return (
+    <Grid container justifyContent="center" spacing={2}>
       <Grid item>
-        <IconButton
-          onClick={() => {
-            handleUserEdit(String(row.id));
-            console.log('row', row);
-          }}
-        >
+        <IconButton onClick={() => handleUserEdit(String(row.id))}>
           <EditIcon />
         </IconButton>
       </Grid>
@@ -49,6 +52,6 @@ export const UserActionsCell: React.FC<UserActionsCellProps> = ({
           onDelete={async () => await handleUserDelete(userIdToDelete)}
         />
       </Grid>
-    </>
-  </Grid>
-);
+    </Grid>
+  );
+};

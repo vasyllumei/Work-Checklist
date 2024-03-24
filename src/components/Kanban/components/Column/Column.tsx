@@ -85,10 +85,10 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
   return (
     <Draggable key={column.id} draggableId={column.id} index={index}>
       {provided => (
-        <div ref={provided.innerRef} {...provided.draggableProps} key={index} className={styles.column}>
+        <div ref={provided.innerRef} {...provided.draggableProps} key={column.id} className={styles.column}>
           <div className={styles.titleColumn} {...provided.dragHandleProps}>
             <h2 className={styles.title}>
-              <ColumnTitleEdit column={column} />
+              <ColumnTitleEdit column={column} key={column.id} />
             </h2>
 
             {!hasTasksInColumn(column.id) && (
@@ -111,11 +111,16 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
           </div>
           <StrictModeDroppable key={column.id} droppableId={column.id} type="TASK">
             {provided => (
-              <div ref={provided.innerRef} {...provided.droppableProps} className={styles.droppable}>
-                {tasksToRender.map((task: TaskType, index: number) => (
-                  <Draggable key={task.id} draggableId={task.id} index={index}>
+              <div ref={provided.innerRef} key={column.id} {...provided.droppableProps} className={styles.droppable}>
+                {tasksToRender.map((task: TaskType, taskIndex: number) => (
+                  <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
                     {provided => (
-                      <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
+                      <div
+                        ref={provided.innerRef}
+                        key={task.id}
+                        {...provided.draggableProps}
+                        className={styles.cardsContainer}
+                      >
                         <div className={styles.card} {...provided.dragHandleProps}>
                           {isEditMode && formik.values.id === task.id ? (
                             <TaskEditor />
@@ -149,7 +154,7 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
                           {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
                             <div className={styles.actionContainer}>
                               <div
-                                key={index}
+                                key={task.id}
                                 className={styles.avatar}
                                 style={{
                                   backgroundColor: userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
