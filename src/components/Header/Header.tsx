@@ -15,7 +15,6 @@ interface HeaderProps {
 
 export const Header: FC<HeaderProps> = ({ breadcrumbData, searchText, handleSearch }) => {
   const currentPage = breadcrumbData[breadcrumbData.length - 1];
-
   return (
     <div className={styles.titleContent}>
       <h1 className={styles.title}>

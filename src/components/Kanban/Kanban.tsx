@@ -10,57 +10,46 @@ import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppa
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/';
 import { ColumnType } from '@/types/Column';
 import { BUTTON_STATES } from '@/constants';
-import { Filter } from '@/components/Filter/Filter';
+import { Filter, FilterOption } from '@/components/Filter/Filter';
 import { useTranslation } from 'react-i18next';
 
 export const Kanban = () => {
   const {
     columns,
-    searchText,
-    handleSearch,
     setIsAddStatusModalOpen,
     onDragEnd,
-    setSelectedAssignedTo,
-    selectedAssignedTo,
-    setSelectedButtonState,
-    selectedButtonState,
+    filters,
+    setFilters,
+    searchText,
+    handleSearch,
     usersList,
     setIsAddTaskModalOpen,
   } = useKanbanContext();
   const { t } = useTranslation();
 
-  enum Filters {
-    ASSIGNED_TO = 'assignedTo',
-    BUTTON_STATE = 'buttonState',
-  }
-  const kanbanFilters = [
+  const kanbanFiltersOptions: FilterOption[] = [
     {
-      name: Filters.ASSIGNED_TO,
+      name: 'assignedTo',
       label: t('assignedUsers'),
       options: usersList,
-      value: selectedAssignedTo,
       applyOnChange: true,
     },
     {
-      name: Filters.BUTTON_STATE,
+      name: 'buttonState',
       label: t('buttonsStates'),
       options: BUTTON_STATES,
-      value: selectedButtonState,
       applyOnChange: true,
     },
   ];
+
   const handleFilterChange = (filterName: string, selectedOptions: string | string[]) => {
-    if (filterName === Filters.ASSIGNED_TO) {
-      setSelectedAssignedTo(Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]);
-    } else if (filterName === Filters.BUTTON_STATE) {
-      setSelectedButtonState(Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]);
-    }
+    setFilters(Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]);
   };
 
   return (
     <Layout
-      searchText={searchText}
       handleSearch={handleSearch}
+      searchText={searchText}
       headTitle={t('kanban')}
       breadcrumbs={[
         { title: t('dashboard'), link: '/' },
@@ -81,7 +70,7 @@ export const Kanban = () => {
           size={'small'}
         />
       </div>
-      <Filter filters={kanbanFilters} handleFilterChange={handleFilterChange} clearAll />
+      <Filter filters={kanbanFiltersOptions} value={filters} handleFilterChange={handleFilterChange} clearAll />
       <DragDropContext onDragEnd={onDragEnd}>
         <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
           {provided => (

@@ -1,298 +1,65 @@
-import React, { FC, useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-} from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import StyledBox from './components/StyledBox/StyledBox';
-import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
-import { TextInput } from '../../TextInput';
-import { Button } from '@/components/Button';
 import { Layout } from '@/components/Layout/Layout';
-import { UserRoleType, UserType } from '@/types/User';
-import { createUser, deleteAllUsers, deleteUser, getAllUsers, updateUser } from '@/services/user/userService';
-import { useFormik } from 'formik';
-import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
-import styles from './Users.module.css';
-import { addEditUserValidationSchema, getFieldError } from '@/utils';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { breadcrumbsUsers, columnsConfig, usersFilterOptions } from '@/components/pages/users/utils';
+import { useUsersContext } from '@/components/pages/users/providers/userProvider/useUsersContext';
+import UserDialog from '@/components/pages/users/components/UserDialog/UserDialog';
+import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { Filter } from '@/components/Filter/Filter';
-
-const initialUserForm = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  password: '',
-  role: UserRoleType.USER,
-  id: '',
-  iconColor: '',
-  editMode: false,
-  createUserError: '',
-};
-
-export const Users: FC = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [users, setUsers] = useState<UserType[]>([]);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeleteAllUsersModalOpen, setIsDeleteAllUsersModalOpen] = useState(false);
-  const [userIdToDelete, setUserIdToDelete] = useState<string>('');
-  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
-  const [searchText, setSearchText] = useState<string>('');
-  const [filters, setFilters] = useState<string[]>([]);
-  const formik = useFormik({
-    initialValues: initialUserForm,
-    validationSchema: addEditUserValidationSchema,
-    onSubmit: async () => {
-      try {
-        if (formik.values.id) {
-          await handleSaveUpdatedUser();
-        } else {
-          await handleUserCreate();
-        }
-      } catch (error) {
-        console.error('Error submitting form:', error);
-      }
-    },
-  });
-
-  const isEditMode = formik.values.editMode;
-  const columns: GridColDef[] = [
-    {
-      field: 'id',
-      headerName: 'ID',
-      headerClassName: 'theme--header',
-      headerAlign: 'center',
-      align: 'center',
-      width: 250,
-    },
-    {
-      field: 'firstName',
-      headerName: 'First Name',
-      headerClassName: 'theme--header',
-      headerAlign: 'center',
-      align: 'center',
-      width: 150,
-      flex: 1,
-      editable: false,
-    },
-    {
-      field: 'lastName',
-      headerName: 'Last Name',
-      headerClassName: 'theme--header',
-      headerAlign: 'center',
-      align: 'center',
-      width: 150,
-      flex: 1,
-      editable: false,
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      headerClassName: 'theme--header',
-      headerAlign: 'center',
-      align: 'center',
-      type: 'string',
-      width: 200,
-      flex: 1,
-      editable: false,
-    },
-    {
-      field: 'role',
-      headerName: 'Role',
-      headerClassName: 'theme--header',
-      headerAlign: 'center',
-      align: 'center',
-      editable: false,
-      sortable: true,
-      flex: 1,
-      width: 160,
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      headerClassName: 'theme--header',
-      headerAlign: 'center',
-      align: 'center',
-      flex: 1,
-      width: 150,
-      editable: false,
-
-      renderCell: ({ row }) => (
-        <UserActionsCell
-          row={row}
-          handleUserEdit={handleUserEdit}
-          handleOpenDeleteModal={handleOpenDeleteModal}
-          handleCloseDeleteModal={handleCloseDeleteModal}
-          handleUserDelete={handleUserDelete}
-          isDeleteModalOpen={isDeleteModalOpen}
-          userIdToDelete={userIdToDelete}
-          isSuperAdmin={isSuperAdmin}
-          currentUserId={currentUserId}
-        />
-      ),
-    },
-  ];
-  const usersFilter = [
-    {
-      name: 'role',
-      label: 'Role',
-      options: [
-        { label: 'User', value: UserRoleType.USER },
-        { label: 'Admin', value: UserRoleType.ADMIN },
-      ],
-      value: filters,
-    },
-  ];
-  const handleUserCreate = async () => {
-    try {
-      await createUser(formik.values);
-      await fetchUsers();
-      handleDialogClose();
-    } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.message) {
-        formik.setErrors({ createUserError: error.response.data.message });
-      }
-    }
-  };
-  const handleUserDelete = async (userId: string): Promise<void> => {
-    try {
-      await deleteUser(userId);
-      await fetchUsers();
-    } catch (error) {
-      console.error('Error deleting the user:', error);
-    }
-  };
-  const handleDeleteAllUsers = async (userIds: string[]) => {
-    try {
-      await deleteAllUsers(userIds);
-      await fetchUsers();
-      setSelectedRows([]);
-    } catch (error) {
-      console.error('Error deleting selected users:', error);
-    }
-  };
-
-  const handleUserEdit = (userId: string) => {
-    try {
-      const userData = users.find(user => user.id === userId);
-      if (userData) {
-        formik.setValues({
-          ...initialUserForm,
-          ...userData,
-          editMode: true,
-        });
-        setIsDialogOpen(true);
-      }
-    } catch (error) {
-      console.error('Error updating the user', error);
-    }
-  };
-  const handleSaveUpdatedUser = async (): Promise<void> => {
-    try {
-      await updateUser(formik.values.id, formik.values);
-      await fetchUsers();
-      handleDialogClose();
-    } catch (error) {
-      console.error('Error updating user:', error);
-    }
-  };
-  const handleOpenDeleteModal = (userId: string) => {
-    setUserIdToDelete(userId);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setUserIdToDelete('');
-    setIsDeleteModalOpen(false);
-  };
-
-  const handleDialogOpen = () => {
-    formik.setValues(initialUserForm);
-    setIsDialogOpen(true);
-  };
-  const handleDialogClose = () => {
-    formik.resetForm();
-    setIsDialogOpen(false);
-  };
-  const handleDeleteButtonClick = () => {
-    if (selectedRows.length > 0) {
-      const userIds = selectedRows.map(rowId => rowId.toString());
-      handleDeleteAllUsers(userIds);
-    }
-  };
-  const handleOpenDeleteAllUsersModal = (userIds: string[]) => {
-    setSelectedRows(userIds);
-    setIsDeleteAllUsersModalOpen(true);
-  };
-  const handleCloseDeleteAllUsersModal = () => {
-    setIsDeleteAllUsersModalOpen(false);
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const fetchedUsersData = await getAllUsers({
-        skip: 0,
-        limit: 10,
-        filter: 'role=admin',
-        sort: '+id',
-      });
-      const fetchedUsers: UserType[] = fetchedUsersData.data;
-      setUsers(fetchedUsers);
-    } catch (error) {
-      console.error('Error retrieving the list of users:', error);
-    }
-  };
-
-  const filteredUsers = users
-    .filter(
-      user =>
-        (user.firstName && user.firstName.toLowerCase().includes(searchText.toLowerCase())) ||
-        (user.lastName && user.lastName.toLowerCase().includes(searchText.toLowerCase())) ||
-        user.email.toLowerCase().includes(searchText.toLowerCase()),
-    )
-    .filter(user => (filters.length > 0 ? filters.includes(user.role) : true));
-
-  const handleSearch = (text: string) => {
-    setSearchText && setSearchText(text);
-  };
-  const handleFilterChange = (filterName: string, selectedOptions: string | string[]) => {
-    setFilters(selectedOptions as string[]);
-  };
-
+import { Button } from '@/components/Button';
+import { Grid } from '@mui/material';
+import { UserType } from '@/types/User';
+import styles from '@/components/pages/users/Users.module.css';
+import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
+export const Users = () => {
+  const {
+    handleDeleteButtonClick,
+    handleFilterChange,
+    filters,
+    isDeleteAllUsersModalOpen,
+    handleCloseDeleteAllUsersModal,
+    selectedRows,
+    handleOpenDeleteAllUsersModal,
+    rowsWithIds,
+    handleSearch,
+    handleDialogOpen,
+    searchText,
+    setSelectedRows,
+    currentUserId,
+    isSuperAdmin,
+    paginationModel,
+    handlePaginationModelChange,
+    handleSortModelChange,
+  } = useUsersContext();
+  const [rowCountState, setRowCountState] = useState(rowsWithIds.length);
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    setRowCountState(rowsWithIds.length);
+  }, [rowsWithIds, setRowCountState]);
 
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  const isSuperAdmin = currentUser?.user.role === UserRoleType.SUPER_ADMIN;
-  const currentUserId = currentUser?.user?._id;
-
+  const columns = columnsConfig.map(column => ({
+    ...column,
+    renderCell: (params: GridRenderCellParams) =>
+      column.field === 'actions' ? <UserActionsCell row={params.row} /> : <span>{params.value}</span>,
+  }));
+  const pageSizeOption = [5, 7, 9];
   return (
-    <Layout
-      searchText={searchText}
-      handleSearch={handleSearch}
-      headTitle="Users"
-      breadcrumbs={[
-        { title: 'Dashboard', link: '/' },
-        { title: 'Users', link: '/users' },
-      ]}
-    >
+    <Layout headTitle="Users" searchText={searchText} handleSearch={handleSearch} breadcrumbs={breadcrumbsUsers}>
       <StyledBox>
         <DeleteModal
-          title="Delete Selected Users"
-          item={`selected users`}
           isOpen={isDeleteAllUsersModalOpen}
           onClose={handleCloseDeleteAllUsersModal}
+          title="Delete Selected Users"
+          item={`selected users`}
           onDelete={async () => await handleDeleteButtonClick()}
-        />{' '}
+        />
         <div className={styles.deleteAllUsersContainer}>
-          <Filter filters={usersFilter} handleFilterChange={handleFilterChange} clearAll={false} />
+          <Filter
+            filters={usersFilterOptions}
+            value={filters}
+            handleFilterChange={handleFilterChange}
+            clearAll={false}
+          />
           {isSuperAdmin && selectedRows && selectedRows.length > 0 ? (
             <Button
               onClick={() => handleOpenDeleteAllUsersModal(selectedRows.map(String))}
@@ -303,17 +70,22 @@ export const Users: FC = () => {
           ) : null}
         </div>
         <DataGrid
+          pagination
+          rowCount={rowCountState}
           className={styles.dataGridContainer}
-          rows={filteredUsers}
+          rows={rowsWithIds}
           columns={columns}
+          paginationModel={paginationModel}
+          onPaginationModelChange={handlePaginationModelChange}
+          pageSizeOptions={pageSizeOption}
+          paginationMode="server"
           initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              },
+            sorting: {
+              sortModel: [{ field: 'rating', sort: 'desc' }],
             },
+            pagination: { paginationModel: { pageSize: 5, page: 0 } },
           }}
-          pageSizeOptions={[5]}
+          onSortModelChange={handleSortModelChange}
           disableRowSelectionOnClick
           getRowId={(row: UserType) => row.id}
           checkboxSelection={isSuperAdmin}
@@ -321,93 +93,11 @@ export const Users: FC = () => {
           onRowSelectionModelChange={ids => {
             setSelectedRows(ids as string[]);
           }}
-        ></DataGrid>
+        />
         <Grid className={styles.gridContainer}>
           {isSuperAdmin && <Button onClick={handleDialogOpen} text="Add User" size={'small'} />}
         </Grid>
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>{!isEditMode ? 'Add new user' : 'Edit existing user'}</DialogTitle>
-          <DialogContent style={{ overflowX: 'hidden' }}>
-            <DialogContentText>
-              {!isEditMode
-                ? 'To add a new user, please enter their first name, last name, email, password and select their role'
-                : 'To edit the user, you can modify their first name, last name and role'}
-            </DialogContentText>
-            <div>
-              <TextInput
-                label="First Name"
-                name="firstName"
-                value={formik.values.firstName || ''}
-                onChange={value => {
-                  formik.setFieldValue('firstName', value);
-                }}
-                placeholder="Enter first name"
-                error={getFieldError('firstName', formik.touched, formik.errors)}
-              />
-            </div>
-            <div>
-              <TextInput
-                label="Last Name"
-                name="lastName"
-                value={formik.values.lastName || ''}
-                onChange={value => {
-                  formik.setFieldValue('lastName', value);
-                }}
-                placeholder="Enter last name"
-                error={getFieldError('lastName', formik.touched, formik.errors)}
-              />
-            </div>
-            <div>
-              <TextInput
-                label="Email"
-                name="email"
-                type="email"
-                value={formik.values.email || ''}
-                onChange={value => formik.setFieldValue('email', value)}
-                placeholder="Enter email address"
-                error={getFieldError('email', formik.touched, formik.errors)}
-                disabled={isEditMode}
-              />
-            </div>
-            {!isEditMode && (
-              <TextInput
-                label="Password"
-                name="password"
-                type="password"
-                value={formik.values.password || ''}
-                onChange={value => formik.setFieldValue('password', value)}
-                placeholder="Enter password"
-                error={getFieldError('password', formik.touched, formik.errors)}
-              />
-            )}
-            <FormControl variant="standard" sx={{ m: 2, minWidth: 300 }}>
-              <Select
-                value={formik.values?.role || UserRoleType.USER}
-                onChange={event => {
-                  formik.setFieldValue('role', event.target.value as UserRoleType);
-                }}
-              >
-                <MenuItem value={UserRoleType.USER}>User</MenuItem>
-                <MenuItem value={UserRoleType.ADMIN}>Admin</MenuItem>
-              </Select>
-              {formik.errors.createUserError && (
-                <div className={styles.createUserError}>
-                  {getFieldError('createUserError', formik.touched, formik.errors)}
-                </div>
-              )}
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <div className={styles.buttonContainer}>
-              <Button onClick={handleDialogClose} text="Cancel" size={'small'} outlined={true} />
-              <Button
-                onClick={formik.handleSubmit}
-                text={formik.values.id ? 'Save Changes' : 'Add User'}
-                size={'small'}
-              />
-            </div>
-          </DialogActions>
-        </Dialog>
+        <UserDialog />
       </StyledBox>
     </Layout>
   );

@@ -1,34 +1,23 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Grid, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
-import { GridRowParams } from '@mui/x-data-grid';
+import { useUsersContext } from '@/components/pages/users/providers/userProvider';
 import { UserType } from '@/types/User';
 
-interface UserActionsCellProps {
-  row: GridRowParams<UserType>;
-  handleUserEdit: (userId: string) => void;
-  handleOpenDeleteModal: (userId: string) => void;
-  handleCloseDeleteModal: () => void;
-  handleUserDelete: (userId: string) => Promise<void>;
-  isDeleteModalOpen: boolean;
-  userIdToDelete: string;
-  isSuperAdmin: boolean;
-  currentUserId: string;
-}
+export const UserActionsCell = ({ row }: { row: UserType }) => {
+  const {
+    isSuperAdmin,
+    isDeleteModalOpen,
+    handleCloseDeleteModal,
+    currentUserId,
+    handleUserEdit,
+    handleOpenDeleteModal,
+    userIdToDelete,
+    handleUserDelete,
+  } = useUsersContext();
 
-export const UserActionsCell: FC<UserActionsCellProps> = ({
-  row,
-  handleUserEdit,
-  handleOpenDeleteModal,
-  handleCloseDeleteModal,
-  handleUserDelete,
-  isDeleteModalOpen,
-  userIdToDelete,
-  isSuperAdmin,
-  currentUserId,
-}) => {
   if (!isSuperAdmin || currentUserId === row.id) {
     return <div>-</div>;
   }

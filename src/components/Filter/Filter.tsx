@@ -3,22 +3,23 @@ import { Option, SelectComponent } from '@/components/Select/Select';
 import styles from './Filter.module.css';
 import { Button } from '@/components/Button';
 import { useTranslation } from 'react-i18next';
+import { FilterType } from '@/types/Filter';
 
-export interface Filter {
+export interface FilterOption {
   name: string;
   label: string;
   options: Option[];
-  value: string | string[];
   applyOnChange?: boolean;
 }
 
 interface FilterProps {
-  filters: Filter[];
+  filters: FilterOption[];
   handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
   clearAll?: boolean;
+  value: FilterType[];
 }
 
-export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll = true }) => {
+export const Filter: FC<FilterProps> = ({ filters, value, handleFilterChange, clearAll = true }) => {
   const [resetKey, setResetKey] = useState(0);
   const { t } = useTranslation();
 
@@ -34,7 +35,7 @@ export const Filter: FC<FilterProps> = ({ filters, handleFilterChange, clearAll 
           <div key={filter.name}>
             <SelectComponent
               options={filter.options}
-              value={filter.value}
+              value={value.find(item => item.name === filter.name)?.value || []}
               label={filter.label}
               applyOnChange={filter.applyOnChange}
               onChange={selectedOptions => {

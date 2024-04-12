@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SelectComponent } from '@/components/Select/Select';
-import { languageList } from '@/utils/languageList';
 import styles from './LanguageMenu.module.css';
+import { languageList } from '@/utils/languageSetup';
 export const LanguageMenu = () => {
   const { i18n } = useTranslation();
 
