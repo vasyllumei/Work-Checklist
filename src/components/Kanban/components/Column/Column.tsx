@@ -26,9 +26,8 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
     formik,
     isEditMode,
     handleTaskEdit,
+    filters,
     getButtonStyle,
-    selectedButtonState,
-    selectedAssignedTo,
     handleTaskDelete,
     searchText,
   } = useKanbanContext();
@@ -49,18 +48,14 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
 
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
-
   const filteredTasks = tasks
     .filter((task: TaskType) => !searchText || task.title.includes(searchText) || task.description.includes(searchText))
     .filter(
       (task: TaskType) =>
-        !selectedAssignedTo.length || selectedAssignedTo.some(state => task.assignedTo.includes(state)),
-    )
-    .filter(
-      (task: TaskType) =>
-        !selectedButtonState.length || selectedButtonState.some(state => task.buttonState.includes(state)),
+        !filters?.length ||
+        filters.some((state: any) => task.assignedTo.includes(state) || task.buttonState.includes(state)),
     );
-
+  console.log(filteredTasks, 'filterdTask');
   const tasksToRender = filteredTasks.filter((task: TaskType) => task.statusId === column.id);
 
   const handleOpenDeleteColumnModal = (columnId: string) => {

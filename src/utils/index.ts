@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+
 export const signUpValidationSchema = Yup.object()
   .shape({
     firstName: Yup.string().min(2, 'Too Short!').max(10, 'Too Long!').required('First name is required'),
@@ -77,4 +78,14 @@ export const getFieldError = (
   const isTouched = touched[fieldName as keyof typeof touched];
 
   return isTouched && errorField ? errorField : undefined;
+};
+export const generateFilterString = (filters: { name: string; value: string | string[] }[]): string => {
+  return filters
+    .map(({ name, value }) => {
+      if (Array.isArray(value)) {
+        return value.map(val => `${name}=${encodeURIComponent(val)}`).join('&');
+      }
+      return `${name}=${encodeURIComponent(value)}`;
+    })
+    .join('&');
 };

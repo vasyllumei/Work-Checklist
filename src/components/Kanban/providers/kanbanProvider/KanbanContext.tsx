@@ -10,6 +10,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import { Option } from '@/components/Select/Select';
+import { FilterType } from '@/types/Filter';
 
 const BUTTON_STATE_COLORS = {
   Updates: BLUE_COLOR,
@@ -44,11 +45,9 @@ interface FormikValues {
   editMode: boolean;
 }
 export default interface KanbanContextProps {
+  filters: any;
+  setFilters: any;
   usersList: Option[];
-  setSelectedAssignedTo: React.Dispatch<React.SetStateAction<string[]>>;
-  setSelectedButtonState: React.Dispatch<React.SetStateAction<string[]>>;
-  selectedAssignedTo: string[];
-  selectedButtonState: string[];
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
@@ -97,9 +96,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
-  const [selectedAssignedTo, setSelectedAssignedTo] = useState<string[]>([]);
-  const [selectedButtonState, setSelectedButtonState] = useState<string[]>([]);
-
+  const [filters, setFilters] = useState<FilterType>();
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
@@ -394,13 +391,11 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     isEditMode,
     stopEditingTask,
     onDragEnd,
-    selectedAssignedTo,
-    setSelectedAssignedTo,
-    selectedButtonState,
-    setSelectedButtonState,
     formik,
     fetchUsers,
     usersList,
+    filters,
+    setFilters,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;
