@@ -35,7 +35,7 @@ export const Filter: FC<FilterProps> = ({ filters, value, handleFilterChange, cl
           <div key={filter.name}>
             <SelectComponent
               options={filter.options}
-              value={value.find(item => item.name === filter.name)?.value || []}
+              value={value?.find(item => item.name === filter.name)?.value || []}
               label={filter.label}
               applyOnChange={filter.applyOnChange}
               onChange={selectedOptions => {
