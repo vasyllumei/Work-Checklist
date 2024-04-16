@@ -7,6 +7,7 @@ import { useFormik } from 'formik';
 import { addEditUserValidationSchema, generateFilterString } from '@/utils';
 import { createUser, deleteAllUsers, deleteUser, getAllUsers, updateUser } from '@/services/user/userService';
 import { FilterType } from '@/types/Filter';
+import { usePagination } from '@/hooks/usePagination';
 
 export interface UsersContext {
   users: UserType[];
@@ -37,9 +38,9 @@ export interface UsersContext {
   isDeleteModalOpen: boolean;
   userIdToDelete: string;
   paginationModel: { pageSize: number; page: number };
-  handlePaginationModelChange: (newPaginationModel: { pageSize: number; page: number }) => void; // Изменен тип
+  handlePaginationModelChange: (newPaginationModel: { pageSize: number; page: number }) => void;
   sortField: string | null;
-  handleSortModelChange: (sortModel: GridSortModel | null) => void; // Изменен тип
+  handleSortModelChange: (sortModel: GridSortModel | null) => void;
 }
 
 const initialUserForm = {
@@ -63,11 +64,8 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   const [userIdToDelete, setUserIdToDelete] = useState<string>('');
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
   const [searchText, setSearchText] = useState<string>('');
-  const [paginationModel, setPaginationModel] = useState({
-    pageSize: 5,
-    page: 0,
-  });
   const [sortField, setSortField] = useState<string | null>(null);
+  const { paginationModel, handlePaginationModelChange } = usePagination();
   const { filters, handleFilterChange } = useFilters();
   const { isOpen: isDialogOpen, openDialog: openUserDialog, closeDialog: closeUserDialog } = useDialogControl();
   const formik = useFormik({
@@ -211,10 +209,6 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
 
   const handleSearch = (text: string) => {
     setSearchText(text);
-  };
-  const handlePaginationModelChange = (newPaginationModel: { pageSize: number; page: number }) => {
-    console.log('New Pagination Model:', newPaginationModel);
-    setPaginationModel(newPaginationModel);
   };
   const rowsWithIds = users.map((user: UserType) => ({ ...user, id: user.id }));
 
