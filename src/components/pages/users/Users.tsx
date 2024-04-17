@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import StyledBox from './components/StyledBox/StyledBox';
 import { Layout } from '@/components/Layout/Layout';
 import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
@@ -24,6 +24,7 @@ export const Users = () => {
     rowsWithIds,
     handleSearch,
     handleDialogOpen,
+    totalUsers,
     searchText,
     setSelectedRows,
     currentUserId,
@@ -32,11 +33,6 @@ export const Users = () => {
     handlePaginationModelChange,
     handleSortModelChange,
   } = useUsersContext();
-  const [rowCountState, setRowCountState] = useState(rowsWithIds.length);
-  useEffect(() => {
-    setRowCountState(rowsWithIds.length);
-  }, [rowsWithIds, setRowCountState]);
-
   const columns = columnsConfig.map(column => ({
     ...column,
     renderCell: (params: GridRenderCellParams) =>
@@ -71,7 +67,7 @@ export const Users = () => {
         </div>
         <DataGrid
           pagination
-          rowCount={rowCountState}
+          rowCount={totalUsers}
           className={styles.dataGridContainer}
           rows={rowsWithIds}
           columns={columns}
@@ -83,7 +79,6 @@ export const Users = () => {
             sorting: {
               sortModel: [{ field: 'rating', sort: 'desc' }],
             },
-            pagination: { paginationModel: { pageSize: 5, page: 0 } },
           }}
           onSortModelChange={handleSortModelChange}
           disableRowSelectionOnClick

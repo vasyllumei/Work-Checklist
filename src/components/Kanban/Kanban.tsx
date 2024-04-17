@@ -12,15 +12,18 @@ import { ColumnType } from '@/types/Column';
 import { BUTTON_STATES } from '@/constants';
 import { Filter, FilterOption } from '@/components/Filter/Filter';
 import { useTranslation } from 'react-i18next';
-
+export enum Filters {
+  ASSIGNED_TO = 'assignedTo',
+  BUTTON_STATE = 'buttonState',
+}
 export const Kanban = () => {
   const {
     columns,
     setIsAddStatusModalOpen,
     onDragEnd,
     filters,
-    setFilters,
     searchText,
+    handleFilterChange,
     handleSearch,
     usersList,
     setIsAddTaskModalOpen,
@@ -29,23 +32,18 @@ export const Kanban = () => {
 
   const kanbanFiltersOptions: FilterOption[] = [
     {
-      name: 'assignedTo',
+      name: Filters.ASSIGNED_TO,
       label: t('assignedUsers'),
       options: usersList,
       applyOnChange: true,
     },
     {
-      name: 'buttonState',
+      name: Filters.BUTTON_STATE,
       label: t('buttonsStates'),
       options: BUTTON_STATES,
       applyOnChange: true,
     },
   ];
-
-  const handleFilterChange = (filterName: string, selectedOptions: string | string[]) => {
-    setFilters(Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]);
-  };
-
   return (
     <Layout
       handleSearch={handleSearch}

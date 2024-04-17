@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 export type ResponseType<Data> = {
   data: Data;
   message?: string;
+  totalCount: number;
 };
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,

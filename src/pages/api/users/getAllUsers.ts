@@ -10,15 +10,10 @@ async function getAllUsers(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     await dbConnect();
-    console.log(req.query, 'req.query');
 
-    // Pagination
     const limit = parseInt(req.query.limit as string, 10) || 5;
     const skip = parseInt(req.query.skip as string, 10) || 0;
-    console.log(limit, 'limit');
 
-    console.log(skip, 'skip');
-    // Filtering
     const filter: any = {};
     if (req.query.filter) {
       const filterQuery = req.query.filter as string;
@@ -31,14 +26,10 @@ async function getAllUsers(req: NextApiRequest, res: NextApiResponse) {
         filter[name].push(value);
       });
     }
-    // Sorting
     const sort: any = {};
     if (req.query.sort) {
-      console.log('SortBy:', req.query.sort);
-      console.log('Order:', req.query.order);
       sort[req.query.sort as string] = req.query.order === 'desc' ? -1 : 1;
     }
-    // Search
     const searchQuery = req.query.search;
     const searchFilter = searchQuery
       ? {
@@ -64,14 +55,14 @@ async function getAllUsers(req: NextApiRequest, res: NextApiResponse) {
       const { _id, firstName, lastName, email, role, iconColor } = user;
       return { id: _id, firstName, lastName, email, role, iconColor };
     });
-    const totalUsers = await User.countDocuments({ ...filter, ...searchFilter });
+    const totalCount = await User.countDocuments({ ...filter, ...searchFilter });
 
-    const totalPages = Math.ceil(totalUsers / limit);
+    const totalPages = Math.ceil(totalCount / limit);
 
     res.status(200).json({
       data: data,
       totalPages,
-      totalUsers,
+      totalCount,
     });
   } catch (error) {
     console.error(error);

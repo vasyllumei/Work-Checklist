@@ -13,6 +13,8 @@ import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/u
 import { ColumnType } from '@/types/Column';
 import { UserType } from '@/types/User';
 import parse from 'html-react-parser';
+import { FilterType } from '@/types/Filter';
+import { Filters } from './../../Kanban';
 interface ColumnProps {
   column: ColumnType;
   index: number;
@@ -48,15 +50,28 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
 
     userDisplayDataMap.set(user.id, { initials, backgroundColor });
   });
-  const filteredTasks = tasks
-    .filter((task: TaskType) => !searchText || task.title.includes(searchText) || task.description.includes(searchText))
-    .filter(
-      (task: TaskType) =>
-        !filters?.length ||
-        filters.some((state: any) => task.assignedTo.includes(state) || task.buttonState.includes(state)),
+  const filterTasks = (tasks: TaskType[]) => {
+    const filteredTasks = tasks.filter(
+      (task: TaskType) => !searchText || task.title.includes(searchText) || task.description.includes(searchText),
     );
-  console.log(filteredTasks, 'filterdTask');
-  const tasksToRender = filteredTasks.filter((task: TaskType) => task.statusId === column.id);
+
+    return filteredTasks.filter(task =>
+      filters.every((filter: FilterType) => {
+        if (filter.value.length === 0) {
+          return true;
+        }
+        if (filter.name === Filters.ASSIGNED_TO) {
+          return filter.value.includes(task.assignedTo);
+        }
+        if (filter.name === Filters.BUTTON_STATE) {
+          return filter.value.includes(task.buttonState);
+        }
+        return true;
+      }),
+    );
+  };
+
+  const tasksToRender = filterTasks(tasks).filter((task: TaskType) => task.statusId === column.id);
 
   const handleOpenDeleteColumnModal = (columnId: string) => {
     setSelectedColumn(columnId);
@@ -80,10 +95,10 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
   return (
     <Draggable key={column.id} draggableId={column.id} index={index}>
       {provided => (
-        <div ref={provided.innerRef} {...provided.draggableProps} key={column.id} className={styles.column}>
+        <div ref={provided.innerRef} {...provided.draggableProps} className={styles.column}>
           <div className={styles.titleColumn} {...provided.dragHandleProps}>
             <h2 className={styles.title}>
-              <ColumnTitleEdit column={column} key={column.id} />
+              <ColumnTitleEdit column={column} />
             </h2>
 
             {!hasTasksInColumn(column.id) && (
@@ -104,18 +119,13 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
               <AddIcon />
             </button>
           </div>
-          <StrictModeDroppable key={column.id} droppableId={column.id} type="TASK">
+          <StrictModeDroppable droppableId={column.id} type="TASK">
             {provided => (
               <div ref={provided.innerRef} key={column.id} {...provided.droppableProps} className={styles.droppable}>
-                {tasksToRender.map((task: TaskType, taskIndex: number) => (
-                  <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
+                {tasksToRender.map((task: TaskType, index: number) => (
+                  <Draggable key={task.id} draggableId={task.id} index={index}>
                     {provided => (
-                      <div
-                        ref={provided.innerRef}
-                        key={task.id}
-                        {...provided.draggableProps}
-                        className={styles.cardsContainer}
-                      >
+                      <div ref={provided.innerRef} {...provided.draggableProps} className={styles.cardsContainer}>
                         <div className={styles.card} {...provided.dragHandleProps}>
                           {isEditMode && formik.values.id === task.id ? (
                             <TaskEditor />
@@ -149,7 +159,6 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
                           {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
                             <div className={styles.actionContainer}>
                               <div
-                                key={task.id}
                                 className={styles.avatar}
                                 style={{
                                   backgroundColor: userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
