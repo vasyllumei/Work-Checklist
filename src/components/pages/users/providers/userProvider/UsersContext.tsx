@@ -23,7 +23,7 @@ export interface UsersContext {
   handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
   isDialogOpen: boolean;
   handleDialogOpen: () => void;
-  handleSearch: any;
+  handleSearch?: ((text: string) => void) | undefined;
   searchText: string;
   isSuperAdmin: boolean;
   selectedRows: GridRowSelectionModel;
@@ -41,6 +41,7 @@ export interface UsersContext {
   handlePaginationModelChange: (newPaginationModel: { pageSize: number; page: number }) => void;
   sortField: string | null;
   handleSortModelChange: (sortModel: GridSortModel | null) => void;
+  totalUsers: number;
 }
 
 const initialUserForm = {
@@ -66,6 +67,8 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   const [searchText, setSearchText] = useState<string>('');
   const [sortField, setSortField] = useState<string | null>(null);
   const { paginationModel, handlePaginationModelChange } = usePagination();
+  const [totalUsers, setTotalUsers] = useState(0);
+
   const { filters, handleFilterChange } = useFilters();
   const { isOpen: isDialogOpen, openDialog: openUserDialog, closeDialog: closeUserDialog } = useDialogControl();
   const formik = useFormik({
@@ -199,17 +202,18 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
         skip: page * pageSize,
         sort: sortField !== null ? sortField : undefined,
       });
-      console.log('fetchedUsersData', fetchedUsersData);
       const fetchedUsers = fetchedUsersData.data;
+      const totalCount = fetchedUsersData.totalCount;
       setUsers(fetchedUsers);
+      setTotalUsers(totalCount);
     } catch (error) {
       console.error('Error retrieving the list of users:', error);
     }
   }, [searchText, filterParams, paginationModel, sortField]);
-
   const handleSearch = (text: string) => {
     setSearchText(text);
   };
+
   const rowsWithIds = users.map((user: UserType) => ({ ...user, id: user.id }));
 
   useEffect(() => {
@@ -252,6 +256,7 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
     paginationModel,
     sortField,
     handleSortModelChange,
+    totalUsers,
   };
 
   return <UsersContext.Provider value={value}>{children}</UsersContext.Provider>;

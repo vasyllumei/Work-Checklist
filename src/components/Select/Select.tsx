@@ -69,9 +69,11 @@ export const SelectComponent: React.FC<SelectProps> = ({
     const isSelectOrCheckbox =
       containerRef.current &&
       (containerRef.current.contains(event.target as Node) || event.target instanceof HTMLInputElement);
-
-    if (!isSelectOrCheckbox && applyOnChange) {
-      handleApplyFilter();
+    if (!isSelectOrCheckbox) {
+      if (applyOnChange && isSelectOpen) {
+        handleApplyFilter();
+      }
+      setIsSelectOpen(false);
     }
   };
 

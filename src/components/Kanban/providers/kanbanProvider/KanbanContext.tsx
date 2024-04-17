@@ -10,6 +10,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import { Option } from '@/components/Select/Select';
+import { useFilters } from '@/hooks/useFilters';
 import { FilterType } from '@/types/Filter';
 
 const BUTTON_STATE_COLORS = {
@@ -45,8 +46,8 @@ interface FormikValues {
   editMode: boolean;
 }
 export default interface KanbanContextProps {
-  filters: any;
-  setFilters: any;
+  filters: FilterType[];
+  handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
   usersList: Option[];
   columns: ColumnType[];
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
@@ -96,7 +97,8 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
-  const [filters, setFilters] = useState<FilterType>();
+  const { filters, handleFilterChange } = useFilters();
+
   const ValidationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
@@ -137,7 +139,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       setTasks(sortedTasks);
     } catch (error) {}
   };
-
   const handleColumnCreate = async () => {
     try {
       const columnData = await createColumn(newColumn);
@@ -395,7 +396,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     fetchUsers,
     usersList,
     filters,
-    setFilters,
+    handleFilterChange,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;
