@@ -20,9 +20,20 @@ const UserDialog: React.FC = () => {
         <UserForm />
       </DialogContent>
       <DialogActions>
-        <div className={styles.buttonContainer}>
-          <Button onClick={handleDialogClose} text="Cancel" size={'small'} outlined={true} />
-          <Button onClick={formik.handleSubmit} text={formik.values.id ? 'Save Changes' : 'Add User'} size={'small'} />
+        <div className={styles.buttonContainer} data-testid="submitActions">
+          <Button
+            dataTestId="cancelUserSubmit"
+            onClick={handleDialogClose}
+            text="Cancel"
+            size={'small'}
+            outlined={true}
+          />
+          <Button
+            dataTestId="addUserSubmit"
+            onClick={formik.handleSubmit}
+            text={formik.values.id ? 'Save Changes' : 'Add User'}
+            size={'small'}
+          />
         </div>
       </DialogActions>
     </Dialog>

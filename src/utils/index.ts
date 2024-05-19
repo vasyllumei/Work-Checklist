@@ -37,8 +37,8 @@ export const signUpValidationSchema = Yup.object()
     return schema;
   });
 export const addEditUserValidationSchema = Yup.object().shape({
-  firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('First name is required'),
-  lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Last name is required'),
+  firstName: Yup.string().min(2, 'Too Short!').max(10, 'Too Long!').required('First name is required'),
+  lastName: Yup.string().min(2, 'Too Short!').max(10, 'Too Long!').required('Last name is required'),
   email: Yup.string()
     .email('Invalid email')
     .when('editMode', (editMode, schema) => {

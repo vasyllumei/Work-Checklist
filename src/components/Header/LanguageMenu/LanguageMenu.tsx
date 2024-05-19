@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { SelectComponent } from '@/components/Select/Select';
 import styles from './LanguageMenu.module.css';
 import { languageList } from '@/utils/languageSetup';
-export const LanguageMenu = () => {
+import { FC } from 'react';
+
+export const LanguageMenu: FC = () => {
   const { i18n } = useTranslation();
 
   const handleLanguageChange = (language: string | string[]) => {
@@ -17,25 +19,28 @@ export const LanguageMenu = () => {
     return null;
   }
   return (
-    <SelectComponent
-      sx={{
-        boxShadow: 'none',
-        '.MuiOutlinedInput-notchedOutline': { border: 0 },
-        width: '100px',
-        '& .MuiSvgIcon-root': {
-          visibility: 'hidden',
-        },
-      }}
-      label={
-        <div className={styles.mainContainer}>
-          <div className={styles.iconContainer}>
-            <currentLanguageObject.leftIcon />
-            {currentLanguageObject?.label}
+    <div className={styles.someName} data-testid="headerLanguage">
+      <SelectComponent
+        sx={{
+          boxShadow: 'none',
+          '.MuiOutlinedInput-notchedOutline': { border: 0 },
+          width: '100px',
+          '& .MuiSvgIcon-root': {
+            visibility: 'hidden',
+          },
+        }}
+        label={
+          <div className={styles.mainContainer}>
+            <div className={styles.iconContainer}>
+              <currentLanguageObject.leftIcon />
+              {currentLanguageObject?.label}
+            </div>
           </div>
-        </div>
-      }
-      onChange={handleLanguageChange}
-      options={languageList}
-    />
+        }
+        onChange={handleLanguageChange}
+        options={languageList}
+        testId="languageSelector"
+      />
+    </div>
   );
 };

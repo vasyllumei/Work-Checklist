@@ -8,6 +8,7 @@ import { addEditUserValidationSchema, generateFilterString } from '@/utils';
 import { createUser, deleteAllUsers, deleteUser, getAllUsers, updateUser } from '@/services/user/userService';
 import { FilterType } from '@/types/Filter';
 import { usePagination } from '@/hooks/usePagination';
+import { useHandleInteraction } from '@/hooks/useHandleInteraction';
 
 export interface UsersContext {
   users: UserType[];
@@ -68,6 +69,7 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   const [sortField, setSortField] = useState<string | null>(null);
   const { paginationModel, handlePaginationModelChange } = usePagination();
   const [totalUsers, setTotalUsers] = useState(0);
+  const handleInteraction = useHandleInteraction();
 
   const { filters, handleFilterChange } = useFilters();
   const { isOpen: isDialogOpen, openDialog: openUserDialog, closeDialog: closeUserDialog } = useDialogControl();
@@ -191,17 +193,21 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
       setSortField(null);
     }
   };
+
   const fetchUsers = useCallback(async () => {
     try {
       const { page, pageSize } = paginationModel;
-
-      const fetchedUsersData = await getAllUsers({
+      const queryParams = {
         search: searchText,
         filter: filterParams,
         limit: pageSize,
         skip: page * pageSize,
         sort: sortField !== null ? sortField : undefined,
-      });
+      };
+      handleInteraction(queryParams);
+
+      const fetchedUsersData = await getAllUsers(queryParams);
+
       const fetchedUsers = fetchedUsersData.data;
       const totalCount = fetchedUsersData.totalCount;
       setUsers(fetchedUsers);
@@ -210,11 +216,12 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
       console.error('Error retrieving the list of users:', error);
     }
   }, [searchText, filterParams, paginationModel, sortField]);
+
   const handleSearch = (text: string) => {
     setSearchText(text);
   };
 
-  const rowsWithIds = users.map((user: UserType) => ({ ...user, id: user.id }));
+  const rowsWithIds = users?.map((user: UserType) => ({ ...user, id: user.id }));
 
   useEffect(() => {
     fetchUsers();

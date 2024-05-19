@@ -26,6 +26,7 @@ interface SelectProps {
   labelId?: string;
   id?: string;
   sx?: SxProps;
+  testId?: string;
 }
 
 export const SelectComponent: React.FC<SelectProps> = ({
@@ -38,6 +39,7 @@ export const SelectComponent: React.FC<SelectProps> = ({
   labelId,
   id,
   sx,
+  testId,
 }) => {
   const [selectedProp, setSelectedProp] = useState<string[]>([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -97,7 +99,12 @@ export const SelectComponent: React.FC<SelectProps> = ({
           >
             {options.map(option => (
               <MenuItem key={option.label} value={option.value}>
-                <Checkbox checked={selectedProp.indexOf(option.value) > -1} />
+                <Checkbox
+                  checked={selectedProp.indexOf(option.value) > -1}
+                  inputProps={
+                    { 'data-testid': `checkbox-${option.value}` } as React.InputHTMLAttributes<HTMLInputElement>
+                  }
+                />
                 <ListItemText primary={option.label} />
               </MenuItem>
             ))}
@@ -106,14 +113,14 @@ export const SelectComponent: React.FC<SelectProps> = ({
                 <Divider />
                 <div className={styles.multiSelectButton}>
                   <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
-                  <Button text="Apply" onClick={handleApplyFilter} size="small" />
+                  <Button text="Apply" onClick={handleApplyFilter} dataTestId={`applyFilterButton`} size="small" />
                 </div>
               </div>
             )}
           </Select>
         </FormControl>
       ) : (
-        <FormControl size="small" className={styles.formControl}>
+        <FormControl size="small" className={styles.formControl} data-testid={testId}>
           <InputLabel>{label}</InputLabel>
           <Select
             labelId={labelId}
@@ -124,7 +131,7 @@ export const SelectComponent: React.FC<SelectProps> = ({
             sx={sx}
           >
             {options.map(({ value, label, leftIcon: LeftIcon }) => (
-              <MenuItem key={value} value={value}>
+              <MenuItem key={value} value={value} data-testid={`${testId}-${value}`}>
                 {LeftIcon && (
                   <div className={styles.iconContainer}>
                     <LeftIcon />

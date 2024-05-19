@@ -53,9 +53,7 @@ export const Login: FC = () => {
     <div className={styles.container}>
       <div className={styles.leftContainer}>
         <div className={styles.form}>
-          {' '}
-          <LanguageMenu />
-          <div className={styles.backLink} />
+          <LanguageMenu /> <div className={styles.backLink} />
           <div>
             <div className={styles.headText}> {t('signIn')} </div>
             <div className={styles.frontText}>{t('enterEmail')}</div>
@@ -65,6 +63,7 @@ export const Login: FC = () => {
             </div>
 
             <TextInput
+              dataTestId="emailInput"
               label={t('userEmail')}
               type="email"
               name="email"
@@ -74,6 +73,7 @@ export const Login: FC = () => {
               error={getFieldError('email', formik.touched, formik.errors)}
             />
             <TextInput
+              dataTestId="passwordInput"
               label={t('userPassword')}
               type="password"
               name="password"
@@ -99,7 +99,7 @@ export const Login: FC = () => {
                 {t('forgetPassword')}
               </a>
             </div>
-            <Button text={t('signIn')} onClick={formik.handleSubmit} size={'medium'} />
+            <Button dataTestId="buttonSubmit" text={t('signIn')} onClick={formik.handleSubmit} size={'medium'} />
             <div className={styles.forgotText}>
               {t('notRegistered')}
               <a className={styles.authLink} href="/signUp" onClick={() => router.push('/signUp')}>

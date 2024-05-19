@@ -11,6 +11,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "types": ["cypress", "@testing-library/cypress"],
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
@@ -19,6 +20,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "cypress/support/commands.ts"],
   "exclude": ["node_modules"]
 }
