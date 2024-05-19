@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cypress:run": "cypress run",
+    "test:watch": "cypress open --e2e --browser chrome"
   },
   "resolutions": {
     "prettier": "2.8.2"
@@ -54,7 +56,9 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@testing-library/cypress": "^10.0.1",
     "@types/react-beautiful-dnd": "^13.1.5",
+    "cypress": "^13.9.0",
     "eslint": "8.27.0",
     "eslint-config-next": "13.2.4",
     "eslint-config-prettier": "^8.6.0",

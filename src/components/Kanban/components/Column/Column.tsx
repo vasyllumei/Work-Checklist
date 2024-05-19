@@ -112,6 +112,7 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
                   isOpen={isDeleteColumnModalOpen}
                   onClose={handleCloseDeleteColumnModal}
                   onDelete={async () => await handleColumnDelete(selectedColumn)}
+                  testIdContext="Column"
                 />
               </div>
             )}

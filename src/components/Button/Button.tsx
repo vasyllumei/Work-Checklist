@@ -10,6 +10,7 @@ interface ButtonPropsType {
   className?: string;
   size: 'small' | 'medium' | 'large';
   outlined?: boolean;
+  dataTestId?: string;
 }
 
 export const Button: FC<ButtonPropsType> = ({
@@ -20,10 +21,12 @@ export const Button: FC<ButtonPropsType> = ({
   className,
   size,
   outlined,
+  dataTestId,
 }) => {
   const buttonSize = styles[size];
   return (
     <button
+      data-testid={dataTestId}
       type={type}
       className={classNames(
         styles.button,

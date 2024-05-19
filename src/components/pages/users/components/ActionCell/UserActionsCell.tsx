@@ -25,20 +25,25 @@ export const UserActionsCell = ({ row }: { row: UserType }) => {
   return (
     <Grid container justifyContent="center" spacing={2}>
       <Grid item>
-        <IconButton onClick={() => handleUserEdit(String(row.id))}>
-          <EditIcon />
-        </IconButton>
+        <div data-testid={`updateUser-${row.id}`}>
+          <IconButton onClick={() => handleUserEdit(String(row.id))}>
+            <EditIcon />
+          </IconButton>
+        </div>
       </Grid>
       <Grid item>
-        <IconButton onClick={() => handleOpenDeleteModal(String(row.id))}>
-          <DeleteIcon />
-        </IconButton>
+        <div data-testid={`deleteUser-${row.id}`}>
+          <IconButton onClick={() => handleOpenDeleteModal(String(row.id))}>
+            <DeleteIcon />
+          </IconButton>
+        </div>
         <DeleteModal
           title="Delete User"
           item={`user with id ${userIdToDelete}`}
           isOpen={isDeleteModalOpen}
           onClose={handleCloseDeleteModal}
           onDelete={async () => await handleUserDelete(userIdToDelete)}
+          testIdContext={`User${row.id}`}
         />
       </Grid>
     </Grid>

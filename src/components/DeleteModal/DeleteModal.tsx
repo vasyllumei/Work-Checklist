@@ -8,9 +8,10 @@ interface DeleteModalProps {
   onDelete: () => Promise<void>;
   item: string;
   title: string;
+  testIdContext?: string;
 }
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onDelete, item, title }) => {
+export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, testIdContext, onClose, onDelete, item, title }) => {
   const handleDelete = async () => {
     await onDelete();
     onClose();
@@ -28,8 +29,14 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onDel
       </DialogContent>
       <DialogActions>
         <div className={styles.buttonContainer}>
-          <Button onClick={handleCancel} text="Cancel" size={'small'} outlined={true} />
-          <Button onClick={handleDelete} text="Delete" size={'small'} />
+          <Button
+            onClick={handleCancel}
+            text="Cancel"
+            dataTestId={`cancelModal${testIdContext}`}
+            size={'small'}
+            outlined={true}
+          />
+          <Button onClick={handleDelete} text="Delete" dataTestId={`deleteModal${testIdContext}`} size={'small'} />
         </div>
       </DialogActions>
     </Dialog>

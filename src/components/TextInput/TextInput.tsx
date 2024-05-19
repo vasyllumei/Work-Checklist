@@ -15,6 +15,7 @@ interface TextInputProps {
   onBlur?: () => void;
   label?: string;
   isEditing?: boolean;
+  dataTestId?: string;
 }
 
 export function TextInput({
@@ -24,6 +25,7 @@ export function TextInput({
   onChange,
   placeholder,
   error,
+  dataTestId,
   disabled,
   onBlur,
   label,
@@ -49,6 +51,7 @@ export function TextInput({
         <HtmlEditor onChange={onChange} value={value || ''} />
       ) : (
         <input
+          data-testid={dataTestId}
           className={classNames(styles.input, { [styles.inputError]: error })}
           name={name}
           value={value || ''}

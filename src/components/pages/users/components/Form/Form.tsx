@@ -12,6 +12,7 @@ const Form = () => {
     <>
       <div>
         <TextInput
+          dataTestId="firstName"
           label="First Name"
           name="firstName"
           value={formik.values.firstName || ''}
@@ -24,6 +25,7 @@ const Form = () => {
       </div>
       <div>
         <TextInput
+          dataTestId="lastName"
           label="Last Name"
           name="lastName"
           value={formik.values.lastName || ''}
@@ -36,6 +38,7 @@ const Form = () => {
       </div>
       <div>
         <TextInput
+          dataTestId="email"
           label="Email"
           name="email"
           type="email"
@@ -48,6 +51,7 @@ const Form = () => {
       </div>
       {!isEditMode && (
         <TextInput
+          dataTestId="password"
           label="Password"
           name="password"
           type="password"
@@ -57,22 +61,25 @@ const Form = () => {
           error={getFieldError('password', formik.touched, formik.errors)}
         />
       )}
-      <FormControl variant="standard" sx={{ m: 2, minWidth: 300 }}>
-        <Select
-          value={formik.values?.role || UserRoleType.USER}
-          onChange={event => {
-            formik.setFieldValue('role', event.target.value as UserRoleType);
-          }}
-        >
-          <MenuItem value={UserRoleType.USER}>User</MenuItem>
-          <MenuItem value={UserRoleType.ADMIN}>Admin</MenuItem>
-        </Select>
-        {formik.errors.createUserError && (
-          <div className={styles.createUserError}>
-            {getFieldError('createUserError', formik.touched, formik.errors)}
-          </div>
-        )}
-      </FormControl>
+      <div data-testid="modalActionsButtons">
+        <FormControl variant="standard" sx={{ m: 2, minWidth: 300 }}>
+          <Select
+            data-testid="role-select"
+            value={formik.values?.role || UserRoleType.USER}
+            onChange={event => {
+              formik.setFieldValue('role', event.target.value as UserRoleType);
+            }}
+          >
+            <MenuItem value={UserRoleType.USER}>User</MenuItem>
+            <MenuItem value={UserRoleType.ADMIN}>Admin</MenuItem>
+          </Select>
+          {formik.errors.createUserError && (
+            <div className={styles.createUserError}>
+              {getFieldError('createUserError', formik.touched, formik.errors)}
+            </div>
+          )}
+        </FormControl>
+      </div>
     </>
   );
 };

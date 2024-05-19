@@ -48,8 +48,9 @@ export const Users = () => {
           title="Delete Selected Users"
           item={`selected users`}
           onDelete={async () => await handleDeleteButtonClick()}
+          testIdContext="AllUsers"
         />
-        <div className={styles.deleteAllUsersContainer}>
+        <div className={styles.deleteAllUsersContainer} data-testid="filterUsers">
           <Filter
             filters={usersFilterOptions}
             value={filters}
@@ -59,6 +60,7 @@ export const Users = () => {
           {isSuperAdmin && selectedRows && selectedRows.length > 0 ? (
             <Button
               onClick={() => handleOpenDeleteAllUsersModal(selectedRows.map(String))}
+              dataTestId="deleteUsers"
               text="Delete selected users"
               size={'small'}
               className={styles.allUsersContainer}
@@ -66,6 +68,7 @@ export const Users = () => {
           ) : null}
         </div>
         <DataGrid
+          disableColumnMenu
           pagination
           rowCount={totalUsers}
           className={styles.dataGridContainer}
@@ -90,7 +93,7 @@ export const Users = () => {
           }}
         />
         <Grid className={styles.gridContainer}>
-          {isSuperAdmin && <Button onClick={handleDialogOpen} text="Add User" size={'small'} />}
+          {isSuperAdmin && <Button onClick={handleDialogOpen} dataTestId="addUser" text="Add User" size={'small'} />}
         </Grid>
         <UserDialog />
       </StyledBox>

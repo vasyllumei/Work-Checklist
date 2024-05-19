@@ -1,3 +1,27 @@
-build:
+stages:
+  - test
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - /root/.cache/Cypress/
+
+test:
+  image: cypress/browsers:node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
+  stage: test
   script:
-    - echo "Hello Worldвіфв"
+    # install dependencies
+    - yarn
+    # start the server in the background
+    - yarn run cypress install
+    - yarn build
+    - yarn start &
+    # run Cypress tests
+    - yarn run cypress:run --browser electron
+  artifacts:
+    when: always
+    paths:
+      - cypress/videos/**/*.mp4
+      - cypress/screenshots/**/*.png
+    expire_in: 1 day

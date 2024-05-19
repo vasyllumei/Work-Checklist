@@ -13,7 +13,7 @@ const generateToken = (payload: object, secret: string, expiresIn: string): stri
   return sign(payload, secret, { expiresIn });
 };
 
-const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+export const handleLogin = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed' });
     return;
