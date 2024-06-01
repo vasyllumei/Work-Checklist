@@ -33,12 +33,15 @@ export const Users = () => {
     handlePaginationModelChange,
     handleSortModelChange,
   } = useUsersContext();
+
   const columns = columnsConfig.map(column => ({
     ...column,
     renderCell: (params: GridRenderCellParams) =>
       column.field === 'actions' ? <UserActionsCell row={params.row} /> : <span>{params.value}</span>,
   }));
+
   const pageSizeOption = [5, 7, 9];
+
   return (
     <Layout headTitle="Users" searchText={searchText} handleSearch={handleSearch} breadcrumbs={breadcrumbsUsers}>
       <StyledBox>

@@ -3,12 +3,13 @@ import { UserRoleType, UserType } from '@/types/User';
 import { GridRowSelectionModel, GridSortModel } from '@mui/x-data-grid';
 import { useFilters } from '@/hooks/useFilters';
 import { useDialogControl } from '@/hooks/useDialogControl';
-import { useFormik } from 'formik';
+import { FormikValues, useFormik } from 'formik';
 import { addEditUserValidationSchema, generateFilterString } from '@/utils';
 import { createUser, deleteAllUsers, deleteUser, getAllUsers, updateUser } from '@/services/user/userService';
 import { FilterType } from '@/types/Filter';
 import { usePagination } from '@/hooks/usePagination';
 import { useHandleInteraction } from '@/hooks/useHandleInteraction';
+import { debounce } from 'lodash';
 
 export interface UsersContext {
   users: UserType[];
@@ -18,7 +19,7 @@ export interface UsersContext {
   handleOpenDeleteAllUsersModal: (userIds: string[]) => void;
   rowsWithIds: UserType[];
   handleDeleteButtonClick: () => void;
-  formik: any;
+  formik: FormikValues;
   fetchUsers: () => void;
   isDeleteAllUsersModalOpen: boolean;
   handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
@@ -193,7 +194,6 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
       setSortField(null);
     }
   };
-
   const fetchUsers = useCallback(async () => {
     try {
       const { page, pageSize } = paginationModel;
@@ -210,23 +210,28 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
 
       const fetchedUsers = fetchedUsersData.data;
       const totalCount = fetchedUsersData.totalCount;
+
       setUsers(fetchedUsers);
       setTotalUsers(totalCount);
     } catch (error) {
       console.error('Error retrieving the list of users:', error);
     }
-  }, [searchText, filterParams, paginationModel, sortField]);
+  }, [paginationModel, filterParams, searchText, sortField]);
+
+  const debouncedFetchUsers = useCallback(debounce(fetchUsers, 1500), [searchText]);
+
+  useEffect(() => {
+    const fetchFunction = searchText ? debouncedFetchUsers : fetchUsers;
+    fetchFunction();
+
+    return debouncedFetchUsers.cancel;
+  }, [filterParams, paginationModel, sortField, searchText]);
 
   const handleSearch = (text: string) => {
     setSearchText(text);
   };
 
-  const rowsWithIds = users?.map((user: UserType) => ({ ...user, id: user.id }));
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
+  const rowsWithIds = users.map((user: UserType) => ({ ...user, id: user.id }));
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   const isSuperAdmin = currentUser?.user.role === UserRoleType.SUPER_ADMIN;
   const currentUserId = currentUser?.user?._id;

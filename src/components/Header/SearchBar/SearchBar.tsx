@@ -1,8 +1,8 @@
 import { IconButton, InputBase } from '@mui/material';
-import React /*, { useEffect }*/ from 'react';
+import React, { useEffect } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from './SearchBar.module.css';
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 
 interface SearchBarProps {
   handleSearch?: ((text: string) => void) | undefined;
@@ -10,25 +10,25 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
-  // const router = useRouter();
+  const router = useRouter();
 
-  /*  const handleInteraction = (text: string) => {
+  const handleInteraction = (text: string) => {
     const updatedRoute = text ? `${router.pathname}?searchText=${text}` : router.pathname;
     router.replace(updatedRoute);
     handleSearchAndSave(text);
-  };*/
+  };
 
   const handleSearchAndSave = (text: string) => {
     if (handleSearch) {
       handleSearch(text || '');
     }
-    /*    localStorage.setItem('searchInputText', text);*/
+    localStorage.setItem('searchInputText', text);
   };
-  /*
+
   useEffect(() => {
     const storedText = localStorage.getItem('searchInputText');
     storedText && handleSearchAndSave(storedText);
-  }, []);*/
+  }, []);
 
   return (
     <div className={styles.searchField}>
@@ -42,10 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ handleSearch, searchText }) => {
         className={styles.text}
         placeholder="Search"
         value={searchText}
-        onChange={event => handleSearchAndSave(event.target.value)}
-        /*
         onChange={event => handleInteraction(event.target.value)}
-*/
       />
     </div>
   );
