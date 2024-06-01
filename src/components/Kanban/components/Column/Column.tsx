@@ -160,6 +160,7 @@ export const Column: FC<ColumnProps> = ({ column, index }) => {
                           {!isEditMode || (isEditMode && formik.values.id !== task.id) ? (
                             <div className={styles.actionContainer}>
                               <div
+                                key={task.id}
                                 className={styles.avatar}
                                 style={{
                                   backgroundColor: userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
