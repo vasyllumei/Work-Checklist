@@ -7,8 +7,8 @@
 
 .addStatusButton{
     display: flex;
-    width: 20%;
-    margin-bottom: 20px;
+    width: 100%;
+    align-items: center;
     gap: 20px;
 }
 
@@ -23,5 +23,20 @@
 .newTaskButton{
     max-height: 40px;
     width: 100%;
+}
+
+.projectTitleName{
+    font-style: normal;
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 42px;
+    letter-spacing: -0.02em;
+    color: #2B3674;
+    margin-left: 9px;
+}
+.titleDivider {
+    height: 5px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 

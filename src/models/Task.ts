@@ -8,6 +8,7 @@ export type TaskDocumentType = Document & {
   statusId: string;
   buttonState: string;
   order: number;
+  projectId: string;
 };
 
 const TaskSchema = new Schema<TaskDocumentType>(
@@ -42,6 +43,11 @@ const TaskSchema = new Schema<TaskDocumentType>(
     },
     order: {
       type: Number,
+      required: true,
+    },
+    projectId: {
+      type: String,
+      ref: 'Project',
       required: true,
     },
   },

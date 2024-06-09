@@ -48,7 +48,7 @@ export function TextInput({
       )}
       {label && <label className={styles.inputLabel}>{label}</label>}
       {isEditing ? (
-        <HtmlEditor onChange={onChange} value={value || ''} />
+        <HtmlEditor dataAid="descriptionInput" onChange={onChange} value={value || ''} />
       ) : (
         <input
           data-testid={dataTestId}

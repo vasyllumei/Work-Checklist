@@ -2,16 +2,21 @@ import React, { createContext, useEffect, useState } from 'react';
 import { ColumnType } from '@/types/Column';
 import { TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
-import { getAllColumns, createColumn, deleteColumn, updateColumns } from '@/services/column/columnService';
-import { getAllTasks, createTask, deleteTask, updateTask, updateTasks } from '@/services/task/taskService';
+import { getAllColumns, createColumn, deleteColumn } from '@/services/column/columnService';
+import { getAllTasks, createTask, deleteTask, updateTask } from '@/services/task/taskService';
 import { getAllUsers } from '@/services/user/userService';
 import { DropResult } from 'react-beautiful-dnd';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import { Option } from '@/components/Select/Select';
 import { useFilters } from '@/hooks/useFilters';
 import { FilterType } from '@/types/Filter';
+import { getAllProjects } from '@/services/project/projectService';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/projectStore/store';
+import handleDragEnd from '@/components/Kanban/utils/onDragEnd';
+import { taskValidationSchema } from '@/components/Kanban/components/Column/components/Task/utils';
+import { setProjects } from '@/store/projectStore/projectReducer/projectReducers';
 
 const BUTTON_STATE_COLORS = {
   Updates: BLUE_COLOR,
@@ -31,6 +36,7 @@ const initialTaskForm = {
   buttonState: '',
   order: 0,
   editMode: false,
+  projectId: '',
 };
 interface FormikValues {
   id: string;
@@ -44,6 +50,7 @@ interface FormikValues {
   buttonState: string;
   order: number;
   editMode: boolean;
+  projectId: string;
 }
 export default interface KanbanContextProps {
   filters: FilterType[];
@@ -63,8 +70,6 @@ export default interface KanbanContextProps {
   setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
   searchText: string;
   handleSearch?: ((text: string) => void) | undefined;
-  fetchData: () => void;
-  fetchUsers: () => void;
   createStatusModal: () => void;
   closeAddStatusModal: () => void;
   stopEditingTask: () => void;
@@ -90,6 +95,8 @@ export default interface KanbanContextProps {
 export const KanbanContext = createContext<KanbanContextProps | null>(null);
 
 export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
+  const projects = useSelector((state: RootState) => state.project.projects);
+  const dispatch = useDispatch();
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [newColumn, setNewColumn] = useState<ColumnType>({ title: '', order: 0, id: '' });
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
@@ -99,15 +106,9 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [searchText, setSearchText] = useState<string>('');
   const { filters, handleFilterChange } = useFilters();
 
-  const ValidationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
-    description: Yup.string().required('Description is required'),
-    editMode: Yup.boolean(),
-  });
-
   const formik = useFormik({
     initialValues: initialTaskForm,
-    validationSchema: ValidationSchema,
+    validationSchema: taskValidationSchema,
     onSubmit: async () => {
       try {
         if (formik.values.description && formik.values.title) {
@@ -122,28 +123,47 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       }
     },
   });
+  const currentUserString = localStorage.getItem('currentUser') || '';
+  const currentUserId = currentUserString ? JSON.parse(currentUserString).user._id : '';
+
+  const activeProject = projects.find(project => project.active);
 
   useEffect(() => {
     fetchData();
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    if (activeProject) {
+      fetchTasks(activeProject.id);
+    }
+  }, [activeProject]);
+
   const fetchData = async () => {
     try {
+      const { data: projectsData } = await getAllProjects();
       const { data: columnsData } = await getAllColumns();
-      const { data: tasksData } = await getAllTasks();
+      dispatch(setProjects(projectsData));
+      setColumns(columnsData.sort((a, b) => a.order - b.order));
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
-      const sortedColumns = columnsData.sort((a, b) => a.order - b.order);
-      const sortedTasks = tasksData.sort((a, b) => a.order - b.order);
-
-      setColumns(sortedColumns);
-      setTasks(sortedTasks);
-    } catch (error) {}
+  const fetchTasks = async (projectId: string) => {
+    try {
+      const { data: tasksData } = await getAllTasks(projectId);
+      setTasks(tasksData.sort((a, b) => a.order - b.order));
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
   };
   const handleColumnCreate = async () => {
     try {
       const columnData = await createColumn(newColumn);
       setColumns(prevColumns => [...prevColumns, columnData]);
       setNewColumn({ title: '', order: 0, id: '' });
+      fetchData();
     } catch (error) {
       console.error('Error creating column:', error);
     }
@@ -160,11 +180,12 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
 
   const handleTaskCreate = async () => {
     try {
-      if (formik.isValid) {
+      if (formik.isValid && activeProject) {
         const taskData = {
           ...formik.values,
-          userId: localStorage.getItem('currentUser') || '',
+          userId: currentUserId,
           assignedTo: formik.values.assignedTo || '',
+          projectId: activeProject.id,
         };
         await createTask(taskData);
         await fetchData();
@@ -274,85 +295,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   };
 
   const onDragEnd = async (result: DropResult) => {
-    try {
-      const { destination, source, type, draggableId } = result;
-
-      if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
-        return;
-      }
-
-      if (type === 'COLUMN') {
-        const updatedColumns = [...columns];
-        const movedColumn = updatedColumns.splice(source.index, 1)[0];
-        updatedColumns.splice(destination.index, 0, movedColumn);
-        if (source.index !== destination.index) {
-          updatedColumns.forEach((column, index) => {
-            column.order = index + 1;
-          });
-        }
-
-        setColumns(updatedColumns);
-        await updateColumns(updatedColumns);
-      } else if (type === 'TASK') {
-        const updatedTasks = [...tasks];
-        const movedTaskIndex = updatedTasks.findIndex(task => task.id === draggableId);
-
-        if (movedTaskIndex !== -1) {
-          const movedTask = updatedTasks[movedTaskIndex];
-          if (source.droppableId === destination.droppableId) {
-            const tasksInColumn = [...updatedTasks.filter(task => task.statusId === source.droppableId)];
-
-            const sortedTasksInColumn = tasksInColumn.sort((a, b) => a.order - b.order);
-
-            const movedTask = sortedTasksInColumn.splice(source.index, 1)[0];
-            sortedTasksInColumn.splice(destination.index, 0, movedTask);
-
-            sortedTasksInColumn.forEach((task, index) => {
-              task.order = index + 1;
-            });
-
-            const updatedTasksCopy = [...updatedTasks];
-            let columnIndex = 0;
-
-            updatedTasksCopy.forEach((task, index) => {
-              if (task.statusId === source.droppableId) {
-                if (columnIndex < sortedTasksInColumn.length) {
-                  updatedTasksCopy[index] = sortedTasksInColumn[columnIndex++];
-                }
-              }
-            });
-
-            setTasks(updatedTasksCopy);
-
-            await updateTasks(updatedTasksCopy);
-          } else {
-            movedTask.statusId = destination.droppableId;
-            updatedTasks.splice(movedTaskIndex, 1);
-
-            const tasksInDestinationColumn = updatedTasks.filter(task => task.statusId === destination.droppableId);
-            const movedTaskClone = { ...movedTask };
-            movedTaskClone.order = destination.index + 1;
-
-            tasksInDestinationColumn.splice(destination.index, 0, movedTaskClone);
-
-            tasksInDestinationColumn.forEach((task, index) => {
-              task.order = index + 1;
-            });
-
-            const updatedTasksWithoutMoved = updatedTasks.filter(task => task.statusId !== destination.droppableId);
-            updatedTasksWithoutMoved.push(...tasksInDestinationColumn);
-            updatedTasks.splice(0, updatedTasks.length, ...updatedTasksWithoutMoved);
-
-            const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
-
-            setTasks(sortedTasks);
-            await updateTasks(sortedTasks);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error in onDragEnd:', error);
-    }
+    await handleDragEnd(result, columns, tasks, setColumns, setTasks);
   };
 
   const handleSearch = (text: string) => {
@@ -379,7 +322,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     setUsers,
     searchText,
     handleSearch,
-    fetchData,
     handleColumnDelete,
     handleTaskEdit,
     handleTaskDelete,
@@ -393,7 +335,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     stopEditingTask,
     onDragEnd,
     formik,
-    fetchUsers,
     usersList,
     filters,
     handleFilterChange,

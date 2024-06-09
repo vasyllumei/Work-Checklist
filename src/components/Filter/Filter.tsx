@@ -14,12 +14,13 @@ export interface FilterOption {
 
 interface FilterProps {
   filters: FilterOption[];
-  handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
+  handleFilterChange: (filterName: string, selectedOptions: string | string[], projectId?: string) => void;
   clearAll?: boolean;
   value: FilterType[];
+  projectId?: string;
 }
 
-export const Filter: FC<FilterProps> = ({ filters, value, handleFilterChange, clearAll = true }) => {
+export const Filter: FC<FilterProps> = ({ filters, value, handleFilterChange, projectId, clearAll = true }) => {
   const [resetKey, setResetKey] = useState(0);
   const { t } = useTranslation();
 
@@ -35,7 +36,7 @@ export const Filter: FC<FilterProps> = ({ filters, value, handleFilterChange, cl
           <div key={filter.name}>
             <SelectComponent
               options={filter.options}
-              value={value?.find(item => item.name === filter.name)?.value || []}
+              value={value?.find(item => item.name === filter.name)?.value || projectId}
               label={filter.label}
               applyOnChange={filter.applyOnChange}
               onChange={selectedOptions => {

@@ -1,0 +1,32 @@
+.projectForm > * {
+    margin-bottom: 20px;
+}
+
+.buttonsProjectContainer{
+     width: 100%;
+     display: flex;
+     justify-content: space-around;
+     margin-bottom: 20px;
+ }
+
+.modalProjectCancel{
+      width: 40%;
+      height: 30%;
+  }
+.modalProjectAdd {
+       width: 40%;
+       height: 30%;
+   }
+
+.colorPickerContainer{
+    margin-left: 10px;
+}
+
+.colorPickerTitle{
+    width: 42px;
+    height: 14px;
+    color: #2B3674;
+    font-weight: 500;
+    font-size: 17px;
+    letter-spacing: -0.05em;
+}

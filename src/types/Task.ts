@@ -9,4 +9,5 @@ export type TaskType = {
   image?: string;
   avatar?: string;
   order: number;
+  projectId: string;
 };

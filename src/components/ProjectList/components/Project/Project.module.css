@@ -1,0 +1,30 @@
+.projectTitleRow{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 39px;
+    cursor: pointer;
+}
+.marker {
+     min-width: 8px;
+     height: 8px;
+     margin-left: 10px;
+     margin-right: 20px;
+     border-radius: 50%;
+ }
+.projectTitle{
+      width: 100%;
+      text-transform: none;
+      color: #A3AED0;
+
+  }
+.activeProject {
+       background: rgba(80, 48, 229, 0.08);
+       border-radius: 8px;
+}
+.actionIconContainer{
+    display: flex;
+}
+.activeTitle{
+    color: #2B3674;
+}

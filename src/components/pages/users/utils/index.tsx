@@ -2,6 +2,8 @@ import { UserRoleType } from '@/types/User';
 import { GridColDef } from '@mui/x-data-grid';
 import React from 'react';
 import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
+import * as Yup from 'yup';
+import { emailValidation, passwordValidation, stringValidation } from '@/utils';
 
 export const columnsConfig: GridColDef[] = [
   {
@@ -68,6 +70,14 @@ export const columnsConfig: GridColDef[] = [
     renderCell: ({ row }) => <UserActionsCell row={row} />,
   },
 ];
+export const addEditUserValidationSchema = Yup.object().shape({
+  firstName: stringValidation('First name'),
+  lastName: stringValidation('Last name'),
+  email: emailValidation,
+  editMode: Yup.boolean(),
+  password: passwordValidation,
+});
+
 export const breadcrumbsUsers = [
   { title: 'Dashboard', link: '/' },
   { title: 'Users', link: '/users' },

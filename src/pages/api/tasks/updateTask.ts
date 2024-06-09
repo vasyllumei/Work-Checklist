@@ -6,7 +6,7 @@ import authenticateToken from '@/middlewares/authenticateToken';
 const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PUT') {
     const { id } = req.query;
-    const { statusId, title, description, buttonState, order, assignedTo } = req.body;
+    const { statusId, title, description, buttonState, order, assignedTo, projectId } = req.body;
 
     try {
       await dbConnect();
@@ -26,6 +26,7 @@ const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
       task.buttonState = buttonState || task.buttonState;
       task.order = order || task.order;
       task.assignedTo = assignedTo || task.assignedTo;
+      task.projectId = projectId || task.projectId;
 
       const updatedTask = await task.save();
 
@@ -37,6 +38,7 @@ const handlerUpdateTask = async (req: NextApiRequest, res: NextApiResponse) => {
           buttonState: updatedTask.buttonState,
           order: updatedTask.order,
           assignedTo: updatedTask.assignedTo,
+          projectId: updatedTask.projectId,
         },
       });
     } catch (error) {

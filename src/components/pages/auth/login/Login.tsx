@@ -1,7 +1,6 @@
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/router';
 import styles from './Login.module.css';
-import { loginValidationSchema } from '@/utils';
 import { FC, useState } from 'react';
 import { TextInput } from '@/components/TextInput';
 import { login } from '@/services/auth';
@@ -10,6 +9,7 @@ import { LanguageMenu } from '@/components/Header/LanguageMenu';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import { getFieldError } from '@/utils/index';
+import { loginValidationSchema } from '@/components/pages/auth/login/utils';
 
 const initialLoginForm = {
   email: '',

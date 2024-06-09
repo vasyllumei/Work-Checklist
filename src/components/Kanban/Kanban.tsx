@@ -12,10 +12,14 @@ import { ColumnType } from '@/types/Column';
 import { BUTTON_STATES } from '@/constants';
 import { Filter, FilterOption } from '@/components/Filter/Filter';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/projectStore/store';
+
 export enum Filters {
   ASSIGNED_TO = 'assignedTo',
   BUTTON_STATE = 'buttonState',
 }
+
 export const Kanban = () => {
   const {
     columns,
@@ -28,7 +32,9 @@ export const Kanban = () => {
     usersList,
     setIsAddTaskModalOpen,
   } = useKanbanContext();
+
   const { t } = useTranslation();
+  const activeProject = useSelector((state: RootState) => state.project.projects.find(project => project.active));
 
   const kanbanFiltersOptions: FilterOption[] = [
     {
@@ -44,6 +50,7 @@ export const Kanban = () => {
       applyOnChange: true,
     },
   ];
+
   return (
     <Layout
       handleSearch={handleSearch}
@@ -54,35 +61,52 @@ export const Kanban = () => {
         { title: t('kanban'), link: '/kanban' },
       ]}
     >
-      <div className={styles.addStatusButton}>
-        <Button
-          text={t('addStatus')}
-          onClick={() => setIsAddStatusModalOpen(true)}
-          className={styles.newStatusButton}
-          size={'small'}
-        />
-        <Button
-          text={t('addTask')}
-          onClick={() => setIsAddTaskModalOpen(true)}
-          className={styles.newTaskButton}
-          size={'small'}
-        />
-      </div>
-      <Filter filters={kanbanFiltersOptions} value={filters} handleFilterChange={handleFilterChange} clearAll />
-      <DragDropContext onDragEnd={onDragEnd}>
-        <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps} className={styles.mainContainer}>
-              {columns.map((column: ColumnType, index: number) => (
-                <Column column={column} key={column.id} index={index} />
-              ))}
-              {provided.placeholder}
+      <div>
+        {activeProject ? (
+          <div>
+            <div className={styles.addStatusButton}>
+              <Button
+                dataTestId="addStatus"
+                text={t('addStatus')}
+                onClick={() => setIsAddStatusModalOpen(true)}
+                className={styles.newStatusButton}
+                size={'small'}
+              />
+              <Button
+                text={t('addTask')}
+                onClick={() => setIsAddTaskModalOpen(true)}
+                className={styles.newTaskButton}
+                size={'small'}
+              />
+              <Filter
+                filters={kanbanFiltersOptions}
+                value={filters}
+                handleFilterChange={handleFilterChange}
+                clearAll
+                projectId={activeProject.id}
+              />
             </div>
-          )}
-        </StrictModeDroppable>
-      </DragDropContext>
-      <CreateColumnModal />
-      <CreateTaskModal />
+            <div className={styles.projectTitleName} style={{ color: activeProject.color }}>
+              {activeProject.title}
+            </div>
+            <div className={styles.titleDivider} style={{ backgroundColor: activeProject.color }} />
+            <DragDropContext onDragEnd={onDragEnd}>
+              <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
+                {provided => (
+                  <div ref={provided.innerRef} {...provided.droppableProps} className={styles.mainContainer}>
+                    {columns.map((column: ColumnType, index: number) => (
+                      <Column column={column} key={column.id} index={index} />
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </StrictModeDroppable>
+            </DragDropContext>
+            <CreateColumnModal />
+            <CreateTaskModal />
+          </div>
+        ) : null}
+      </div>
     </Layout>
   );
 };

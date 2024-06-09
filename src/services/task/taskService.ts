@@ -1,8 +1,11 @@
 import { api, ResponseType } from '@/services/apiService';
 import { TaskType } from '@/types/Task';
 
-export const getAllTasks = async (): Promise<ResponseType<TaskType[]>> =>
-  await api.get<ResponseType<TaskType[]>>('/tasks/getAllTasks').then(resolve => resolve.data);
+export const getAllTasks = async (projectId: string): Promise<ResponseType<TaskType[]>> => {
+  return await api
+    .get<ResponseType<TaskType[]>>(`/tasks/getAllTasks`, { params: { projectId } })
+    .then(response => response.data);
+};
 export const createTask = async (taskData: TaskType): Promise<ResponseType<TaskType>> =>
   await api.post<ResponseType<TaskType>>('/tasks/createTask', taskData).then(resolve => resolve.data);
 
