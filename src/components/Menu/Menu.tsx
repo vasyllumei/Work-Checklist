@@ -11,11 +11,15 @@ import SignInIcon from '../../assets/image/menuicon/signinicon.svg';
 import SettingIcon from '../../assets/image/menuicon/settingicon.svg';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { ProjectsList } from 'src/components/ProjectList';
+import CircularIndeterminate from '@/components/Kanban/components/Loader/Loader';
 
 const pages = [
   { id: 1, title: 'Dashboard', link: '/', disabled: false, icon: DashboardIcon },
   { id: 2, title: 'Users', link: '/users', disabled: false, icon: MarketPlaceIcon },
+
   { id: 3, title: 'Tables', link: '/tables', disabled: false, icon: TablesIcon },
+
   { id: 4, title: 'Kanban', link: '/kanban', disabled: false, icon: KanbanIcon },
   {
     id: 5,
@@ -45,6 +49,8 @@ const pages = [
 export const Menu: FC = () => {
   const router = useRouter();
   const [openMenuIds, setOpenMenuIds] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const toggleMenu = (menuId: number) => {
     setOpenMenuIds(prevOpenMenuIds => {
       const isOpen = prevOpenMenuIds.includes(menuId);
@@ -53,6 +59,13 @@ export const Menu: FC = () => {
       } else {
         return [...prevOpenMenuIds, menuId];
       }
+    });
+  };
+
+  const handleNavigation = (link: string) => {
+    setIsLoading(true);
+    router.push(link).finally(() => {
+      setIsLoading(false);
     });
   };
 
@@ -69,7 +82,7 @@ export const Menu: FC = () => {
                     if (children) {
                       toggleMenu(id);
                     } else {
-                      router.push(link);
+                      handleNavigation(link);
                     }
                   }}
                   className={classNames(styles.text, {
@@ -116,6 +129,13 @@ export const Menu: FC = () => {
           );
         })}
       </ul>
+
+      <ProjectsList setIsLoading={setIsLoading} />
+      {isLoading && (
+        <div className={styles.loaderContainer}>
+          <CircularIndeterminate />
+        </div>
+      )}
     </div>
   );
 };

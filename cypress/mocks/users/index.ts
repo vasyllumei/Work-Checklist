@@ -19,7 +19,7 @@ export const mockCreateUser = () => {
 };
 
 export function mockUsers(customUsers: UserType[] | null = null) {
-  const users = customUsers || defaultUserArray; // Использовать предоставленный массив или по умолчанию
+  const users = customUsers || defaultUserArray;
   const formattedDataWithMetaData = {
     data: users,
     totalCount: users.length,

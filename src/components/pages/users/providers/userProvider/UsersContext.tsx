@@ -4,13 +4,14 @@ import { GridRowSelectionModel, GridSortModel } from '@mui/x-data-grid';
 import { useFilters } from '@/hooks/useFilters';
 import { useDialogControl } from '@/hooks/useDialogControl';
 import { FormikValues, useFormik } from 'formik';
-import { addEditUserValidationSchema, generateFilterString } from '@/utils';
+import { generateFilterString } from '@/utils';
 import { createUser, deleteAllUsers, deleteUser, getAllUsers, updateUser } from '@/services/user/userService';
 import { FilterType } from '@/types/Filter';
 import { usePagination } from '@/hooks/usePagination';
 import { useHandleInteraction } from '@/hooks/useHandleInteraction';
+import { addEditUserValidationSchema } from '@/components/pages/users/utils';
 import { debounce } from 'lodash';
-
+//
 export interface UsersContext {
   users: UserType[];
   setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
@@ -104,7 +105,7 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
     }
   };
 
-  const handleUserDelete = async (userId: string): Promise<void> => {
+  const handleUserDelete = async (userId: string) => {
     try {
       await deleteUser(userId);
       await fetchUsers();
@@ -194,6 +195,7 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
       setSortField(null);
     }
   };
+
   const fetchUsers = useCallback(async () => {
     try {
       const { page, pageSize } = paginationModel;
@@ -231,7 +233,12 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
     setSearchText(text);
   };
 
-  const rowsWithIds = users.map((user: UserType) => ({ ...user, id: user.id }));
+  const rowsWithIds = users?.map((user: UserType) => ({ ...user, id: user.id }));
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   const isSuperAdmin = currentUser?.user.role === UserRoleType.SUPER_ADMIN;
   const currentUserId = currentUser?.user?._id;

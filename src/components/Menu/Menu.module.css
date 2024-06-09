@@ -102,7 +102,11 @@
     margin-right: 10px;
 }
 
-
+.loaderContainer {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
 
 
 

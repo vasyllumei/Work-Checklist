@@ -17,6 +17,7 @@ const updateColumns = async (req: NextApiRequest, res: NextApiResponse) => {
 
           status.title = title || status.title;
           status.order = order || status.order;
+
           console.log('status', status);
           return status.save();
         }),

@@ -8,7 +8,7 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       await dbConnect();
       const updatedTasks = await Promise.all(
-        req.body.map(async ({ id, title, description, statusId, order }: TaskDocumentType) => {
+        req.body.map(async ({ id, title, description, statusId, order, projectId }: TaskDocumentType) => {
           const task: TaskDocumentType | null = await Task.findById(id);
 
           if (!task) {
@@ -19,6 +19,7 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
           task.description = description || task.description;
           task.statusId = statusId || task.statusId;
           task.order = order || task.order;
+          task.projectId = projectId || task.projectId;
 
           return task.save();
         }),
@@ -27,11 +28,12 @@ const updateTasks = async (req: NextApiRequest, res: NextApiResponse) => {
       const validUpdatedTasks = updatedTasks.filter(task => task !== null);
 
       return res.status(200).json({
-        tasks: validUpdatedTasks.map(({ title, description, statusId, order }) => ({
+        tasks: validUpdatedTasks.map(({ title, description, statusId, order, projectId }) => ({
           title,
           description,
           statusId,
           order,
+          projectId,
         })),
       });
     } catch (error) {

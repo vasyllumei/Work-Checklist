@@ -25,6 +25,7 @@ export const CreateColumnModal = () => {
       <DialogTitle>Add New Status</DialogTitle>
       <DialogContent>
         <TextInput
+          dataTestId="statusModalInput"
           label="Title"
           error=""
           name="title"
@@ -38,6 +39,7 @@ export const CreateColumnModal = () => {
         <div className={styles.buttonContainer}>
           <Button text="Cancel" onClick={handleCancelStatus} size={'small'} outlined={true} />
           <Button
+            dataTestId="addStatusSubmit"
             text="Add Status"
             onClick={handleCreateStatus}
             size={'small'}

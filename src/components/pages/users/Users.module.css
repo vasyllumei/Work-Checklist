@@ -22,3 +22,7 @@ align-items: center;
     margin: 20px 0;
     color: red;
 }
+
+.dataGridContainer .MuiDataGrid-columnHeaderCheckbox {
+    background-color: blue;
+}

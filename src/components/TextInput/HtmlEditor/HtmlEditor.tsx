@@ -5,18 +5,20 @@ import { htmlEditorConfig } from '@/components/TextInput/HtmlEditor/HtmlEditorCo
 interface HtmlEditorProps {
   onChange: (value: string) => void;
   value: string | number;
+  dataAid?: string;
 }
 
 const DynamicJoditEditor = dynamic(() => import('jodit-react').then(module => module.default), { ssr: false });
 
-const HtmlEditor: FC<HtmlEditorProps> = ({ onChange, value }) => {
+const HtmlEditor: FC<HtmlEditorProps> = ({ onChange, value, dataAid }) => {
   const editor = useRef(null);
   const [content, setContent] = useState(value.toString());
   const config = useMemo(() => htmlEditorConfig(), []);
 
   return (
-    <div>
+    <div data-aid="dataAid">
       <DynamicJoditEditor
+        data-testid={dataAid}
         ref={editor}
         value={content}
         config={config}

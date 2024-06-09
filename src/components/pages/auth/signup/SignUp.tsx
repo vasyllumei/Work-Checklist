@@ -7,7 +7,8 @@ import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
 import { useFormik } from 'formik';
-import { getFieldError, signUpValidationSchema } from '@/utils';
+import { getFieldError } from '@/utils';
+import { signUpValidationSchema } from '@/components/pages/auth/signup/utils';
 
 const initialUserForm = {
   firstName: '',
