@@ -11,7 +11,7 @@ import { Button } from '@/components/Button';
 import { Grid } from '@mui/material';
 import { UserType } from '@/types/User';
 import styles from '@/components/pages/users/Users.module.css';
-import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
+import { UserActionsCell } from '@/components/pages/users/components/ActionsCell/UserActionsCell';
 export const Users = () => {
   const {
     handleDeleteButtonClick,

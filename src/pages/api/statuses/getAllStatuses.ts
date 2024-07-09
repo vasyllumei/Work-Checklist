@@ -8,13 +8,19 @@ async function getAllStatuses(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
+  const { projectId } = req.query;
+
+  if (!projectId) {
+    return res.status(400).json({ message: 'Project ID is required' });
+  }
+
   try {
     await dbConnect();
 
-    const statuses: StatusDocumentType[] = await Status.find();
+    const statuses: StatusDocumentType[] = await Status.find({ projectId });
     const data = statuses.map((status: StatusDocumentType) => {
-      const { _id, title, order } = status;
-      return { id: _id, title, order };
+      const { _id, title, order, projectId } = status;
+      return { id: _id, title, order, projectId };
     });
 
     res.status(200).json({ data });
@@ -23,4 +29,5 @@ async function getAllStatuses(req: NextApiRequest, res: NextApiResponse) {
     res.status(500).json({ message: 'Internal server error' });
   }
 }
+
 export default authenticateToken(getAllStatuses);

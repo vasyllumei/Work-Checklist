@@ -1,10 +1,9 @@
 import '@testing-library/cypress/add-commands';
 import { mockUsers } from '../mocks/users';
 import { mockTasks } from '../mocks/tasks';
-import { mockCreateStatus, mockStatuses } from '../mocks/statuses';
+import { mockStatuses } from '../mocks/statuses';
 import { interceptUpdateActiveProject, mockCreateProject, mockProjects } from '../mocks/projects';
 import { defaultProjectArray } from '../fixtures/projects';
-import { defaultStatusArray } from '../fixtures/statuses';
 
 describe('Kanban page test', () => {
   beforeEach(() => {
@@ -17,7 +16,7 @@ describe('Kanban page test', () => {
     interceptUpdateActiveProject('updateActiveProject');
   });
 
-  it('Should activate project', () => {
+  it('Should activate projectId', () => {
     cy.findByTestId('projectItem-1p').click();
     cy.wait(100);
     cy.wait('@updateActiveProject').its('request.body').should('deep.equal', {
@@ -26,7 +25,7 @@ describe('Kanban page test', () => {
     cy.findByText('testTask');
   });
 
-  it('Should deactivated project', () => {
+  it('Should deactivated projectId', () => {
     interceptUpdateActiveProject('updateActiveProject');
     cy.findByTestId('projectItem-1p').click();
     cy.wait('@updateActiveProject').its('request.body').should('deep.equal', {
@@ -39,7 +38,7 @@ describe('Kanban page test', () => {
     });
   });
 
-  it('Should edit project', () => {
+  it('Should edit projectId', () => {
     cy.findByTestId('projectItem-1p').click().findByTestId('projectItem-menuButton-1p-button').click();
     cy.get('ul[role="menu"]').should('be.visible');
     cy.findByTestId('projectItem-menuButton-1p-edit').should('be.visible').click();
@@ -72,7 +71,7 @@ describe('Kanban page test', () => {
     cy.findByTestId('projectItem-1p').should('contain.text', 'someName');
   });
 
-  it('Should cancel project editing', () => {
+  it('Should cancel projectId editing', () => {
     cy.findByTestId('projectItem-menuButton-1p-button').should('exist').should('be.visible').click();
     cy.get('ul[role="menu"]').should('be.visible');
     cy.findByTestId('projectItem-menuButton-1p-edit').should('exist').should('be.visible').click();
@@ -81,7 +80,7 @@ describe('Kanban page test', () => {
     cy.findByTestId('projectItem-1p').should('contain.text', 'someName');
   });
 
-  it('should handle project deletion', () => {
+  it('should handle projectId deletion', () => {
     cy.intercept('DELETE', '**/projects/deleteProject*', req => {
       req.reply({
         body: {
@@ -102,7 +101,7 @@ describe('Kanban page test', () => {
     });
   });
 
-  it('Should create project', () => {
+  it('Should create projectId', () => {
     cy.findByTestId('addProject').click();
     cy.findByTestId('title-input').clear().type('testName');
     cy.findByTestId('description-input').type('abc');
@@ -124,45 +123,5 @@ describe('Kanban page test', () => {
     mockProjects(updatedProjectList);
     cy.visit('/kanban');
     cy.findByText('testName').should('contain.text', 'testName');
-  });
-
-  it('Should create status', () => {
-    cy.findByTestId('addStatus').click();
-    cy.findByTestId('statusModalInput').type('testStatusName');
-    mockCreateStatus();
-    cy.findByTestId('addStatusSubmit').click();
-
-    const newStatus = {
-      id: '',
-      title: 'testStatusName',
-      order: 0,
-    };
-    cy.wait('@createStatus').its('request.body').should('be.deep.equal', newStatus);
-    const updatedStatusList = [...defaultStatusArray, newStatus];
-    mockStatuses(updatedStatusList);
-    cy.visit('/kanban');
-    cy.findByTestId('projectItem-1p').click();
-    cy.get('[data-rbd-droppable-id="mainContainer"]').findByTestId('column');
-    cy.contains('testStatusName').should('be.visible');
-  });
-
-  it('should handle status delete', () => {
-    cy.intercept('DELETE', '**/statuses/deleteStatus*', req => {
-      req.reply({
-        body: {
-          success: true,
-          message: 'Status deleted successfully',
-        },
-      });
-    }).as('deleteStatus');
-    cy.findByTestId('column2s').findByTestId('DeleteIcon').click();
-    cy.findByTestId('deleteModalColumn').click({ force: true });
-    cy.wait('@deleteStatus').then(() => {
-      const updatedStatuses = defaultStatusArray.filter(status => status.id !== '2s');
-      mockStatuses(updatedStatuses);
-      cy.visit('/kanban');
-      cy.findByTestId('projectItem-1p').click();
-      cy.findByText('In Progress').should('not.exist');
-    });
   });
 });

@@ -14,13 +14,19 @@ const handleCreateStatus = async (req: NextApiRequest, res: NextApiResponse): Pr
 
   await dbConnect();
 
-  const { title } = req.body;
+  const { title, projectId } = req.body;
+
+  if (!title || !projectId) {
+    res.status(400).json({ message: 'Title and projectId are required' });
+    return;
+  }
 
   try {
     const order = await getNextStatusOrder();
     const newStatus: StatusDocumentType = new Status({
       title,
       order,
+      projectId,
     });
 
     const savedStatus = await newStatus.save();
@@ -29,10 +35,11 @@ const handleCreateStatus = async (req: NextApiRequest, res: NextApiResponse): Pr
         id: savedStatus._id,
         title: savedStatus.title,
         order: savedStatus.order,
+        projectId: savedStatus.projectId,
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error creating status:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };

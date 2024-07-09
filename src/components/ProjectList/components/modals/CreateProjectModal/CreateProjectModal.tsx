@@ -3,9 +3,9 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import { FormikValues } from 'formik';
-import { getFieldError } from '@/utils';
 import { CirclePicker } from 'react-color';
 import styles from './CreateProjectModal.module.css';
+import useFieldError from '@/hooks/useFieldError';
 interface CreateProjectModalProps {
   formik: FormikValues;
   isDialogOpen: boolean;
@@ -18,14 +18,16 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({
   handleDialogClose,
   isEditMode,
 }) => {
+  const { getFieldError } = useFieldError(formik.touched, formik.errors);
+
   return (
     <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-      <DialogTitle>{!isEditMode ? 'Add new project' : 'Edit existing project'}</DialogTitle>
+      <DialogTitle>{!isEditMode ? 'Add new projectId' : 'Edit existing projectId'}</DialogTitle>
       <DialogContent style={{ overflowX: 'hidden' }}>
         <DialogContentText>
           {!isEditMode
-            ? 'To add a new project, please enter title and description'
-            : 'To edit the project, you can modify title and description'}
+            ? 'To add a new projectId, please enter title and description'
+            : 'To edit the projectId, you can modify title and description'}
         </DialogContentText>
         <div className={styles.projectForm}>
           <TextInput
@@ -35,7 +37,7 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({
             value={formik.values.title || ''}
             onChange={value => formik.setFieldValue('title', value)}
             placeholder="New project title"
-            error={getFieldError('title', formik.touched, formik.errors)}
+            error={getFieldError('title')}
             dataTestId="title-input"
           />
           <TextInput
@@ -47,7 +49,7 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({
             placeholder="New project description"
             label="Description"
             isEditing={formik.values.editMode}
-            error={getFieldError('description', formik.touched, formik.errors)}
+            error={getFieldError('description')}
             dataTestId="description-input"
           />
           <div className={styles.colorPickerContainer} data-testid="color-picker">

@@ -96,7 +96,7 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
       await deleteProject(projectId);
       await fetchProjectData();
     } catch (error) {
-      console.error('Error deleting project:', error);
+      console.error('Error deleting projectId:', error);
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +117,7 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
       await fetchProjectData();
       handleDialogClose();
     } catch (error) {
-      console.error('Error updating project:', error);
+      console.error('Error updating projectId:', error);
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +136,7 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
         dispatch(setActiveProject(projectId));
       }
     } catch (error) {
-      console.error('Error updating project:', error);
+      console.error('Error updating projectId:', error);
     } finally {
       setIsLoading(false);
     }

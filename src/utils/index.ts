@@ -39,16 +39,6 @@ export const getRandomColor = (id: string) => {
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-export const getFieldError = (
-  fieldName: string,
-  touched: Record<string, boolean>,
-  errors: Record<string, string>,
-): string | undefined => {
-  const errorField = errors[fieldName as keyof typeof errors];
-  const isTouched = touched[fieldName as keyof typeof touched];
-  return isTouched && errorField ? errorField : undefined;
-};
-
 export const generateFilterString = (filters: { name: string; value: string | string[] }[]): string => {
   return filters
     .map(({ name, value }) => {
@@ -59,3 +49,9 @@ export const generateFilterString = (filters: { name: string; value: string | st
     })
     .join('&');
 };
+
+export const taskValidationSchema = Yup.object().shape({
+  title: stringValidation('Title'),
+  description: Yup.string().required('Description is required'),
+  editMode: Yup.boolean(),
+});

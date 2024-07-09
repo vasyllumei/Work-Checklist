@@ -6,8 +6,10 @@ import { SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import useFieldError from '@/hooks/useFieldError';
 export const TaskEditor = () => {
-  const { usersList, isEditMode, formik, getFieldError, stopEditingTask } = useKanbanContext();
+  const { usersList, isEditMode, formik, stopEditingTask } = useKanbanContext();
+  const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   return (
     <Dialog open={isEditMode} onClose={stopEditingTask}>

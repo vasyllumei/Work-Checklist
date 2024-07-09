@@ -1,7 +1,7 @@
 import { UserRoleType } from '@/types/User';
 import { GridColDef } from '@mui/x-data-grid';
 import React from 'react';
-import { UserActionsCell } from '@/components/pages/users/components/ActionCell/UserActionsCell';
+import { UserActionsCell } from '@/components/pages/users/components/ActionsCell/UserActionsCell';
 import * as Yup from 'yup';
 import { emailValidation, passwordValidation, stringValidation } from '@/utils';
 

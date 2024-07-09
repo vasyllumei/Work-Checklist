@@ -6,11 +6,13 @@ import styles from '@/components/Kanban/components/modals/CreateTaskModal/Create
 import { BUTTON_STATES } from '@/constants';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
 import { SelectComponent } from '@/components/Select/Select';
+import useFieldError from '@/hooks/useFieldError';
 
 export const CreateTaskModal = () => {
-  const { usersList, formik, getFieldError, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } =
-    useKanbanContext();
+  const { usersList, formik, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } = useKanbanContext();
   const [showColumn, setShowColumn] = useState(false);
+  const { getFieldError } = useFieldError(formik.touched, formik.errors);
+
   const handleCancelTask = () => {
     closeAddTaskModal();
     setShowColumn(false);

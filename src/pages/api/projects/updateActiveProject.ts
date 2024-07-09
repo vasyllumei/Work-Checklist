@@ -24,7 +24,7 @@ const updateActiveProject = async (req: NextApiRequest, res: NextApiResponse) =>
         await Project.updateMany({}, { active: false });
       }
 
-      return res.status(200).json({ message: 'Active project updated' });
+      return res.status(200).json({ message: 'Active projectId updated' });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Internal server error' });
