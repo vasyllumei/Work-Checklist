@@ -26,7 +26,7 @@ export const interceptUpdateActiveProject = (alias: string) => {
   cy.intercept('PATCH', '**/projects/updateActiveProject*', req => {
     req.reply({
       body: {
-        message: 'Active project updated',
+        message: 'Active projectId updated',
       },
     });
   }).as(alias);

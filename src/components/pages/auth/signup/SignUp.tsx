@@ -7,8 +7,8 @@ import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { LOCAL_STORAGE_TOKEN } from '@/constants';
 import { useFormik } from 'formik';
-import { getFieldError } from '@/utils';
 import { signUpValidationSchema } from '@/components/pages/auth/signup/utils';
+import useFieldError from '@/hooks/useFieldError';
 
 const initialUserForm = {
   firstName: '',
@@ -30,6 +30,8 @@ export const SignUp: FC = () => {
       await handleSignUp();
     },
   });
+
+  const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   const handleSignUp = async () => {
     try {
@@ -62,7 +64,7 @@ export const SignUp: FC = () => {
               value={formik.values.firstName}
               onChange={value => formik.setFieldValue('firstName', value)}
               placeholder="Enter your first name"
-              error={getFieldError('firstName', formik.touched, formik.errors)}
+              error={getFieldError('firstName')}
             />
             <TextInput
               label="Last Name"
@@ -70,7 +72,7 @@ export const SignUp: FC = () => {
               value={formik.values.lastName}
               onChange={value => formik.setFieldValue('lastName', value)}
               placeholder="Enter your last name"
-              error={getFieldError('lastName', formik.touched, formik.errors)}
+              error={getFieldError('lastName')}
             />
             <TextInput
               label="Email"
@@ -79,7 +81,7 @@ export const SignUp: FC = () => {
               value={formik.values.email}
               onChange={value => formik.setFieldValue('email', value)}
               placeholder="Enter your email address"
-              error={getFieldError('email', formik.touched, formik.errors)}
+              error={getFieldError('email')}
             />
             <TextInput
               label="Password"
@@ -88,7 +90,7 @@ export const SignUp: FC = () => {
               value={formik.values.password}
               onChange={value => formik.setFieldValue('password', value)}
               placeholder="Min. 5 characters"
-              error={getFieldError('password', formik.touched, formik.errors)}
+              error={getFieldError('password')}
             />
             <TextInput
               label="Confirm password"
@@ -97,11 +99,9 @@ export const SignUp: FC = () => {
               value={formik.values.confirmPassword}
               onChange={value => formik.setFieldValue('confirmPassword', value)}
               placeholder="Min. 8 characters"
-              error={getFieldError('confirmPassword', formik.touched, formik.errors)}
+              error={getFieldError('confirmPassword')}
             />
-            {formik.errors.signUpError && (
-              <div className={styles.signUpError}>{getFieldError('signUpError', formik.touched, formik.errors)}</div>
-            )}
+            {formik.errors.signUpError && <div className={styles.signUpError}>{getFieldError('signUpError')}</div>}
             <div className={styles.checkboxContainer}>
               <label>
                 <input

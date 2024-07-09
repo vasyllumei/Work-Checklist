@@ -12,10 +12,6 @@
     gap: 20px;
 }
 
-.selectContainer{
-    display: flex;
-}
-
 .newStatusButton{
     max-height: 40px;
     width: 100%;

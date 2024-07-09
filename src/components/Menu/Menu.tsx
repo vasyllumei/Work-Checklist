@@ -3,64 +3,32 @@ import React, { FC, useState } from 'react';
 import styles from './Menu.module.css';
 import { useRouter } from 'next/router';
 import DashboardIcon from '../../assets/image/menuicon/dashboardicon.svg';
-import MarketPlaceIcon from '../../assets/image/menuicon/marketplaceIcon.svg';
-import TablesIcon from '../../assets/image/menuicon/tablesIcon.svg';
+import BacklogIcon from './../../assets/image/menuicon/tablesIcon.svg';
 import KanbanIcon from '../../assets/image/menuicon/kanbasicon.svg';
+import ConfigIcon from '../../assets/image/menuicon/configIcon.svg';
 import ProfileIcon from '../../assets/image/menuicon/prifoleicon.svg';
-import SignInIcon from '../../assets/image/menuicon/signinicon.svg';
 import SettingIcon from '../../assets/image/menuicon/settingicon.svg';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { ProjectsList } from 'src/components/ProjectList';
 import CircularIndeterminate from '@/components/Kanban/components/Loader/Loader';
 
 const pages = [
   { id: 1, title: 'Dashboard', link: '/', disabled: false, icon: DashboardIcon },
-  { id: 2, title: 'Users', link: '/users', disabled: false, icon: MarketPlaceIcon },
-
-  { id: 3, title: 'Tables', link: '/tables', disabled: false, icon: TablesIcon },
-
+  { id: 2, title: 'Users', link: '/users', disabled: false, icon: ProfileIcon },
+  { id: 3, title: 'Backlog', link: '/backlog', disabled: false, icon: BacklogIcon },
   { id: 4, title: 'Kanban', link: '/kanban', disabled: false, icon: KanbanIcon },
   {
     id: 5,
-    title: 'Profile',
-    link: '/profile',
+    title: 'Board Configs',
+    link: '/configs',
     disabled: false,
-    icon: ProfileIcon,
-    children: [
-      { id: 10, title: 'Profile', link: '/1', disabled: false, icon: DashboardIcon },
-      { id: 11, title: 'Setting', link: '/1', disabled: false, icon: SettingIcon },
-    ],
+    icon: ConfigIcon,
   },
-  {
-    id: 6,
-    title: 'Sign In',
-    link: '/signin',
-    disabled: false,
-    icon: SignInIcon,
-    children: [
-      { id: 20, title: 'Profile', link: '/1', disabled: false, icon: DashboardIcon },
-      { id: 21, title: 'Setting', link: '/1', disabled: false, icon: SettingIcon },
-    ],
-  },
-  { id: 7, title: 'Setting', link: '/menulist', disabled: false, icon: SettingIcon },
+  { id: 6, title: 'Setting', link: '/menulist', disabled: false, icon: SettingIcon },
 ];
 
 export const Menu: FC = () => {
   const router = useRouter();
-  const [openMenuIds, setOpenMenuIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const toggleMenu = (menuId: number) => {
-    setOpenMenuIds(prevOpenMenuIds => {
-      const isOpen = prevOpenMenuIds.includes(menuId);
-      if (isOpen) {
-        return prevOpenMenuIds.filter(id => id !== menuId);
-      } else {
-        return [...prevOpenMenuIds, menuId];
-      }
-    });
-  };
 
   const handleNavigation = (link: string) => {
     setIsLoading(true);
@@ -71,19 +39,14 @@ export const Menu: FC = () => {
 
   return (
     <div className={styles.menuComponent}>
-      <ul>
-        {pages.map(({ id, title, link, icon: Icon, children }) => {
-          const isOpen = openMenuIds.includes(id);
+      <ul className={styles.listContainer}>
+        {pages.map(({ id, title, link, icon: Icon }) => {
           return (
             <li key={id}>
               <div className={styles.box}>
                 <div
                   onClick={() => {
-                    if (children) {
-                      toggleMenu(id);
-                    } else {
-                      handleNavigation(link);
-                    }
+                    handleNavigation(link);
                   }}
                   className={classNames(styles.text, {
                     [styles.active]: router.pathname === link,
@@ -93,44 +56,16 @@ export const Menu: FC = () => {
                     <Icon />
                     <div className={styles.title}> {title} </div>
                   </div>
-                  {children && (
-                    <div className={styles.arrowIcon}>{isOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</div>
-                  )}
                   <span className={styles.line} />
                 </div>
               </div>
-              {isOpen && children && (
-                <ul>
-                  {children.map(({ id: childId, title: childTitle, link: childLink, icon: ChildIcon }) => {
-                    return (
-                      <li key={childId}>
-                        <div className={styles.childrenBox}>
-                          <div
-                            onClick={() => {
-                              router.push(childLink);
-                            }}
-                            className={classNames(styles.text, {
-                              [styles.active]: router.pathname === childLink,
-                            })}
-                          >
-                            <div className={styles.leftBlock}>
-                              <ChildIcon />
-                              <div className={styles.title}> {childTitle} </div>
-                            </div>
-                            <span className={styles.line} />
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
             </li>
           );
         })}
       </ul>
-
-      <ProjectsList setIsLoading={setIsLoading} />
+      {(router.pathname.includes('kanban') || router.pathname.includes('backlog')) && (
+        <ProjectsList setIsLoading={setIsLoading} />
+      )}
       {isLoading && (
         <div className={styles.loaderContainer}>
           <CircularIndeterminate />

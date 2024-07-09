@@ -1,8 +1,10 @@
 import { api, ResponseType } from '@/services/apiService';
 import { ColumnType } from '@/types/Column';
 
-export const getAllColumns = async (): Promise<ResponseType<ColumnType[]>> =>
-  await api.get<ResponseType<ColumnType[]>>('/statuses/getAllStatuses').then(resolve => resolve.data);
+export const getAllColumns = async (projectId: string): Promise<ResponseType<ColumnType[]>> =>
+  await api
+    .get<ResponseType<ColumnType[]>>('/statuses/getAllStatuses', { params: { projectId } })
+    .then(resolve => resolve.data);
 export const createColumn = async (statusData: ColumnType): Promise<ColumnType> =>
   await api.post<ColumnType>('/statuses/createStatus', statusData).then(resolve => resolve.data);
 

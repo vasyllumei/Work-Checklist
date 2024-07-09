@@ -1,9 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export type StatusDocumentType = Document & {
+export interface StatusDocumentType extends Document {
   title: string;
   order: number;
-};
+  projectId: string;
+}
 
 const StatusSchema = new Schema<StatusDocumentType>(
   {
@@ -13,6 +14,11 @@ const StatusSchema = new Schema<StatusDocumentType>(
     },
     order: {
       type: Number,
+      required: true,
+    },
+    projectId: {
+      type: String,
+      ref: 'Project',
       required: true,
     },
   },

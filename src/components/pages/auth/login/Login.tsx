@@ -8,8 +8,8 @@ import Cookies from 'js-cookie';
 import { LanguageMenu } from '@/components/Header/LanguageMenu';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import { getFieldError } from '@/utils/index';
 import { loginValidationSchema } from '@/components/pages/auth/login/utils';
+import useFieldError from '@/hooks/useFieldError';
 
 const initialLoginForm = {
   email: '',
@@ -27,6 +27,7 @@ export const Login: FC = () => {
       await handleLogin();
     },
   });
+  const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
@@ -70,7 +71,7 @@ export const Login: FC = () => {
               value={formik.values.email || ''}
               onChange={value => formik.setFieldValue('email', value)}
               placeholder="mail@simmmple.com"
-              error={getFieldError('email', formik.touched, formik.errors)}
+              error={getFieldError('email')}
             />
             <TextInput
               dataTestId="passwordInput"
@@ -80,7 +81,7 @@ export const Login: FC = () => {
               value={formik.values.password || ''}
               onChange={value => formik.setFieldValue('password', value)}
               placeholder={t('minLength')}
-              error={getFieldError('password', formik.touched, formik.errors)}
+              error={getFieldError('password')}
             />
 
             {formik.errors.loginError && <div className={styles.loginError}>{formik.errors.loginError}</div>}

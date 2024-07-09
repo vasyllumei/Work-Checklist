@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from '@/components/Kanban/components/Column';
-import { CreateColumnModal } from '@/components/Kanban/components/modals/CreateColumnModal/CreateColumnModal';
 import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal';
 import { Button } from '@/components/Button';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -23,7 +22,6 @@ export enum Filters {
 export const Kanban = () => {
   const {
     columns,
-    setIsAddStatusModalOpen,
     onDragEnd,
     filters,
     searchText,
@@ -66,13 +64,6 @@ export const Kanban = () => {
           <div>
             <div className={styles.addStatusButton}>
               <Button
-                dataTestId="addStatus"
-                text={t('addStatus')}
-                onClick={() => setIsAddStatusModalOpen(true)}
-                className={styles.newStatusButton}
-                size={'small'}
-              />
-              <Button
                 text={t('addTask')}
                 onClick={() => setIsAddTaskModalOpen(true)}
                 className={styles.newTaskButton}
@@ -91,18 +82,17 @@ export const Kanban = () => {
             </div>
             <div className={styles.titleDivider} style={{ backgroundColor: activeProject.color }} />
             <DragDropContext onDragEnd={onDragEnd}>
-              <StrictModeDroppable droppableId="mainContainer" type="COLUMN" direction="horizontal">
+              <StrictModeDroppable droppableId="mainContainer">
                 {provided => (
                   <div ref={provided.innerRef} {...provided.droppableProps} className={styles.mainContainer}>
-                    {columns.map((column: ColumnType, index: number) => (
-                      <Column column={column} key={column.id} index={index} />
+                    {columns.map((column: ColumnType) => (
+                      <Column column={column} key={column.id} />
                     ))}
                     {provided.placeholder}
                   </div>
                 )}
               </StrictModeDroppable>
             </DragDropContext>
-            <CreateColumnModal />
             <CreateTaskModal />
           </div>
         ) : null}

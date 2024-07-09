@@ -1,13 +1,15 @@
 import React from 'react';
 import { TextInput } from '@/components/TextInput';
-import { getFieldError } from '@/utils';
 import { FormControl, MenuItem, Select } from '@mui/material';
 import { UserRoleType } from '@/types/User';
 import styles from '@/components/pages/users/Users.module.css';
 import { useUsersContext } from '@/components/pages/users/providers/userProvider';
+import useFieldError from '@/hooks/useFieldError';
 
 const Form = () => {
   const { formik, isEditMode } = useUsersContext();
+  const { getFieldError } = useFieldError(formik.touched, formik.errors);
+
   return (
     <>
       <div>
@@ -20,7 +22,7 @@ const Form = () => {
             formik.setFieldValue('firstName', value);
           }}
           placeholder="Enter first name"
-          error={getFieldError('firstName', formik.touched, formik.errors)}
+          error={getFieldError('firstName')}
         />
       </div>
       <div>
@@ -33,7 +35,7 @@ const Form = () => {
             formik.setFieldValue('lastName', value);
           }}
           placeholder="Enter last name"
-          error={getFieldError('lastName', formik.touched, formik.errors)}
+          error={getFieldError('lastName')}
         />
       </div>
       <div>
@@ -45,7 +47,7 @@ const Form = () => {
           value={formik.values.email || ''}
           onChange={value => formik.setFieldValue('email', value)}
           placeholder="Enter email address"
-          error={getFieldError('email', formik.touched, formik.errors)}
+          error={getFieldError('email')}
           disabled={isEditMode}
         />
       </div>
@@ -58,7 +60,7 @@ const Form = () => {
           value={formik.values.password || ''}
           onChange={value => formik.setFieldValue('password', value)}
           placeholder="Enter password"
-          error={getFieldError('password', formik.touched, formik.errors)}
+          error={getFieldError('password')}
         />
       )}
       <div data-testid="modalActionsButtons">
@@ -74,9 +76,7 @@ const Form = () => {
             <MenuItem value={UserRoleType.ADMIN}>Admin</MenuItem>
           </Select>
           {formik.errors.createUserError && (
-            <div className={styles.createUserError}>
-              {getFieldError('createUserError', formik.touched, formik.errors)}
-            </div>
+            <div className={styles.createUserError}>{getFieldError('createUserError')}</div>
           )}
         </FormControl>
       </div>

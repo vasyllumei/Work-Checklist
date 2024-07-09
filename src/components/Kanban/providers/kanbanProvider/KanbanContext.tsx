@@ -2,12 +2,11 @@ import React, { createContext, useEffect, useState } from 'react';
 import { ColumnType } from '@/types/Column';
 import { TaskType } from '@/types/Task';
 import { UserType } from '@/types/User';
-import { getAllColumns, createColumn, deleteColumn } from '@/services/column/columnService';
+import { getAllColumns } from '@/services/column/columnService';
 import { getAllTasks, createTask, deleteTask, updateTask } from '@/services/task/taskService';
 import { getAllUsers } from '@/services/user/userService';
 import { DropResult } from 'react-beautiful-dnd';
 import { useFormik } from 'formik';
-import { BLUE_COLOR, GREEN_COLOR, RED_COLOR, YELLOW_COLOR } from '@/constants';
 import { Option } from '@/components/Select/Select';
 import { useFilters } from '@/hooks/useFilters';
 import { FilterType } from '@/types/Filter';
@@ -15,15 +14,10 @@ import { getAllProjects } from '@/services/project/projectService';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/projectStore/store';
 import handleDragEnd from '@/components/Kanban/utils/onDragEnd';
-import { taskValidationSchema } from '@/components/Kanban/components/Column/components/Task/utils';
 import { setProjects } from '@/store/projectStore/projectReducer/projectReducers';
+import useFieldError from '@/hooks/useFieldError';
+import { taskValidationSchema } from '@/utils';
 
-const BUTTON_STATE_COLORS = {
-  Updates: BLUE_COLOR,
-  Errors: RED_COLOR,
-  Done: GREEN_COLOR,
-  Pending: YELLOW_COLOR,
-};
 const initialTaskForm = {
   id: '',
   userId: '',
@@ -60,8 +54,6 @@ export default interface KanbanContextProps {
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
   newColumn: ColumnType;
   setNewColumn: React.Dispatch<React.SetStateAction<ColumnType>>;
-  isAddStatusModalOpen: boolean;
-  setIsAddStatusModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   isAddTaskModalOpen: boolean;
@@ -70,10 +62,7 @@ export default interface KanbanContextProps {
   setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
   searchText: string;
   handleSearch?: ((text: string) => void) | undefined;
-  createStatusModal: () => void;
-  closeAddStatusModal: () => void;
   stopEditingTask: () => void;
-  getFieldError: (fieldName: string) => string | undefined;
   formik: {
     values: FormikValues;
     touched: Record<string, boolean>;
@@ -85,11 +74,9 @@ export default interface KanbanContextProps {
   };
   closeAddTaskModal: () => void;
   onDragEnd: (result: DropResult) => Promise<void>;
-  handleColumnDelete: (statusId: string) => Promise<void>;
   onAddNewTask: (columnId?: string) => void;
   isEditMode: boolean;
   handleTaskEdit: (taskId: string) => void;
-  getButtonStyle: (buttonState: string) => React.CSSProperties;
   handleTaskDelete: (taskId: string) => Promise<void>;
 }
 export const KanbanContext = createContext<KanbanContextProps | null>(null);
@@ -98,8 +85,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const projects = useSelector((state: RootState) => state.project.projects);
   const dispatch = useDispatch();
   const [columns, setColumns] = useState<ColumnType[]>([]);
-  const [newColumn, setNewColumn] = useState<ColumnType>({ title: '', order: 0, id: '' });
-  const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
+  const [column, setColumn] = useState<ColumnType>({ title: '', order: 0, id: '', projectId: '' });
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -125,28 +111,35 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   });
   const currentUserString = localStorage.getItem('currentUser') || '';
   const currentUserId = currentUserString ? JSON.parse(currentUserString).user._id : '';
-
   const activeProject = projects.find(project => project.active);
 
   useEffect(() => {
-    fetchData();
+    fetchProjects();
     fetchUsers();
   }, []);
 
   useEffect(() => {
     if (activeProject) {
+      fetchColumns(activeProject.id);
       fetchTasks(activeProject.id);
     }
   }, [activeProject]);
 
-  const fetchData = async () => {
+  const fetchProjects = async () => {
     try {
       const { data: projectsData } = await getAllProjects();
-      const { data: columnsData } = await getAllColumns();
       dispatch(setProjects(projectsData));
-      setColumns(columnsData.sort((a, b) => a.order - b.order));
     } catch (error) {
       console.error('Error fetching data:', error);
+    }
+  };
+  const fetchColumns = async (projectId: string) => {
+    try {
+      const { data: columnsData } = await getAllColumns(projectId);
+      const columnToRender = columnsData.filter(column => column.title !== 'Backlog');
+      setColumns(columnToRender.sort((a, b) => a.order - b.order));
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
     }
   };
 
@@ -156,25 +149,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       setTasks(tasksData.sort((a, b) => a.order - b.order));
     } catch (error) {
       console.error('Error fetching tasks:', error);
-    }
-  };
-  const handleColumnCreate = async () => {
-    try {
-      const columnData = await createColumn(newColumn);
-      setColumns(prevColumns => [...prevColumns, columnData]);
-      setNewColumn({ title: '', order: 0, id: '' });
-      fetchData();
-    } catch (error) {
-      console.error('Error creating column:', error);
-    }
-  };
-
-  const handleColumnDelete = async (statusId: string) => {
-    try {
-      await deleteColumn(statusId);
-      await fetchData();
-    } catch (error) {
-      console.error('Error deleting status:', error);
     }
   };
 
@@ -188,7 +162,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
           projectId: activeProject.id,
         };
         await createTask(taskData);
-        await fetchData();
+        await fetchProjects();
         formik.resetForm();
         setIsAddTaskModalOpen(false);
       }
@@ -202,7 +176,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const handleTaskDelete = async (taskId: string) => {
     try {
       await deleteTask(taskId);
-      await fetchData();
+      await fetchProjects();
     } catch (error) {
       console.error('Error deleting the user:', error);
     }
@@ -227,7 +201,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     try {
       if (formik.isValid) {
         await updateTask(formik.values.id, formik.values);
-        await fetchData();
+        await fetchProjects();
         formik.resetForm();
         await stopEditingTask();
       }
@@ -236,24 +210,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     }
   };
 
-  const getFieldError = (fieldName: string): string | undefined => {
-    const touchedField = formik.touched[fieldName as keyof typeof formik.touched];
-    const errorField = formik.errors[fieldName as keyof typeof formik.errors];
-
-    if (touchedField && errorField) {
-      return errorField;
-    }
-    return undefined;
-  };
-
-  const createStatusModal = () => {
-    handleColumnCreate();
-    setIsAddStatusModalOpen(false);
-  };
-
-  const closeAddStatusModal = () => {
-    setIsAddStatusModalOpen(false);
-  };
+  const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   const closeAddTaskModal = () => {
     formik.resetForm();
@@ -262,19 +219,11 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
 
   const onAddNewTask = (columnId?: string) => {
     setIsAddTaskModalOpen(true);
-
     if (columnId) {
       formik.setValues({ ...initialTaskForm, statusId: columnId });
     } else {
       formik.setValues({ ...initialTaskForm, statusId: '' });
     }
-  };
-
-  const getButtonStyle = (buttonState: string) => {
-    const backgroundColor = (BUTTON_STATE_COLORS as Record<string, string>)[buttonState] || '';
-    return {
-      backgroundColor,
-    };
   };
 
   const isEditMode = formik.values.editMode;
@@ -310,10 +259,8 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const value = {
     columns,
     setColumns,
-    newColumn,
-    setNewColumn,
-    isAddStatusModalOpen,
-    setIsAddStatusModalOpen,
+    newColumn: column,
+    setNewColumn: setColumn,
     tasks,
     setTasks,
     isAddTaskModalOpen,
@@ -322,15 +269,11 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     setUsers,
     searchText,
     handleSearch,
-    handleColumnDelete,
     handleTaskEdit,
     handleTaskDelete,
     getFieldError,
-    createStatusModal,
-    closeAddStatusModal,
     closeAddTaskModal,
     onAddNewTask,
-    getButtonStyle,
     isEditMode,
     stopEditingTask,
     onDragEnd,
