@@ -11,7 +11,7 @@ import { usePagination } from '@/hooks/usePagination';
 import { useHandleInteraction } from '@/hooks/useHandleInteraction';
 import { addEditUserValidationSchema } from '@/components/pages/users/utils';
 import { debounce } from 'lodash';
-//
+
 export interface UsersContext {
   users: UserType[];
   setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
@@ -234,10 +234,6 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   };
 
   const rowsWithIds = users?.map((user: UserType) => ({ ...user, id: user.id }));
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   const isSuperAdmin = currentUser?.user.role === UserRoleType.SUPER_ADMIN;
