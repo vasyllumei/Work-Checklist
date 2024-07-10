@@ -1,7 +1,7 @@
 import React from 'react';
 import StyledBox from './components/StyledBox/StyledBox';
 import { Layout } from '@/components/Layout/Layout';
-import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { DeleteModal } from '@/components/modals/DeleteModal/DeleteModal';
 import { breadcrumbsUsers, columnsConfig, usersFilterOptions } from '@/components/pages/users/utils';
 import { useUsersContext } from '@/components/pages/users/providers/userProvider/useUsersContext';
 import UserDialog from '@/components/pages/users/components/UserDialog/UserDialog';

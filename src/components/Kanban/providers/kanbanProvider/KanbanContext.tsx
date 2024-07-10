@@ -6,7 +6,6 @@ import { getAllColumns } from '@/services/column/columnService';
 import { getAllTasks, createTask, deleteTask, updateTask } from '@/services/task/taskService';
 import { getAllUsers } from '@/services/user/userService';
 import { DropResult } from 'react-beautiful-dnd';
-import { useFormik } from 'formik';
 import { Option } from '@/components/Select/Select';
 import { useFilters } from '@/hooks/useFilters';
 import { FilterType } from '@/types/Filter';
@@ -15,24 +14,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/projectStore/store';
 import handleDragEnd from '@/components/Kanban/utils/onDragEnd';
 import { setProjects } from '@/store/projectStore/projectReducer/projectReducers';
-import useFieldError from '@/hooks/useFieldError';
-import { taskValidationSchema } from '@/utils';
+import useTaskForm from '@/hooks/useTaskForm';
 
-const initialTaskForm = {
-  id: '',
-  userId: '',
-  assignedTo: '',
-  title: '',
-  description: '',
-  statusId: '',
-  avatar: '',
-  image: '',
-  buttonState: '',
-  order: 0,
-  editMode: false,
-  projectId: '',
-};
-interface FormikValues {
+interface FormikTaskValues {
   id: string;
   userId: string;
   assignedTo: string;
@@ -47,68 +31,46 @@ interface FormikValues {
   projectId: string;
 }
 export default interface KanbanContextProps {
-  filters: FilterType[];
-  handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
-  usersList: Option[];
   columns: ColumnType[];
-  setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
-  newColumn: ColumnType;
-  setNewColumn: React.Dispatch<React.SetStateAction<ColumnType>>;
-  tasks: TaskType[];
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
-  isAddTaskModalOpen: boolean;
-  setIsAddTaskModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  users: UserType[];
-  setUsers: React.Dispatch<React.SetStateAction<UserType[]>>;
+  onDragEnd: (result: DropResult) => Promise<void>;
+  filters: FilterType[];
   searchText: string;
+  handleFilterChange: (filterName: string, selectedOptions: string | string[]) => void;
   handleSearch?: ((text: string) => void) | undefined;
-  stopEditingTask: () => void;
+  usersList: Option[];
+  setIsAddTaskModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isAddTaskModalOpen: boolean;
+  closeAddTaskModal: () => void;
+  isEditMode: boolean;
+  tasks: TaskType[];
+  onAddNewTask: (columnId?: string) => void;
+  handleTaskEdit: (taskId: string) => void;
+  handleTaskDelete: (taskId: string) => Promise<void>;
+  users: UserType[];
+
   formik: {
-    values: FormikValues;
+    values: FormikTaskValues;
     touched: Record<string, boolean>;
     errors: Record<string, string>;
-    setValues: (values: FormikValues) => void;
+    setValues: (values: FormikTaskValues) => void;
     resetForm: () => void;
     setFieldValue: (fieldName: string, value: string | string[]) => void;
     handleSubmit: () => void;
   };
-  closeAddTaskModal: () => void;
-  onDragEnd: (result: DropResult) => Promise<void>;
-  onAddNewTask: (columnId?: string) => void;
-  isEditMode: boolean;
-  handleTaskEdit: (taskId: string) => void;
-  handleTaskDelete: (taskId: string) => Promise<void>;
 }
+
 export const KanbanContext = createContext<KanbanContextProps | null>(null);
 
 export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const projects = useSelector((state: RootState) => state.project.projects);
   const dispatch = useDispatch();
   const [columns, setColumns] = useState<ColumnType[]>([]);
-  const [column, setColumn] = useState<ColumnType>({ title: '', order: 0, id: '', projectId: '' });
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
   const { filters, handleFilterChange } = useFilters();
 
-  const formik = useFormik({
-    initialValues: initialTaskForm,
-    validationSchema: taskValidationSchema,
-    onSubmit: async () => {
-      try {
-        if (formik.values.description && formik.values.title) {
-          if (formik.values.id) {
-            await handleSaveUpdatedTask();
-          } else {
-            await handleTaskCreate();
-          }
-        }
-      } catch (error) {
-        console.error('Error submitting form:', error);
-      }
-    },
-  });
   const currentUserString = localStorage.getItem('currentUser') || '';
   const currentUserId = currentUserString ? JSON.parse(currentUserString).user._id : '';
   const activeProject = projects.find(project => project.active);
@@ -187,7 +149,7 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       const cardData = tasks.find(card => card.id === taskId);
       if (cardData) {
         formik.setValues({
-          ...initialTaskForm,
+          ...formik.initialValues,
           ...cardData,
           editMode: true,
         });
@@ -203,14 +165,11 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
         await updateTask(formik.values.id, formik.values);
         await fetchProjects();
         formik.resetForm();
-        await stopEditingTask();
       }
     } catch (error) {
       console.error('Error updating task:', error);
     }
   };
-
-  const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   const closeAddTaskModal = () => {
     formik.resetForm();
@@ -220,17 +179,10 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const onAddNewTask = (columnId?: string) => {
     setIsAddTaskModalOpen(true);
     if (columnId) {
-      formik.setValues({ ...initialTaskForm, statusId: columnId });
+      formik.setValues({ ...formik.initialValues, statusId: columnId });
     } else {
-      formik.setValues({ ...initialTaskForm, statusId: '' });
+      formik.setValues({ ...formik.initialValues, statusId: '' });
     }
-  };
-
-  const isEditMode = formik.values.editMode;
-
-  const stopEditingTask = () => {
-    formik.setFieldValue('editMode', false);
-    formik.resetForm();
   };
 
   const fetchUsers = async () => {
@@ -256,31 +208,27 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     label: `${user.firstName} ${user.lastName}`,
   }));
 
+  const formik = useTaskForm(handleSaveUpdatedTask, handleTaskCreate);
+  const isEditMode = formik.values.editMode;
+
   const value = {
     columns,
-    setColumns,
-    newColumn: column,
-    setNewColumn: setColumn,
-    tasks,
-    setTasks,
-    isAddTaskModalOpen,
-    setIsAddTaskModalOpen,
-    users,
-    setUsers,
+    onDragEnd,
+    filters,
     searchText,
+    handleFilterChange,
     handleSearch,
+    usersList,
+    setIsAddTaskModalOpen,
+    isAddTaskModalOpen,
+    formik,
+    closeAddTaskModal,
+    isEditMode,
+    tasks,
+    onAddNewTask,
     handleTaskEdit,
     handleTaskDelete,
-    getFieldError,
-    closeAddTaskModal,
-    onAddNewTask,
-    isEditMode,
-    stopEditingTask,
-    onDragEnd,
-    formik,
-    usersList,
-    filters,
-    handleFilterChange,
+    users,
   };
 
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;

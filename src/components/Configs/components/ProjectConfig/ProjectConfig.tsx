@@ -8,7 +8,7 @@ import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppa
 import { ColumnType } from '@/types/Column';
 import { ColumnTitleEdit } from '@/components/Configs/components/ProjectConfig/ColumnTitleEdit/ColumnTitleEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { DeleteModal } from '@/components/modals/DeleteModal/DeleteModal';
 import { createColumn, deleteColumn, getAllColumns, updateColumns } from '@/services/column/columnService';
 import { useDialogControl } from '@/hooks/useDialogControl';
 import styles from './ProjectConfig.module.css';

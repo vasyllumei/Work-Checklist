@@ -6,15 +6,26 @@ import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/u
 import { ColumnType } from '@/types/Column';
 import { FilterType } from '@/types/Filter';
 import { Filters } from './../../Kanban';
-import { Task } from '@/components/Kanban/components/Column/components/Task';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
+import { Task } from '@/components/Task';
 
 interface ColumnProps {
   column: ColumnType;
 }
 
 export const Column: FC<ColumnProps> = ({ column }) => {
-  const { tasks, onAddNewTask, filters, searchText } = useKanbanContext();
+  const {
+    tasks,
+    onAddNewTask,
+    filters,
+    formik,
+    isEditMode,
+    handleTaskEdit,
+    handleTaskDelete,
+    users,
+    usersList,
+    searchText,
+  } = useKanbanContext();
 
   const filterTasks = (tasks: TaskType[]) => {
     const filteredTasks = tasks.filter(
@@ -54,7 +65,17 @@ export const Column: FC<ColumnProps> = ({ column }) => {
         {provided => (
           <div ref={provided.innerRef} key={column.id} {...provided.droppableProps} className={styles.droppable}>
             {tasksToRender.map((task: TaskType, index: number) => (
-              <Task key={task.id} task={task} index={index} />
+              <Task
+                key={task.id}
+                task={task}
+                index={index}
+                formik={formik}
+                isEditMode={isEditMode}
+                handleTaskEdit={handleTaskEdit}
+                handleTaskDelete={handleTaskDelete}
+                users={users}
+                usersList={usersList}
+              />
             ))}
             {provided.placeholder}
           </div>

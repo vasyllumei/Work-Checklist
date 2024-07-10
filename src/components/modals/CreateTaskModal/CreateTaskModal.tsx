@@ -1,15 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
-import styles from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal.module.css';
+import styles from '@/components/modals/CreateTaskModal/CreateTaskModal.module.css';
 import { BUTTON_STATES } from '@/constants';
-import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/useKanbanContext';
-import { SelectComponent } from '@/components/Select/Select';
+import { Option, SelectComponent } from '@/components/Select/Select';
 import useFieldError from '@/hooks/useFieldError';
+import { ColumnType } from '@/types/Column';
+import { FormikValues } from 'formik';
 
-export const CreateTaskModal = () => {
-  const { usersList, formik, stopEditingTask, columns, closeAddTaskModal, isAddTaskModalOpen } = useKanbanContext();
+interface CreateTaskModalProps {
+  usersList: Option[];
+  formik: FormikValues;
+  columns: ColumnType[];
+  closeAddTaskModal: () => void;
+  isAddTaskModalOpen: boolean;
+}
+export const CreateTaskModal: FC<CreateTaskModalProps> = ({
+  usersList,
+  formik,
+  columns,
+  closeAddTaskModal,
+  isAddTaskModalOpen,
+}) => {
   const [showColumn, setShowColumn] = useState(false);
   const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
@@ -23,7 +36,10 @@ export const CreateTaskModal = () => {
       setShowColumn(false);
     }
   };
-
+  const stopEditingTask = () => {
+    formik.setFieldValue('editMode', false);
+    formik.resetForm();
+  };
   const columnList = columns.map(column => ({
     value: column.id,
     label: `${column.title}`,
