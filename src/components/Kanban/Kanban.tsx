@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from '@/components/Kanban/components/Column';
-import { CreateTaskModal } from '@/components/Kanban/components/modals/CreateTaskModal/CreateTaskModal';
+import { CreateTaskModal } from '@/components/modals/CreateTaskModal/CreateTaskModal';
 import { Button } from '@/components/Button';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
@@ -29,6 +29,9 @@ export const Kanban = () => {
     handleSearch,
     usersList,
     setIsAddTaskModalOpen,
+    isAddTaskModalOpen,
+    formik,
+    closeAddTaskModal,
   } = useKanbanContext();
 
   const { t } = useTranslation();
@@ -93,7 +96,13 @@ export const Kanban = () => {
                 )}
               </StrictModeDroppable>
             </DragDropContext>
-            <CreateTaskModal />
+            <CreateTaskModal
+              usersList={usersList}
+              formik={formik}
+              columns={columns}
+              closeAddTaskModal={closeAddTaskModal}
+              isAddTaskModalOpen={isAddTaskModalOpen}
+            />
           </div>
         ) : null}
       </div>

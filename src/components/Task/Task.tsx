@@ -4,39 +4,49 @@ import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import parse from 'html-react-parser';
-import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { DeleteModal } from '@/components/modals/DeleteModal/DeleteModal';
 import { Option, SelectComponent } from '@/components/Select/Select';
 import { useDialogControl } from '@/hooks/useDialogControl';
 import useButtonStyle from '@/hooks/useButtonStyle';
 import { FormikValues } from 'formik';
 import { TaskType } from '@/types/Task';
 import styles from './Task.module.css';
+import { TaskEditModal } from '@/components/modals/TaskEditModal';
+import { useUserDisplayDataMap } from '@/hooks/useUserDisplayDataMap';
+import { UserType } from '@/types/User';
 
 interface TaskProps {
   task: TaskType;
   index: number;
-  userDisplayDataMap: Map<string, { backgroundColor: string; initials: string }>;
   handleTaskEdit: (taskId: string) => void;
   handleTaskDelete: (taskId: string) => Promise<void>;
-  sendingList: Option[];
+  sendingList?: Option[];
+  usersList: Option[];
   formik: FormikValues;
-  handleTaskStatusChange: (taskId: string, newStatusId: string) => void;
+  handleTaskStatusChange?: (taskId: string, newStatusId: string) => void;
+  isEditMode: boolean;
+  showSelect?: boolean;
+  users: UserType[];
 }
 
 export const Task: React.FC<TaskProps> = ({
   task,
   index,
-  userDisplayDataMap,
   handleTaskEdit,
   handleTaskDelete,
   sendingList,
   handleTaskStatusChange,
   formik,
+  isEditMode,
+  usersList,
+  showSelect,
+  users,
 }) => {
   const { isOpen: isDialogOpen, openDialog: openProjectDialog, closeDialog: closeProjectDialog } = useDialogControl();
   const [selectedTask, setSelectedTask] = useState<{ id: string; title: string } | null>(null);
   const [selectedStatusId, setSelectedStatusId] = useState<string>(formik.values.statusId);
   const getButtonStyle = useButtonStyle();
+  const userDisplayDataMap = useUserDisplayDataMap(users);
 
   const onStatusChange = (statusId: string | string[]) => {
     if (typeof statusId === 'string') {
@@ -60,15 +70,21 @@ export const Task: React.FC<TaskProps> = ({
   const handleDeleteClick = (taskId: string, taskTitle: string) => {
     handleOpenDeleteTaskModal(taskId, taskTitle);
   };
-
+  const stopEditingTask = () => {
+    formik.setFieldValue('editMode', false);
+    formik.resetForm();
+  };
   const handleSendClick = (taskId: string) => {
-    handleTaskStatusChange(taskId, selectedStatusId);
+    if (handleTaskStatusChange) {
+      handleTaskStatusChange(taskId, selectedStatusId);
+    }
     setSelectedTask(null);
   };
+
   return (
     <Draggable key={task.id} draggableId={task.id} index={index}>
       {provided => (
-        <div ref={provided.innerRef} {...provided.draggableProps} className={styles.mainContainer}>
+        <div ref={provided.innerRef} {...provided.draggableProps}>
           <div className={styles.card} {...provided.dragHandleProps}>
             <div className={styles.contentContainer}>
               <div className={styles.titleContainer}>
@@ -92,33 +108,41 @@ export const Task: React.FC<TaskProps> = ({
               </div>
               <div className={styles.taskDescription}>{parse(task.description)}</div>
             </div>
-            {task.avatar || task.buttonState ? (
-              <div className={styles.actionContainer}>
-                <div
-                  className={styles.avatar}
-                  style={{
-                    backgroundColor: userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
-                  }}
-                >
-                  {userDisplayDataMap.get(task.assignedTo)?.initials}
-                </div>
-                <button style={getButtonStyle(task.buttonState)} className={styles.buttonAction}>
-                  {task.buttonState}
-                </button>
+            <div className={styles.actionContainer}>
+              <div
+                className={styles.avatar}
+                style={{
+                  backgroundColor: userDisplayDataMap.get(task.assignedTo)?.backgroundColor || 'blue',
+                }}
+              >
+                {userDisplayDataMap.get(task.assignedTo)?.initials}
               </div>
-            ) : null}
+              <button style={getButtonStyle(task.buttonState)} className={styles.buttonAction}>
+                {task.buttonState}
+              </button>
+            </div>
           </div>
-          <span className={styles.sendingContainer}>
-            <span className={styles.select}>
-              <SelectComponent
-                onChange={onStatusChange}
-                label="Choise status"
-                value={selectedStatusId}
-                options={sendingList}
-              />{' '}
+          {showSelect && (
+            <span className={styles.sendingContainer}>
+              <span className={styles.select}>
+                <SelectComponent
+                  onChange={onStatusChange}
+                  label="Choise status"
+                  value={selectedStatusId}
+                  options={sendingList || []}
+                />
+              </span>
+              <SendIcon onClick={() => handleSendClick(task.id)} className={styles.editIcon} />
             </span>
-            <SendIcon onClick={() => handleSendClick(task.id)} className={styles.editIcon} />
-          </span>
+          )}
+          {isEditMode && formik.values.id === task.id && (
+            <TaskEditModal
+              usersList={usersList}
+              isEditMode={isEditMode}
+              formik={formik}
+              stopEditingTask={stopEditingTask}
+            />
+          )}
         </div>
       )}
     </Draggable>

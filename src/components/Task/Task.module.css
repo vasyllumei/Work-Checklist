@@ -4,7 +4,7 @@
     height: 150px;
     display: flex;
     flex-direction: column;
-    background: rgba(238, 234, 234, 0.53);
+    background-color: #FFFFFF;
     box-shadow:  6px 15px 10px rgba(2, 7, 12, 0.18);
     border-radius: 15px;
     cursor: auto;
@@ -29,19 +29,7 @@
     justify-content: space-around;
     margin-bottom: 20px;
 }
-.mainContainer{
-    display: flex;
-    align-items: flex-start;
-    flex: 1;
-}
-.mainContainer > * {
-    flex: 1; 
-}
-@media screen and (max-width: 800px) {
-    .mainContainer {
-        flex-direction: column;
-    }
-}
+
 .contentContainer {
      height: 100%;
      font-style: normal;
@@ -64,7 +52,7 @@
     padding: 0 10px 0 20px;
     border-radius: 15px;
     margin-top: 2rem;
-    background: rgba(238, 234, 234, 0.53);
+    background-color: #FFFFFF;
     width: 100%;
     max-width: 30rem;
     box-shadow:  6px 15px 10px rgba(186, 204, 224, 0.18);

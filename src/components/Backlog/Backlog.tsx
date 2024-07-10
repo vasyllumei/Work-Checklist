@@ -13,61 +13,26 @@ import { createTask, deleteTask, getAllTasks, updateTask, updateTasks } from '@/
 import { TaskType } from '@/types/Task';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
-import { useUserDisplayDataMap } from '@/hooks/useUserDisplayDataMap';
-import { useFormik } from 'formik';
 import { Button } from '@/components/Button';
 import { Filter, FilterOption } from '@/components/Filter/Filter';
 import { Filters } from '@/components/Kanban';
 import { useFilters } from '@/hooks/useFilters';
 import { BUTTON_STATES } from '@/constants';
-import { TaskForm } from '@/components/Backlog/components/TaskForm';
-import { Task } from '@/components/Backlog/components/Task/Task';
-import { taskValidationSchema } from '@/utils';
-export const initialTaskForm = {
-  id: '',
-  userId: '',
-  assignedTo: '',
-  title: '',
-  description: '',
-  statusId: '',
-  avatar: '',
-  image: '',
-  buttonState: '',
-  order: 0,
-  editMode: false,
-  projectId: '',
-};
+import { Task } from '@/components/Task/Task';
+import { CreateTaskModal } from '@/components/modals/CreateTaskModal/CreateTaskModal';
+import useTaskForm from '@/hooks/useTaskForm';
+
 export const Backlog = () => {
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
-  const [showColumn, setShowColumn] = useState(false);
 
-  const userDisplayDataMap = useUserDisplayDataMap(users);
   const { filters, handleFilterChange } = useFilters();
   const dispatch = useDispatch();
   const projects = useSelector((state: RootState) => state.project.projects);
   const activeProject = projects.find(project => project.active);
   const backLogColumn = columns.find(column => column.title === 'Backlog');
-
-  const formik = useFormik({
-    initialValues: initialTaskForm,
-    validationSchema: taskValidationSchema,
-    onSubmit: async () => {
-      try {
-        if (formik.values.description && formik.values.title) {
-          if (formik.values.id) {
-            await handleSaveUpdatedTask();
-          } else {
-            await handleTaskCreate();
-          }
-        }
-      } catch (error) {
-        console.error('Error submitting form:', error);
-      }
-    },
-  });
 
   const currentUserString = localStorage.getItem('currentUser') || '';
   const currentUserId = currentUserString ? JSON.parse(currentUserString).user._id : '';
@@ -99,16 +64,6 @@ export const Backlog = () => {
       label: `${column.title}`,
     }));
 
-  const handleCancelTask = () => {
-    closeAddTaskModal();
-    setShowColumn(false);
-  };
-  const handleSubmitForm = () => {
-    formik.handleSubmit();
-    if (!formik.errors) {
-      setShowColumn(false);
-    }
-  };
   const fetchProjectData = async (projectId: string) => {
     try {
       const [{ data: columnsData }, { data: tasksData }] = await Promise.all([
@@ -138,7 +93,7 @@ export const Backlog = () => {
       const cardData = tasks.find(card => card.id === taskId);
       if (cardData) {
         formik.setValues({
-          ...initialTaskForm,
+          ...formik.initialValues,
           ...cardData,
           editMode: true,
         });
@@ -183,7 +138,7 @@ export const Backlog = () => {
   };
   const onAddNewTask = (columnId?: string) => {
     setIsAddTaskModalOpen(true);
-    formik.setValues({ ...initialTaskForm, statusId: columnId || '' });
+    formik.setValues({ ...formik.initialValues, statusId: columnId || '' });
   };
 
   const handleTaskDelete = async (taskId: string) => {
@@ -242,6 +197,9 @@ export const Backlog = () => {
     }
   };
 
+  const formik = useTaskForm(handleSaveUpdatedTask, handleTaskCreate);
+  const isEditMode = formik.values.editMode;
+
   return (
     <Layout
       headTitle="backlog"
@@ -281,12 +239,15 @@ export const Backlog = () => {
                         key={task.id}
                         task={task}
                         index={index}
-                        userDisplayDataMap={userDisplayDataMap}
                         handleTaskEdit={handleTaskEdit}
                         handleTaskDelete={handleTaskDelete}
                         sendingList={sendingList}
                         formik={formik}
                         handleTaskStatusChange={handleTaskStatusChange}
+                        isEditMode={isEditMode}
+                        usersList={usersList}
+                        users={users}
+                        showSelect
                       />
                     ))}
                     {provided.placeholder}
@@ -294,14 +255,12 @@ export const Backlog = () => {
                 )}
               </StrictModeDroppable>
             </DragDropContext>
-            <TaskForm
-              formik={formik}
-              isOpen={isAddTaskModalOpen}
-              onClose={handleCancelTask}
-              columns={columns}
-              showColumn={showColumn}
+            <CreateTaskModal
               usersList={usersList}
-              handleSubmitForm={handleSubmitForm}
+              formik={formik}
+              columns={columns}
+              closeAddTaskModal={closeAddTaskModal}
+              isAddTaskModalOpen={isAddTaskModalOpen}
             />
           </>
         ) : null}

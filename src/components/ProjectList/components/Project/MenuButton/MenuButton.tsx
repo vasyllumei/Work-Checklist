@@ -3,7 +3,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { DeleteModal } from '@/components/modals/DeleteModal/DeleteModal';
 
 type MenuButtonProps = {
   projectId: string;

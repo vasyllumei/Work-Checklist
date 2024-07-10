@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { DeleteModal } from '@/components/DeleteModal/DeleteModal';
+import { DeleteModal } from '@/components/modals/DeleteModal/DeleteModal';
 import { useUsersContext } from '@/components/pages/users/providers/userProvider';
 import { UserType } from '@/types/User';
 
