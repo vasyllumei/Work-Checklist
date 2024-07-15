@@ -9,7 +9,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: 30px;
+    gap: 20px;
 }
 
 @media screen and (max-width: 600px)  {
@@ -17,11 +17,11 @@
         flex-wrap: wrap;
         justify-content: flex-start;
         width: 70%;
-        min-width: 340px;
-        gap: 10px; /* Меньший отступ между элементами в узком экране */
+        min-width: 20em;
+        gap: 10px;
     }
 
     .mainFilterBox > * {
-        flex: 0 0 48%; /* Ширина каждого элемента 48% чтобы влезали два в строку с учетом gap */
+        flex: 0 0 48%;
     }
 }
