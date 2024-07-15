@@ -1,9 +1,4 @@
-.breadcrumbs {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-height: 35px;
-}
+
 .breadcrumbText {
     font-style: normal;
     font-weight: 500;

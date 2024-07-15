@@ -3,7 +3,6 @@ import styles from './Kanban.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { Column } from '@/components/Kanban/components/Column';
 import { CreateTaskModal } from '@/components/modals/CreateTaskModal/CreateTaskModal';
-import { Button } from '@/components/Button';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from '@/components/Kanban/components/StrictDroppable/StrictModeDroppable';
 import { useKanbanContext } from '@/components/Kanban/providers/kanbanProvider/';
@@ -28,7 +27,7 @@ export const Kanban = () => {
     handleFilterChange,
     handleSearch,
     usersList,
-    setIsAddTaskModalOpen,
+    onAddNewTask,
     isAddTaskModalOpen,
     formik,
     closeAddTaskModal,
@@ -65,21 +64,15 @@ export const Kanban = () => {
       <div>
         {activeProject ? (
           <div>
-            <div className={styles.addStatusButton}>
-              <Button
-                text={t('addTask')}
-                onClick={() => setIsAddTaskModalOpen(true)}
-                className={styles.newTaskButton}
-                size={'small'}
-              />
-              <Filter
-                filters={kanbanFiltersOptions}
-                value={filters}
-                handleFilterChange={handleFilterChange}
-                clearAll
-                projectId={activeProject.id}
-              />
-            </div>
+            <Filter
+              filters={kanbanFiltersOptions}
+              value={filters}
+              handleFilterChange={handleFilterChange}
+              clearAll
+              projectId={activeProject.id}
+              addItem
+              onAddNewTask={onAddNewTask}
+            />
             <div className={styles.projectTitleName} style={{ color: activeProject.color }}>
               {activeProject.title}
             </div>

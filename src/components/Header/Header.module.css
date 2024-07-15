@@ -1,58 +1,57 @@
-.titleContent {
+.header {
     width: 100%;
+    min-height: 70px;
     display: flex;
     justify-content: space-between;
-}
-
-.title {
-    flex: 8;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 34px;
-    line-height: 42px;
-    letter-spacing: -0.02em;
-    color: #2B3674;
-    margin-top: 15px;
-    margin-left: 9px;
-    padding-bottom: 5px;
+    align-items: center;
+    padding-left: 2em;
+    margin-bottom: 1em;
 }
 
 .misc {
-    padding: 10px;
-    margin-left: 85px;
-    margin-top: 27px;
+    padding: 5px;
     display: flex;
-    width: 100%;
+    justify-content: space-between;
     background-color: #FFFFFF;
-    flex: 3;
     align-items: center;
-    max-height: 61px;
+    width: 35%;
+    min-width: 18em;
     box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
     border-radius: 30px;
+    margin-bottom: 0.2em;
 }
-.search {
-    flex: 7;
-    width: 100%;
-    height: 100%;
-}
-.actionsMenu{
-    margin-left: 20px;
-    flex: 6;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-.moonIcon{
-    color: #A3AED0;
-    cursor: pointer;
+@media screen and (max-width: 600px) {
+    .header {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+    }
+    .misc {
+        width: 100%;
+    }
 }
 
-.infoIcon {
-    color: #A3AED0;
-    cursor: pointer;
+.title {
+    height: 100%;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 1.8em;
+    line-height: 1em;
+    letter-spacing: -0.02em;
+    color: #2B3674;
+    margin-top: 0;
+    margin-bottom: 0.1em;
+}
+
+
+
+.search {
+    width: 50%;
+    min-width: 8em;
+
+}
+.actionsMenu{
+    width: 20%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }

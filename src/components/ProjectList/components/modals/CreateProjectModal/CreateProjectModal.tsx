@@ -48,7 +48,6 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({
             }}
             placeholder="New project description"
             label="Description"
-            isEditing={formik.values.editMode}
             error={getFieldError('description')}
             dataTestId="description-input"
           />

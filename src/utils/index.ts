@@ -16,13 +16,9 @@ export const emailValidation = Yup.string()
 export const passwordValidation = Yup.string()
   .required('Password is required')
   .when('editMode', (editMode, schema) => (!editMode ? schema.required('Password is required') : schema))
-  .test(
-    'password-format',
-    'Password must contain at least one uppercase letter, one special character, and be 5 to 12 characters long',
-    value => {
-      return /^(?=.*[A-Z])(?=.*[_\W])(?=.{5,12}$)/.test(value);
-    },
-  );
+  .test('password-format', 'Add uppercase, special character (5-10long)', value => {
+    return /^(?=.*[A-Z])(?=.*[_\W])(?=.{5,12}$)/.test(value);
+  });
 
 export const confirmPasswordValidation = Yup.string()
   .oneOf([Yup.ref('password')], 'Passwords must match')

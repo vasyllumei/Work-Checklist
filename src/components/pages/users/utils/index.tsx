@@ -12,7 +12,8 @@ export const columnsConfig: GridColDef[] = [
     headerClassName: 'theme--header',
     headerAlign: 'center',
     align: 'center',
-    width: 250,
+    flex: 1,
+    minWidth: 250,
     sortable: false,
   },
   {
@@ -21,7 +22,7 @@ export const columnsConfig: GridColDef[] = [
     headerClassName: 'theme--header',
     headerAlign: 'center',
     align: 'center',
-    width: 150,
+    minWidth: 90,
     flex: 1,
     editable: false,
   },
@@ -31,8 +32,8 @@ export const columnsConfig: GridColDef[] = [
     headerClassName: 'theme--header',
     headerAlign: 'center',
     align: 'center',
-    width: 150,
     flex: 1,
+    minWidth: 90,
     editable: false,
   },
   {
@@ -42,8 +43,8 @@ export const columnsConfig: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     type: 'string',
-    width: 200,
     flex: 1,
+    minWidth: 150,
     editable: false,
   },
   {
@@ -54,7 +55,7 @@ export const columnsConfig: GridColDef[] = [
     align: 'center',
     editable: false,
     flex: 1,
-    width: 160,
+    minWidth: 90,
   },
   {
     field: 'actions',
@@ -62,8 +63,8 @@ export const columnsConfig: GridColDef[] = [
     headerClassName: 'theme--header',
     headerAlign: 'center',
     align: 'center',
+    minWidth: 150,
     flex: 1,
-    width: 150,
     sortable: false,
     editable: false,
 

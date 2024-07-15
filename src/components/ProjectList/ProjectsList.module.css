@@ -28,6 +28,7 @@
 .projectAdd:hover path {
     stroke: #4318FF;
 }
+
 .projectListContainer{
     display: flex;
     flex-direction: column;

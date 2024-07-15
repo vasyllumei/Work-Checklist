@@ -1,17 +1,17 @@
 .multiSelectButton {
-  display: flex;
-  margin: 10px 20px 0 20px;
-  gap: 30px;
+    display: flex;
+    margin: 10px 20px 0 20px;
+    gap: 30px;
 }
 .formControl {
-  width: 100%;
-  max-width: 200px;
+    width: 100%;
+    max-width: 200px;
 }
 
 .languageItem{
-  display: flex;
+    display: flex;
 }
 .iconContainer{
-  width: 30%;
-  margin-right: 10px;
+    width: 30%;
+    margin-right: 10px;
 }

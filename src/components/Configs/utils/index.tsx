@@ -10,6 +10,7 @@ export const projectsList: GridColDef<ProjectType>[] = [
     headerAlign: 'center',
     align: 'center',
     flex: 1,
+    minWidth: 210,
     sortable: false,
   },
   {
@@ -18,6 +19,7 @@ export const projectsList: GridColDef<ProjectType>[] = [
     headerClassName: 'theme--header',
     headerAlign: 'center',
     align: 'center',
+    minWidth: 90,
     flex: 1,
     sortable: false,
   },
@@ -27,6 +29,7 @@ export const projectsList: GridColDef<ProjectType>[] = [
     headerClassName: 'theme--header',
     headerAlign: 'center',
     align: 'center',
+    minWidth: 90,
     flex: 1,
     sortable: false,
   },

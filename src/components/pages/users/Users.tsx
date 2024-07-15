@@ -59,13 +59,14 @@ export const Users = () => {
             value={filters}
             handleFilterChange={handleFilterChange}
             clearAll={false}
+            addItem={false}
           />
           {isSuperAdmin && selectedRows && selectedRows.length > 0 ? (
             <Button
               onClick={() => handleOpenDeleteAllUsersModal(selectedRows.map(String))}
               dataTestId="deleteUsers"
               text="Delete selected users"
-              size={'small'}
+              size={'medium'}
               className={styles.allUsersContainer}
             />
           ) : null}
@@ -96,7 +97,7 @@ export const Users = () => {
           }}
         />
         <Grid className={styles.gridContainer}>
-          {isSuperAdmin && <Button onClick={handleDialogOpen} dataTestId="addUser" text="Add User" size={'small'} />}
+          {isSuperAdmin && <Button onClick={handleDialogOpen} dataTestId="addUser" text="Add User" size={'medium'} />}
         </Grid>
         <UserDialog />
       </StyledBox>

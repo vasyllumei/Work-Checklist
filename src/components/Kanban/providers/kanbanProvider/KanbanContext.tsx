@@ -6,7 +6,6 @@ import { getAllColumns } from '@/services/column/columnService';
 import { getAllTasks, createTask, deleteTask, updateTask } from '@/services/task/taskService';
 import { getAllUsers } from '@/services/user/userService';
 import { DropResult } from 'react-beautiful-dnd';
-import { Option } from '@/components/Select/Select';
 import { useFilters } from '@/hooks/useFilters';
 import { FilterType } from '@/types/Filter';
 import { getAllProjects } from '@/services/project/projectService';
@@ -15,6 +14,7 @@ import { RootState } from '@/store/projectStore/store';
 import handleDragEnd from '@/components/Kanban/utils/onDragEnd';
 import { setProjects } from '@/store/projectStore/projectReducer/projectReducers';
 import useTaskForm from '@/hooks/useTaskForm';
+import { Option } from '@/components/Select/Select';
 
 interface FormikTaskValues {
   id: string;

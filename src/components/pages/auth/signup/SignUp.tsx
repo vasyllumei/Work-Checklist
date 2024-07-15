@@ -9,6 +9,9 @@ import { LOCAL_STORAGE_TOKEN } from '@/constants';
 import { useFormik } from 'formik';
 import { signUpValidationSchema } from '@/components/pages/auth/signup/utils';
 import useFieldError from '@/hooks/useFieldError';
+import Loader from '@/components/Loader/Loader';
+import { LanguageMenu } from 'src/components/LanguageMenu';
+import { useTranslation } from 'react-i18next';
 
 const initialUserForm = {
   firstName: '',
@@ -21,7 +24,9 @@ const initialUserForm = {
 };
 export const SignUp: FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation();
 
   const formik = useFormik({
     initialValues: initialUserForm,
@@ -34,6 +39,7 @@ export const SignUp: FC = () => {
   const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   const handleSignUp = async () => {
+    setIsLoading(true);
     try {
       const response = await signUp(formik.values);
       if (response && response.token) {
@@ -45,6 +51,8 @@ export const SignUp: FC = () => {
       if (error.response && error.response.data && error.response.data.message) {
         formik.setErrors({ signUpError: error.response.data.message });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,100 +61,91 @@ export const SignUp: FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.leftContainer}>
-        <div className={styles.form}>
-          <div className={styles.contentForm}>
-            <div className={styles.headText}> Sign Up</div>
-            <TextInput
-              label="First Name"
-              name="firstName"
-              value={formik.values.firstName}
-              onChange={value => formik.setFieldValue('firstName', value)}
-              placeholder="Enter your first name"
-              error={getFieldError('firstName')}
-            />
-            <TextInput
-              label="Last Name"
-              name="lastName"
-              value={formik.values.lastName}
-              onChange={value => formik.setFieldValue('lastName', value)}
-              placeholder="Enter your last name"
-              error={getFieldError('lastName')}
-            />
-            <TextInput
-              label="Email"
-              type="email"
-              name="email"
-              value={formik.values.email}
-              onChange={value => formik.setFieldValue('email', value)}
-              placeholder="Enter your email address"
-              error={getFieldError('email')}
-            />
-            <TextInput
-              label="Password"
-              type="password"
-              name="password"
-              value={formik.values.password}
-              onChange={value => formik.setFieldValue('password', value)}
-              placeholder="Min. 5 characters"
-              error={getFieldError('password')}
-            />
-            <TextInput
-              label="Confirm password"
-              type="password"
-              name="confirmPassword"
-              value={formik.values.confirmPassword}
-              onChange={value => formik.setFieldValue('confirmPassword', value)}
-              placeholder="Min. 8 characters"
-              error={getFieldError('confirmPassword')}
-            />
-            {formik.errors.signUpError && <div className={styles.signUpError}>{getFieldError('signUpError')}</div>}
-            <div className={styles.checkboxContainer}>
-              <label>
-                <input
-                  className={styles.checkbox}
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={handleRememberMe}
-                  name="remember"
-                />
-                Keep me logged in
-              </label>
-            </div>
-            <Button onClick={formik.handleSubmit} text="Sign Up" type="submit" size="medium" />
+    <main className={styles.signUpContainer}>
+      <section className={styles.formSection}>
+        <span className={styles.languageMenu}>
+          <LanguageMenu />
+        </span>
+        <form className={styles.form} onSubmit={formik.handleSubmit}>
+          <header>
+            <h1 className={styles.formHeader}> {t('signUp')}</h1>
+            <p className={styles.formSubheader}> {t('completeForms')} </p>
+          </header>
+          <hr className={styles.lineForm} />
+          <TextInput
+            label={t('fName')}
+            name="firstName"
+            value={formik.values.firstName}
+            onChange={value => formik.setFieldValue('firstName', value)}
+            placeholder={t('firstName')}
+            error={getFieldError('firstName')}
+          />
+          <TextInput
+            label={t('lName')}
+            name="lastName"
+            value={formik.values.lastName}
+            onChange={value => formik.setFieldValue('lastName', value)}
+            placeholder={t('lastName')}
+            error={getFieldError('lastName')}
+          />
+          <TextInput
+            label={t('userEmail')}
+            type="email"
+            name="email"
+            value={formik.values.email}
+            onChange={value => formik.setFieldValue('email', value)}
+            placeholder={t('enterYourEmail')}
+            error={getFieldError('email')}
+          />
+          <TextInput
+            label={t('userPassword')}
+            type="password"
+            name="password"
+            value={formik.values.password}
+            onChange={value => formik.setFieldValue('password', value)}
+            placeholder={t('confirmPassword')}
+            error={getFieldError('password')}
+          />
+          <TextInput
+            label={t('confirmPassword')}
+            type="password"
+            name="confirmPassword"
+            value={formik.values.confirmPassword}
+            onChange={value => formik.setFieldValue('confirmPassword', value)}
+            placeholder="Min. 8 characters"
+            error={getFieldError('confirmPassword')}
+          />
+          {formik.errors.signUpError && <div className={styles.loginError}>{formik.errors.signUpError}</div>}
+          <div className={styles.checkboxContainer}>
+            <label>
+              <input
+                className={styles.checkbox}
+                type="checkbox"
+                checked={rememberMe}
+                onChange={handleRememberMe}
+                name="remember"
+              />
+              {t('keepLogged')}
+            </label>
           </div>
-          <footer>
-            <div className={styles.leftFooter}>© 2022 Horizon UI. All Rights Reserved. Made with love by Simple!</div>
-          </footer>
-        </div>
-      </div>
-      <div className={styles.rightContainer}>
-        <div className={styles.logo}>
+          <Button onClick={formik.handleSubmit} text={t('signUp')} type="submit" size="large" />
+        </form>
+      </section>
+      <aside className={styles.infoSection}>
+        <div className={styles.infoContainer}>
           <div className={styles.logoContainer}></div>
           <div className={styles.infoBox}>
             <p className={styles.learnInfo}>Learn more about Horizon UI on </p>
             <p className={styles.infoLink}>horizon-ui.com</p>
           </div>
-          <footer>
-            <ul className={styles.rightFooter}>
-              <li>
-                <a>Marketplace</a>
-              </li>
-              <li>
-                <a>License</a>
-              </li>
-              <li>
-                <a>Terms of Use</a>
-              </li>
-              <li>
-                <a>Blog</a>
-              </li>
-            </ul>
-          </footer>
         </div>
-      </div>
-    </div>
+      </aside>
+      {isLoading && (
+        <div className={styles.loaderContainer}>
+          <Loader />
+        </div>
+      )}
+    </main>
   );
 };
 
