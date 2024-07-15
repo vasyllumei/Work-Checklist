@@ -24,7 +24,7 @@ export const LanguageMenu: FC = () => {
         sx={{
           boxShadow: 'none',
           '.MuiOutlinedInput-notchedOutline': { border: 0 },
-          width: '100px',
+          width: '75px',
           '& .MuiSvgIcon-root': {
             visibility: 'hidden',
           },

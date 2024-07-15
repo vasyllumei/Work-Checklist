@@ -2,11 +2,11 @@ import React, { FC } from 'react';
 import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
 import styles from './TaskEditModal.module.css';
-import { Option, SelectComponent } from '@/components/Select/Select';
 import { BUTTON_STATES } from '@/constants';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import useFieldError from '@/hooks/useFieldError';
 import { FormikValues } from 'formik';
+import { Option, SelectComponent } from '@/components/Select/Select';
 
 interface TaskEditModalProps {
   usersList: Option[];

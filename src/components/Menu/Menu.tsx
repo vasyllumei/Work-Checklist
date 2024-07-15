@@ -9,8 +9,7 @@ import ConfigIcon from '../../assets/image/menuicon/configIcon.svg';
 import ProfileIcon from '../../assets/image/menuicon/prifoleicon.svg';
 import SettingIcon from '../../assets/image/menuicon/settingicon.svg';
 import { ProjectsList } from 'src/components/ProjectList';
-import CircularIndeterminate from '@/components/Kanban/components/Loader/Loader';
-
+import Loader from '@/components/Loader/Loader';
 const pages = [
   { id: 1, title: 'Dashboard', link: '/', disabled: false, icon: DashboardIcon },
   { id: 2, title: 'Users', link: '/users', disabled: false, icon: ProfileIcon },
@@ -29,7 +28,6 @@ const pages = [
 export const Menu: FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-
   const handleNavigation = (link: string) => {
     setIsLoading(true);
     router.push(link).finally(() => {
@@ -68,7 +66,7 @@ export const Menu: FC = () => {
       )}
       {isLoading && (
         <div className={styles.loaderContainer}>
-          <CircularIndeterminate />
+          <Loader />
         </div>
       )}
     </div>

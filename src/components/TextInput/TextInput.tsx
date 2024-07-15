@@ -40,15 +40,10 @@ export function TextInput({
   };
 
   return (
-    <div className={styles.container}>
-      {type === 'password' && (
-        <div className={styles.eyePassword} onClick={togglePasswordVisibility}>
-          {showPassword ? <FaEyeSlash /> : <FaEye />}
-        </div>
-      )}
+    <div className={styles.inputContainer}>
       {label && <label className={styles.inputLabel}>{label}</label>}
       {isEditing ? (
-        <HtmlEditor dataAid="descriptionInput" onChange={onChange} value={value || ''} />
+        <HtmlEditor dataAid={dataTestId} onChange={onChange} value={value || ''} />
       ) : (
         <input
           data-testid={dataTestId}
@@ -60,9 +55,14 @@ export function TextInput({
           type={inputType}
           disabled={disabled}
           onBlur={onBlur}
-        />
+        ></input>
       )}
-      {error && <span className={styles.error}>{error}</span>}
+      {error && <span className={styles.error}>{error}</span>}{' '}
+      {type === 'password' && (
+        <div className={styles.eyePassword} onClick={togglePasswordVisibility}>
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </div>
+      )}
     </div>
   );
 }

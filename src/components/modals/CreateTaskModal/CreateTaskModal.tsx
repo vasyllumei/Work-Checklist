@@ -4,10 +4,10 @@ import { Button } from '@/components/Button';
 import { TextInput } from '@/components/TextInput';
 import styles from '@/components/modals/CreateTaskModal/CreateTaskModal.module.css';
 import { BUTTON_STATES } from '@/constants';
-import { Option, SelectComponent } from '@/components/Select/Select';
 import useFieldError from '@/hooks/useFieldError';
 import { ColumnType } from '@/types/Column';
 import { FormikValues } from 'formik';
+import { Option, SelectComponent } from '@/components/Select/Select';
 
 interface CreateTaskModalProps {
   usersList: Option[];

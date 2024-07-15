@@ -168,6 +168,7 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   const handleDialogClose = () => {
     formik.resetForm();
     closeUserDialog();
+    formik.resetForm();
   };
 
   const handleDeleteButtonClick = () => {

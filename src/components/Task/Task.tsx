@@ -5,7 +5,6 @@ import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import parse from 'html-react-parser';
 import { DeleteModal } from '@/components/modals/DeleteModal/DeleteModal';
-import { Option, SelectComponent } from '@/components/Select/Select';
 import { useDialogControl } from '@/hooks/useDialogControl';
 import useButtonStyle from '@/hooks/useButtonStyle';
 import { FormikValues } from 'formik';
@@ -14,6 +13,7 @@ import styles from './Task.module.css';
 import { TaskEditModal } from '@/components/modals/TaskEditModal';
 import { useUserDisplayDataMap } from '@/hooks/useUserDisplayDataMap';
 import { UserType } from '@/types/User';
+import { Option, SelectComponent } from '@/components/Select/Select';
 
 interface TaskProps {
   task: TaskType;

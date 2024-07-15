@@ -4,5 +4,6 @@ export function fillUserForm(firstName: string, lastName: string, email: string,
   cy.findByTestId('email').type(email);
   cy.findByTestId('password').type(password);
   cy.findByTestId('modalActionsButtons').click();
+  cy.findByTestId('role-select').contains(role).click();
   cy.get('ul.MuiList-root').contains(role).click();
 }

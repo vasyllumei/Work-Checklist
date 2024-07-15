@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { Button } from '@/components/Button';
 import styles from './DeleteModal.module.css';
+import { Button } from '@/components/Button';
 interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -33,10 +33,10 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, testIdContext,
             onClick={handleCancel}
             text="Cancel"
             dataTestId={`cancelModal${testIdContext}`}
-            size={'small'}
+            size={'medium'}
             outlined={true}
           />
-          <Button onClick={handleDelete} text="Delete" dataTestId={`deleteModal${testIdContext}`} size={'small'} />
+          <Button onClick={handleDelete} text="Delete" dataTestId={`deleteModal${testIdContext}`} size={'medium'} />
         </div>
       </DialogActions>
     </Dialog>

@@ -13,7 +13,6 @@ import { createTask, deleteTask, getAllTasks, updateTask, updateTasks } from '@/
 import { TaskType } from '@/types/Task';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
-import { Button } from '@/components/Button';
 import { Filter, FilterOption } from '@/components/Filter/Filter';
 import { Filters } from '@/components/Kanban';
 import { useFilters } from '@/hooks/useFilters';
@@ -212,18 +211,15 @@ export const Backlog = () => {
         {activeProject ? (
           <>
             <div className={styles.addStatusButton}>
-              <Button
-                text={'Add task'}
-                onClick={() => onAddNewTask(backLogColumn?.id)}
-                className={styles.newTaskButton}
-                size={'small'}
-              />
               <Filter
                 filters={backLogFiltersOptions}
                 value={filters}
                 handleFilterChange={handleFilterChange}
                 clearAll
                 projectId={activeProject.id}
+                addItem
+                backLogColumn={backLogColumn}
+                onAddNewTask={onAddNewTask}
               />
             </div>
             <div className={styles.projectTitleName} style={{ color: activeProject.color }}>
