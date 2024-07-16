@@ -3,12 +3,14 @@
     margin: 10px 20px 0 20px;
     gap: 30px;
 }
-
 .formControl {
     width: 100%;
     max-width: 200px;
 }
 
+.languageItem{
+    display: flex;
+}
 .iconContainer{
     width: 30%;
     margin-right: 10px;

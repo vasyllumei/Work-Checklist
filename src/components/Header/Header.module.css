@@ -42,12 +42,13 @@
     margin-bottom: 0.1em;
 }
 
+
+
 .search {
     width: 50%;
     min-width: 8em;
 
 }
-
 .actionsMenu{
     width: 20%;
     display: flex;
