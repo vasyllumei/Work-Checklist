@@ -49,6 +49,10 @@ export const Configs = () => {
     }
   };
 
+  useEffect(() => {
+    fetchProjects();
+  }, [dispatch]);
+
   const handleProjectCreate = async () => {
     try {
       await createProject(formik.values);
@@ -60,10 +64,6 @@ export const Configs = () => {
       }
     }
   };
-
-  useEffect(() => {
-    fetchProjects();
-  }, [dispatch]);
 
   const handleRowClick = (projectId: string) => {
     router.push(`/configs/${projectId}`);

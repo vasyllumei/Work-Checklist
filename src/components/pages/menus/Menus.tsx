@@ -2,13 +2,61 @@ import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout/Layout';
 import { MenuDocumentType } from '@/models/Menu';
 import { getAllMenus } from '@/services/menu/menuService';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
-import { menuColumns } from '@/components/pages/menus/utils';
 
 export const Menus: React.FC = () => {
   const [menus, setMenus] = useState<MenuDocumentType[]>([]);
 
+  const columns: GridColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Title',
+      headerClassName: 'theme--header',
+      headerAlign: 'center',
+      sortable: false,
+      flex: 1,
+    },
+    {
+      field: 'link',
+      headerName: 'Link',
+      headerClassName: 'theme--header',
+      headerAlign: 'center',
+      flex: 1,
+      editable: false,
+      sortable: false,
+    },
+    {
+      field: 'order',
+      headerName: 'Order',
+      headerClassName: 'theme--header',
+      headerAlign: 'center',
+      align: 'center',
+      type: 'string',
+      maxWidth: 70,
+      editable: false,
+      sortable: false,
+    },
+    {
+      field: 'children',
+      headerName: 'Children',
+      headerClassName: 'theme--header',
+      headerAlign: 'center',
+      align: 'center',
+      flex: 1,
+      sortable: false,
+    },
+    /*{
+      field: 'actions',
+      headerName: 'Actions',
+      headerClassName: 'theme--header',
+      headerAlign: 'center',
+      align: 'center',
+      flex: 1,
+      width: 150,
+      editable: false,
+    },*/
+  ];
   const fetchMenus = async () => {
     try {
       const fetchedMenusData = await getAllMenus();
@@ -43,7 +91,7 @@ export const Menus: React.FC = () => {
       >
         <DataGrid
           rows={menus}
-          columns={menuColumns}
+          columns={columns}
           initialState={{
             pagination: {
               paginationModel: {

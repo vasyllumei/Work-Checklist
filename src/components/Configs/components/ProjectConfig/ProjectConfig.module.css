@@ -4,8 +4,8 @@
     align-items: center;
     flex-direction: column;
     max-width: 500px;
-    padding: 20px;
-    border-radius: 10%;
+    padding: 40px;
+    border-radius: 70px;
 }
 
 .projectTitleName{
@@ -17,7 +17,6 @@
     line-height: 42px;
     letter-spacing: -0.02em;
 }
-
 .column {
     width: 100%;
     background: #FFFFFF;
@@ -28,6 +27,7 @@
     margin-bottom: 40px;
     padding: 20px;
 }
+
 
 .deleteStatusButton {
     cursor: pointer;
@@ -63,6 +63,7 @@
     margin-left: -5px;
     margin-bottom: 7px;
 }
+
 
 .columnBox {
     display: flex;

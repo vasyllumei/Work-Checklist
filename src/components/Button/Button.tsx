@@ -24,7 +24,6 @@ export const Button: FC<ButtonPropsType> = ({
   dataTestId,
 }) => {
   const buttonSize = styles[size];
-
   return (
     <button
       data-testid={dataTestId}

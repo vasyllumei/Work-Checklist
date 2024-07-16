@@ -124,6 +124,10 @@
     text-align: left;
 }
 
+.formFooter {
+    width: 100%;
+}
+
 .infoContainer {
     height: 100%;
     width: 100%;
@@ -165,6 +169,7 @@
     width: 100%;
     margin: 0;
 }
+
 
 .loaderContainer {
     position: absolute;

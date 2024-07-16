@@ -62,6 +62,8 @@ export default interface KanbanContextProps {
 export const KanbanContext = createContext<KanbanContextProps | null>(null);
 
 export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
+  const projects = useSelector((state: RootState) => state.project.projects);
+  const dispatch = useDispatch();
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState<boolean>(false);
@@ -69,11 +71,21 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
   const [searchText, setSearchText] = useState<string>('');
   const { filters, handleFilterChange } = useFilters();
 
-  const projects = useSelector((state: RootState) => state.project.projects);
-  const dispatch = useDispatch();
   const currentUserString = localStorage.getItem('currentUser') || '';
   const currentUserId = currentUserString ? JSON.parse(currentUserString).user._id : '';
   const activeProject = projects.find(project => project.active);
+
+  useEffect(() => {
+    fetchProjects();
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (activeProject) {
+      fetchColumns(activeProject.id);
+      fetchTasks(activeProject.id);
+    }
+  }, [activeProject]);
 
   const fetchProjects = async () => {
     try {
@@ -83,7 +95,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       console.error('Error fetching data:', error);
     }
   };
-
   const fetchColumns = async (projectId: string) => {
     try {
       const { data: columnsData } = await getAllColumns(projectId);
@@ -159,15 +170,6 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
       console.error('Error updating task:', error);
     }
   };
-  const fetchUsers = async () => {
-    try {
-      const fetchedUsersData = await getAllUsers();
-      const fetchedUsers: UserType[] = fetchedUsersData.data;
-      setUsers(fetchedUsers);
-    } catch (error) {
-      console.error('Error retrieving the list of users:', error);
-    }
-  };
 
   const closeAddTaskModal = () => {
     formik.resetForm();
@@ -183,17 +185,15 @@ export const KanbanProvider = ({ children }: { children: JSX.Element }) => {
     }
   };
 
-  useEffect(() => {
-    fetchProjects();
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    if (activeProject) {
-      fetchColumns(activeProject.id);
-      fetchTasks(activeProject.id);
+  const fetchUsers = async () => {
+    try {
+      const fetchedUsersData = await getAllUsers();
+      const fetchedUsers: UserType[] = fetchedUsersData.data;
+      setUsers(fetchedUsers);
+    } catch (error) {
+      console.error('Error retrieving the list of users:', error);
     }
-  }, [activeProject]);
+  };
 
   const onDragEnd = async (result: DropResult) => {
     await handleDragEnd(result, columns, tasks, setColumns, setTasks);
