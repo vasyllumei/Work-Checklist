@@ -22,6 +22,7 @@ const initialLoginForm = {
 export const Login: FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const { t } = useTranslation();
   const formik = useFormik({
     initialValues: initialLoginForm,
@@ -31,6 +32,7 @@ export const Login: FC = () => {
     },
   });
   const { getFieldError } = useFieldError(formik.touched, formik.errors);
+  const router = useRouter();
 
   const handleRememberMe = (e: ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
@@ -41,7 +43,7 @@ export const Login: FC = () => {
       Cookies.remove('isUserAuthenticated');
     }
   };
-  const router = useRouter();
+
   const handleLogin = async () => {
     setIsLoading(true);
     try {

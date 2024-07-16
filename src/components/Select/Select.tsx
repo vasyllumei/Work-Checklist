@@ -78,12 +78,12 @@ export const SelectComponent: React.FC<SelectProps> = ({
       setIsSelectOpen(false);
     }
   };
-
   useOutsideClick(handleOutsideClick, containerRef, excludeRefs);
+
   return (
     <Box>
       {multiple ? (
-        <FormControl size="small" sx={{ m: 1, width: 300 }} ref={containerRef}>
+        <FormControl size="small" sx={{ m: 0.5, minWidth: 180 }} ref={containerRef}>
           <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
           <Select
             labelId="demo-multiple-checkbox-label"
@@ -112,8 +112,8 @@ export const SelectComponent: React.FC<SelectProps> = ({
               <div>
                 <Divider />
                 <div className={styles.multiSelectButton}>
-                  <Button text="Clear" onClick={handleResetCheckbox} size="small" outlined={true} />
-                  <Button text="Apply" onClick={handleApplyFilter} dataTestId={`applyFilterButton`} size="small" />
+                  <Button text="Clear" onClick={handleResetCheckbox} size="medium" outlined={true} />
+                  <Button text="Apply" onClick={handleApplyFilter} dataTestId={`applyFilterButton`} size="medium" />
                 </div>
               </div>
             )}
