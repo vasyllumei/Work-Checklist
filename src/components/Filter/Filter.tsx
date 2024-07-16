@@ -4,6 +4,7 @@ import { Button } from '@/components/Button';
 import { useTranslation } from 'react-i18next';
 import { FilterType } from '@/types/Filter';
 import { Option, SelectComponent } from '@/components/Select/Select';
+import { ColumnType } from '@/types/Column';
 
 export interface FilterOption {
   name: string;
@@ -19,8 +20,8 @@ interface FilterProps {
   addItem?: boolean;
   value: FilterType[];
   projectId?: string;
-  onAddNewTask?: any;
-  backLogColumn?: any;
+  onAddNewTask?: (columnId?: string) => void;
+  backLogColumn?: ColumnType | undefined;
 }
 
 export const Filter: FC<FilterProps> = ({
@@ -46,9 +47,9 @@ export const Filter: FC<FilterProps> = ({
       {addItem && (
         <Button
           text={t('addTask')}
-          onClick={() => onAddNewTask(backLogColumn?.id)}
+          onClick={() => onAddNewTask?.(backLogColumn?.id)}
           className={styles.newTaskButton}
-          size={'medium'}
+          size="medium"
         />
       )}
       {clearAll && <Button text={t('clear')} onClick={handleClearAll} size="medium" outlined={true} />}
@@ -58,12 +59,12 @@ export const Filter: FC<FilterProps> = ({
             <SelectComponent
               options={filter.options}
               value={value?.find(item => item.name === filter.name)?.value || projectId}
-              label={filter.label}
+              label={t(filter.label)}
               applyOnChange={filter.applyOnChange}
               onChange={selectedOptions => {
                 handleFilterChange(filter.name, selectedOptions);
               }}
-              multiple
+              multiple={true}
               key={resetKey}
             />
           </div>

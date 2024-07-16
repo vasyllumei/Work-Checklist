@@ -9,12 +9,13 @@ import { ColumnType } from '@/types/Column';
 import { ColumnTitleEdit } from '@/components/Configs/components/ProjectConfig/ColumnTitleEdit/ColumnTitleEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DeleteModal } from '@/components/modals/DeleteModal/DeleteModal';
-import { createColumn, deleteColumn, getAllColumns, updateColumns } from '@/services/column/columnService';
+import { createColumn, deleteColumn, getAllColumns } from '@/services/column/columnService';
 import { useDialogControl } from '@/hooks/useDialogControl';
 import styles from './ProjectConfig.module.css';
 import ConfigActions from '@/components/Configs/components/ProjectConfig/components/ConfigActions/ConfigActions';
 import { useFormik } from 'formik';
 import { columnValidationSchema } from '@/components/Configs/utils';
+import { handleColumnDragEnd } from '@/components/Configs/components/ProjectConfig/utils/onDragEndColumn';
 
 const initialColumnForm = {
   title: '',
@@ -23,13 +24,15 @@ const initialColumnForm = {
   projectId: '',
 };
 export const ProjectConfig = () => {
-  const router = useRouter();
-  const { projectId } = router.query;
-  const [project, setProject] = useState<ProjectType | null>(null);
-  const { isOpen: isDialogOpen, openDialog: openProjectDialog, closeDialog: closeProjectDialog } = useDialogControl();
   const [selectedColumn, setSelectedColumn] = useState<string>('');
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [isAddStatusModalOpen, setIsAddStatusModalOpen] = useState<boolean>(false);
+  const [project, setProject] = useState<ProjectType | null>(null);
+
+  const { isOpen: isDialogOpen, openDialog: openProjectDialog, closeDialog: closeProjectDialog } = useDialogControl();
+  const router = useRouter();
+  const { projectId } = router.query;
+
   const formik = useFormik({
     initialValues: initialColumnForm,
     validationSchema: columnValidationSchema,
@@ -41,6 +44,7 @@ export const ProjectConfig = () => {
       }
     },
   });
+
   const fetchProject = async () => {
     try {
       if (projectId && typeof projectId === 'string') {
@@ -63,11 +67,6 @@ export const ProjectConfig = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProject();
-    fetchColumns(projectId as string);
-  }, [projectId]);
-
   const handleColumnCreate = async () => {
     try {
       if (formik.isValid) {
@@ -78,6 +77,30 @@ export const ProjectConfig = () => {
     } catch (error) {
       console.error('Error creating column:', error);
     }
+  };
+
+  const handleColumnDelete = async (columnId: string) => {
+    try {
+      await deleteColumn(columnId);
+      await fetchColumns(projectId as string);
+    } catch (error) {
+      console.error('Error deleting column:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProject();
+    fetchColumns(projectId as string);
+  }, [projectId]);
+
+  const handleOpenDeleteColumnModal = (columnId: string) => {
+    setSelectedColumn(columnId);
+    openProjectDialog();
+  };
+
+  const handleCloseDeleteColumnModal = () => {
+    setSelectedColumn('');
+    closeProjectDialog();
   };
 
   const handleAddStatus = () => {
@@ -95,44 +118,9 @@ export const ProjectConfig = () => {
     setIsAddStatusModalOpen(false);
   };
 
-  const handleColumnDelete = async (columnId: string) => {
-    try {
-      await deleteColumn(columnId);
-      await fetchColumns(projectId as string);
-    } catch (error) {
-      console.error('Error deleting column:', error);
-    }
+  const handleColumnDragEndLocal = (result: DropResult) => {
+    handleColumnDragEnd(columns, setColumns, result);
   };
-
-  const handleOpenDeleteColumnModal = (columnId: string) => {
-    setSelectedColumn(columnId);
-    openProjectDialog();
-  };
-
-  const handleCloseDeleteColumnModal = () => {
-    setSelectedColumn('');
-    closeProjectDialog();
-  };
-
-  const handleColumnDragEnd = async (result: DropResult) => {
-    const { source, destination } = result;
-
-    if (!destination || source.index === destination.index) {
-      return;
-    }
-
-    const updatedColumns = [...columns];
-    const movedColumn = updatedColumns.splice(source.index, 1)[0];
-    updatedColumns.splice(destination.index, 0, movedColumn);
-
-    updatedColumns.forEach((column, index) => {
-      column.order = index + 1;
-    });
-
-    setColumns(updatedColumns);
-    await updateColumns(updatedColumns);
-  };
-
   return (
     <Layout
       headTitle="Configs"
@@ -142,66 +130,65 @@ export const ProjectConfig = () => {
         { title: `Project ${project?.title}`, link: `/${projectId}` },
       ]}
     >
-      {project ? (
+      {project && (
         <div>
-          <div>
-            <div className={styles.projectTitleName} style={{ color: project?.color }}>
-              {project?.title}
-              <ConfigActions
-                projectId={projectId}
-                formik={formik}
-                isAddStatusModalOpen={isAddStatusModalOpen}
-                openAddStatusModal={handleOpenColumnModal}
-                closeAddStatusModal={handleCloseColumnModal}
-                handleAddStatus={handleAddStatus}
-              />
-            </div>
+          <div className={styles.projectTitleName} style={{ color: project?.color }}>
+            {project.title}
+            <ConfigActions
+              projectId={projectId}
+              formik={formik}
+              isAddStatusModalOpen={isAddStatusModalOpen}
+              openAddStatusModal={handleOpenColumnModal}
+              closeAddStatusModal={handleCloseColumnModal}
+              handleAddStatus={handleAddStatus}
+            />
+          </div>
 
-            <DragDropContext onDragEnd={handleColumnDragEnd}>
-              <StrictModeDroppable droppableId="columnContainer" type="COLUMN" direction="vertical">
-                {provided => (
-                  <div ref={provided.innerRef} {...provided.droppableProps} className={styles.columnContainer}>
-                    {columns.map((column, index) => (
-                      <div key={column.id} className={styles.columnBox}>
-                        <Draggable draggableId={column.id ? column.id.toString() : ''} index={index}>
-                          {provided => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className={styles.column}
-                              data-testid={`column${column.id}`}
-                            >
-                              <div className={styles.columnHead} {...provided.dragHandleProps}>
-                                <h2 className={styles.columnTitle}>
-                                  <ColumnTitleEdit column={column} />
-                                </h2>
-                                <button
-                                  className={styles.deleteStatusButton}
-                                  onClick={() => handleOpenDeleteColumnModal(column.id)}
-                                >
-                                  <DeleteIcon color="primary" />
-                                </button>
-                                <DeleteModal
-                                  title="Delete Column"
-                                  item={`column "${selectedColumn}"`}
-                                  isOpen={isDialogOpen}
-                                  onClose={handleCloseDeleteColumnModal}
-                                  onDelete={async () => await handleColumnDelete(selectedColumn)}
-                                />
-                              </div>
+          <DragDropContext onDragEnd={handleColumnDragEndLocal}>
+            <StrictModeDroppable droppableId="columnContainer" type="COLUMN" direction="vertical">
+              {provided => (
+                <div {...provided.droppableProps} ref={provided.innerRef} className={styles.columnContainer}>
+                  {columns.map((column, index) => (
+                    <Draggable key={column.id} draggableId={column.id ? column.id.toString() : ''} index={index}>
+                      {provided => (
+                        <div
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          ref={provided.innerRef}
+                          className={styles.columnBox}
+                          data-testid={`column${column.id}`}
+                        >
+                          <div className={styles.column}>
+                            <div className={styles.columnHead}>
+                              <h2 className={styles.columnTitle}>
+                                <ColumnTitleEdit column={column} />
+                              </h2>
+                              <button
+                                className={styles.deleteStatusButton}
+                                onClick={() => handleOpenDeleteColumnModal(column.id)}
+                              >
+                                <DeleteIcon color="primary" />
+                              </button>
+                              <DeleteModal
+                                title="Delete Column"
+                                item={`column "${selectedColumn}"`}
+                                isOpen={isDialogOpen}
+                                onClose={handleCloseDeleteColumnModal}
+                                onDelete={async () => await handleColumnDelete(selectedColumn)}
+                              />
                             </div>
-                          )}
-                        </Draggable>
-                      </div>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </StrictModeDroppable>
-            </DragDropContext>
-          </div>{' '}
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </StrictModeDroppable>
+          </DragDropContext>
         </div>
-      ) : null}
+      )}
     </Layout>
   );
 };
