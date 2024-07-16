@@ -1,6 +1,6 @@
 export const LOCAL_STORAGE_TOKEN = 'token';
 
-export const BUTTON_STATES: { value: string; label: string }[] = [
+export const BUTTON_STATES = [
   { value: 'Pending', label: 'Pending' },
   { value: 'Updates', label: 'Updates' },
   { value: 'Errors', label: 'Errors' },

@@ -54,7 +54,7 @@ export const Column: FC<ColumnProps> = ({ column }) => {
       <div className={styles.columnHead}>
         <h2 className={styles.columnTitle}>
           <div className={styles.columnTitle}>
-            <h3>{column.title}</h3>
+            <h3 className={styles.editInput}>{column.title}</h3>
           </div>
         </h2>
         <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>

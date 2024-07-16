@@ -78,8 +78,8 @@ export const SelectComponent: React.FC<SelectProps> = ({
       setIsSelectOpen(false);
     }
   };
+  //dffd
   useOutsideClick(handleOutsideClick, containerRef, excludeRefs);
-
   return (
     <Box>
       {multiple ? (

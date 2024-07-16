@@ -9,22 +9,18 @@ import { getAllColumns } from '@/services/column/columnService';
 import { ColumnType } from '@/types/Column';
 import { getAllProjects } from '@/services/project/projectService';
 import { setProjects } from '@/store/projectStore/projectReducer/projectReducers';
-import { createTask, deleteTask, getAllTasks, updateTask } from '@/services/task/taskService';
+import { createTask, deleteTask, getAllTasks, updateTask, updateTasks } from '@/services/task/taskService';
 import { TaskType } from '@/types/Task';
 import { getAllUsers } from '@/services/user/userService';
 import { UserType } from '@/types/User';
 import { Filter, FilterOption } from '@/components/Filter/Filter';
+import { Filters } from '@/components/Kanban';
 import { useFilters } from '@/hooks/useFilters';
 import { BUTTON_STATES } from '@/constants';
 import { Task } from '@/components/Task/Task';
 import { CreateTaskModal } from '@/components/modals/CreateTaskModal/CreateTaskModal';
 import useTaskForm from '@/hooks/useTaskForm';
-import { breadcrumbsBacklog } from '@/components/Backlog/utils';
-import { handleTaskDragEnd } from '@/components/Backlog/utils/onDragEndTask';
-export enum Filters {
-  ASSIGNED_TO = 'assignedTo',
-  BUTTON_STATE = 'buttonState',
-}
+
 export const Backlog = () => {
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -36,9 +32,9 @@ export const Backlog = () => {
   const projects = useSelector((state: RootState) => state.project.projects);
   const activeProject = projects.find(project => project.active);
   const backLogColumn = columns.find(column => column.title === 'Backlog');
+
   const currentUserString = localStorage.getItem('currentUser') || '';
   const currentUserId = currentUserString ? JSON.parse(currentUserString).user._id : '';
-
   const fetchInitialData = async () => {
     try {
       const [{ data: projectsData }, { data: usersData }] = await Promise.all([getAllProjects(), getAllUsers()]);
@@ -48,6 +44,24 @@ export const Backlog = () => {
       console.error('Error fetching initial data:', error);
     }
   };
+  useEffect(() => {
+    fetchInitialData();
+  }, [dispatch]);
+  const closeAddTaskModal = () => {
+    formik.resetForm();
+    setIsAddTaskModalOpen(false);
+  };
+  const usersList: { value: string; label: string }[] = users.map((user: UserType) => ({
+    value: user.id,
+    label: `${user.firstName} ${user.lastName}`,
+  }));
+
+  const sendingList = columns
+    .filter(column => column.title !== 'Backlog')
+    .map(column => ({
+      value: column.id,
+      label: `${column.title}`,
+    }));
 
   const fetchProjectData = async (projectId: string) => {
     try {
@@ -66,6 +80,12 @@ export const Backlog = () => {
       console.error('Error fetching project data:', error);
     }
   };
+
+  useEffect(() => {
+    if (activeProject) {
+      fetchProjectData(activeProject.id);
+    }
+  }, [activeProject]);
 
   const handleTaskEdit = (taskId: string) => {
     try {
@@ -115,6 +135,10 @@ export const Backlog = () => {
       }
     }
   };
+  const onAddNewTask = (columnId?: string) => {
+    setIsAddTaskModalOpen(true);
+    formik.setValues({ ...formik.initialValues, statusId: columnId || '' });
+  };
 
   const handleTaskDelete = async (taskId: string) => {
     try {
@@ -124,58 +148,6 @@ export const Backlog = () => {
       console.error('Error deleting the task:', error);
     }
   };
-
-  const handleTaskStatusChange = async (taskId: string, newStatusId: string) => {
-    try {
-      await updateTask(taskId, { statusId: newStatusId } as TaskType);
-      setTasks(prevTasks => {
-        const updatedTasks = prevTasks.map(task => (task.id === taskId ? { ...task, statusId: newStatusId } : task));
-        return updatedTasks.sort((a, b) => a.order - b.order);
-      });
-      fetchInitialData();
-    } catch (error) {
-      console.error('Failed to update task status:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchInitialData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (activeProject) {
-      fetchProjectData(activeProject.id);
-    }
-  }, [activeProject]);
-
-  const closeAddTaskModal = () => {
-    formik.resetForm();
-    setIsAddTaskModalOpen(false);
-  };
-
-  const usersList: { value: string; label: string }[] = users.map((user: UserType) => ({
-    value: user.id,
-    label: `${user.firstName} ${user.lastName}`,
-  }));
-
-  const sendingList = columns
-    .filter(column => column.title !== 'Backlog')
-    .map(column => ({
-      value: column.id,
-      label: `${column.title}`,
-    }));
-
-  const onAddNewTask = (columnId?: string) => {
-    setIsAddTaskModalOpen(true);
-    formik.setValues({ ...formik.initialValues, statusId: columnId || '' });
-  };
-
-  const handleTaskDragEndLocal = (result: DropResult) => {
-    handleTaskDragEnd(result, tasks, setTasks);
-  };
-
-  const formik = useTaskForm(handleSaveUpdatedTask, handleTaskCreate);
-  const isEditMode = formik.values.editMode;
 
   const backLogFiltersOptions: FilterOption[] = [
     {
@@ -191,26 +163,70 @@ export const Backlog = () => {
       applyOnChange: true,
     },
   ];
+  const handleTaskDragEnd = async (result: DropResult) => {
+    const { source, destination } = result;
+
+    if (!destination || source.index === destination.index) {
+      return;
+    }
+
+    const updatedTasks = [...tasks];
+    const movedTask = updatedTasks.splice(source.index, 1)[0];
+    updatedTasks.splice(destination.index, 0, movedTask);
+
+    updatedTasks.forEach((column, index) => {
+      column.order = index + 1;
+    });
+    const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
+
+    setTasks(sortedTasks);
+    await updateTasks(sortedTasks);
+  };
+
+  const handleTaskStatusChange = async (taskId: string, newStatusId: string) => {
+    try {
+      await updateTask(taskId, { statusId: newStatusId } as TaskType);
+      setTasks(prevTasks => {
+        const updatedTasks = prevTasks.map(task => (task.id === taskId ? { ...task, statusId: newStatusId } : task));
+        return updatedTasks.sort((a, b) => a.order - b.order);
+      });
+      fetchInitialData();
+    } catch (error) {
+      console.error('Failed to update task status:', error);
+    }
+  };
+
+  const formik = useTaskForm(handleSaveUpdatedTask, handleTaskCreate);
+  const isEditMode = formik.values.editMode;
+
   return (
-    <Layout headTitle="backlog" breadcrumbs={breadcrumbsBacklog}>
-      <main>
+    <Layout
+      headTitle="backlog"
+      breadcrumbs={[
+        { title: 'dashboard', link: '/' },
+        { title: 'backlog', link: '/backlog' },
+      ]}
+    >
+      <div>
         {activeProject ? (
-          <section>
-            <Filter
-              filters={backLogFiltersOptions}
-              value={filters}
-              handleFilterChange={handleFilterChange}
-              clearAll
-              projectId={activeProject.id}
-              addItem
-              backLogColumn={backLogColumn}
-              onAddNewTask={onAddNewTask}
-            />
-            <header className={styles.projectTitleName} style={{ color: activeProject.color }}>
+          <>
+            <div className={styles.addStatusButton}>
+              <Filter
+                filters={backLogFiltersOptions}
+                value={filters}
+                handleFilterChange={handleFilterChange}
+                clearAll
+                projectId={activeProject.id}
+                addItem
+                backLogColumn={backLogColumn}
+                onAddNewTask={onAddNewTask}
+              />
+            </div>
+            <div className={styles.projectTitleName} style={{ color: activeProject.color }}>
               {activeProject.title}
-            </header>
+            </div>
             <div className={styles.titleDivider} style={{ backgroundColor: activeProject.color }} />
-            <DragDropContext onDragEnd={handleTaskDragEndLocal}>
+            <DragDropContext onDragEnd={handleTaskDragEnd}>
               <StrictModeDroppable droppableId="columnContainer">
                 {provided => (
                   <div ref={provided.innerRef} {...provided.droppableProps} className={styles.droppable}>
@@ -242,9 +258,9 @@ export const Backlog = () => {
               closeAddTaskModal={closeAddTaskModal}
               isAddTaskModalOpen={isAddTaskModalOpen}
             />
-          </section>
+          </>
         ) : null}
-      </main>
+      </div>
     </Layout>
   );
 };

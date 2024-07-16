@@ -25,8 +25,7 @@
     justify-content: space-between;
     cursor: pointer;
 }
-
-/*.childrenBox{
+.childrenBox{
     display: flex;
     flex-direction: row;
     width: 257px;
@@ -39,7 +38,7 @@
     margin-left: 5px;
     cursor: pointer;
 
-}*/
+}
 
 .text {
     width: 257px;
@@ -98,14 +97,14 @@
 .box:hover .text {
     color: #2B3674;
 }
-/*
+
 .childrenBox:hover .text {
     color: #2B3674;
 }
 
 .arrowIcon {
     margin-right: 10px;
-}*/
+}
 
 .loaderContainer {
     position: absolute;

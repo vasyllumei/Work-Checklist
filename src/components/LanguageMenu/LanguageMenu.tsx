@@ -4,7 +4,6 @@ import { SelectComponent } from '@/components/Select/Select';
 import styles from './LanguageMenu.module.css';
 import { languageList } from '@/utils/languageSetup';
 import { FC } from 'react';
-import { selectStyles } from '@/components/LanguageMenu/utils';
 
 export const LanguageMenu: FC = () => {
   const { i18n } = useTranslation();
@@ -20,9 +19,16 @@ export const LanguageMenu: FC = () => {
     return null;
   }
   return (
-    <div data-testid="headerLanguage">
+    <div className={styles.someName} data-testid="headerLanguage">
       <SelectComponent
-        sx={selectStyles}
+        sx={{
+          boxShadow: 'none',
+          '.MuiOutlinedInput-notchedOutline': { border: 0 },
+          width: '75px',
+          '& .MuiSvgIcon-root': {
+            visibility: 'hidden',
+          },
+        }}
         label={
           <div className={styles.mainContainer}>
             <div className={styles.iconContainer}>

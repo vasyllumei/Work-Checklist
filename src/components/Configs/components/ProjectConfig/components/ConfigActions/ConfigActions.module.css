@@ -1,13 +1,6 @@
 .buttonContainer{
     width: 100%;
-    min-width: 20em;
-    overflow: hidden;
     display: flex;
     justify-content: space-around;
     margin-bottom: 20px;
-    gap: 10px;
-}
-
-.formContainer {
-    width: 100%;
 }

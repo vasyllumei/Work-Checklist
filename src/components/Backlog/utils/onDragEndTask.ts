@@ -1,34 +1,47 @@
 import { DropResult } from 'react-beautiful-dnd';
-import { TaskType } from '@/types/Task';
 import { updateTasks } from '@/services/task/taskService';
+import { ColumnType } from '@/types/Column';
+import { TaskType } from '@/types/Task';
 import { Dispatch, SetStateAction } from 'react';
 
-export const handleTaskDragEnd = async (
+export const onDragEndTask = async (
   result: DropResult,
+  columns: ColumnType[],
   tasks: TaskType[],
+  setColumns: Dispatch<SetStateAction<ColumnType[]>>,
   setTasks: Dispatch<SetStateAction<TaskType[]>>,
 ) => {
-  const { source, destination } = result;
+  const { destination, source, draggableId } = result;
 
-  if (!destination || source.index === destination.index) {
+  if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
     return;
   }
 
   const updatedTasks = [...tasks];
-  const movedTask = updatedTasks.splice(source.index, 1)[0];
-  updatedTasks.splice(destination.index, 0, movedTask);
+  const movedTaskIndex = updatedTasks.findIndex(task => task.id === draggableId);
+  const movedTask = updatedTasks[movedTaskIndex];
 
-  updatedTasks.forEach((task, index) => {
-    task.order = index + 1;
-  });
+  if (source.droppableId === destination.droppableId) {
+    movedTask.statusId = destination.droppableId;
+    updatedTasks.splice(movedTaskIndex, 1);
 
-  const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
+    const tasksInDestinationColumn = updatedTasks.filter(task => task.statusId === destination.droppableId);
+    const movedTaskClone = { ...movedTask };
+    movedTaskClone.order = destination.index + 1;
 
-  setTasks(sortedTasks);
+    tasksInDestinationColumn.splice(destination.index, 0, movedTaskClone);
 
-  try {
-    await updateTasks(sortedTasks);
-  } catch (error) {
-    console.error('Error updating tasks:', error);
+    tasksInDestinationColumn.forEach((task, index) => {
+      task.order = index + 1;
+    });
+
+    const updatedTasksWithoutMoved = updatedTasks.filter(task => task.statusId !== destination.droppableId);
+    updatedTasksWithoutMoved.push(...tasksInDestinationColumn);
+    updatedTasks.splice(0, updatedTasks.length, ...updatedTasksWithoutMoved);
+
+    const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
+
+    setTasks(sortedTasks);
+    updateTasks(sortedTasks);
   }
 };
