@@ -1,28 +1,15 @@
 .mainContainer {
     display: flex;
-    align-items: flex-start; /*important for correct drag and drop work*/
+    align-items: flex-start;
     max-height: 1077px;
     justify-content: space-between;
 }
+
 @media screen and (max-width:700px) {
     .mainContainer {
     flex-direction: column;
     align-items: center;
     }
-}
-.addStatusButton{
-    display: flex;
-    align-items: center;
-    gap:20px
-}
-
-.newStatusButton{
-    max-height: 40px;
-    width: 100%;
-}
-.newTaskButton{
-    max-height: 40px;
-    min-width: 200px;
 }
 
 .projectTitleName{
@@ -34,6 +21,7 @@
     color: #2B3674;
     margin-left: 9px;
 }
+
 .titleDivider {
     height: 5px;
     width: 100%;
