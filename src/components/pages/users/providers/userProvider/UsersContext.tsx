@@ -71,8 +71,8 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   const [sortField, setSortField] = useState<string | null>(null);
   const { paginationModel, handlePaginationModelChange } = usePagination();
   const [totalUsers, setTotalUsers] = useState(0);
-  const handleInteraction = useHandleInteraction();
 
+  const handleInteraction = useHandleInteraction();
   const { filters, handleFilterChange } = useFilters();
   const { isOpen: isDialogOpen, openDialog: openUserDialog, closeDialog: closeUserDialog } = useDialogControl();
   const formik = useFormik({

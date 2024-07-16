@@ -3,9 +3,9 @@ import Head from 'next/head';
 import styles from './Layout.module.css';
 import { Menu } from '@/components/Menu/Menu';
 import { Header } from '@/components/Header/Header';
-import { Footer } from '@/components/Footer/Footer';
 import SideBarIcon from '@/assets/image/menuicon/sidebarIcon.svg';
 import CloseIcon from '../../assets/image/menuicon/closeIcon.svg';
+import { useDialogControl } from '@/hooks/useDialogControl';
 
 interface Breadcrumb {
   title: string;
@@ -21,15 +21,7 @@ interface LayoutProps {
 }
 
 export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, searchText, handleSearch }) => {
-  const [toggle, setToggle] = useState(false);
-
-  const toggleMenu = () => {
-    setToggle(!toggle);
-  };
-
-  const closeMenu = () => {
-    setToggle(false);
-  };
+  const { isOpen: isMenuOpen, openDialog: openMenu, closeDialog: closeMenu } = useDialogControl();
 
   return (
     <div className={styles.container}>
@@ -38,7 +30,7 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, sear
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </Head>
 
-      <nav className={`${styles.menu} ${toggle ? styles.visible : styles.hidden}`}>
+      <nav className={`${styles.menu} ${isMenuOpen ? styles.visible : styles.hidden}`}>
         <button className={styles.closeIcon} onClick={closeMenu}>
           <CloseIcon />
         </button>
@@ -47,8 +39,8 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, sear
 
       <main className={styles.content}>
         <header>
-          {!toggle && (
-            <button className={styles.sidebarIcon} onClick={toggleMenu}>
+          {!isMenuOpen && (
+            <button className={styles.sidebarIcon} onClick={openMenu}>
               <SideBarIcon />
             </button>
           )}
@@ -56,10 +48,6 @@ export const Layout: FC<LayoutProps> = ({ children, headTitle, breadcrumbs, sear
         </header>
 
         {children}
-
-        <footer>
-          <Footer />
-        </footer>
       </main>
     </div>
   );

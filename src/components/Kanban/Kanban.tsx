@@ -12,12 +12,11 @@ import { Filter, FilterOption } from '@/components/Filter/Filter';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/projectStore/store';
-
+import { breadcrumbsKanban } from '@/components/Kanban/utils';
 export enum Filters {
   ASSIGNED_TO = 'assignedTo',
   BUTTON_STATE = 'buttonState',
 }
-
 export const Kanban = () => {
   const {
     columns,
@@ -52,18 +51,10 @@ export const Kanban = () => {
   ];
 
   return (
-    <Layout
-      handleSearch={handleSearch}
-      searchText={searchText}
-      headTitle={t('kanban')}
-      breadcrumbs={[
-        { title: t('dashboard'), link: '/' },
-        { title: t('kanban'), link: '/kanban' },
-      ]}
-    >
-      <div>
+    <Layout handleSearch={handleSearch} searchText={searchText} headTitle={t('kanban')} breadcrumbs={breadcrumbsKanban}>
+      <main>
         {activeProject ? (
-          <div>
+          <section>
             <Filter
               filters={kanbanFiltersOptions}
               value={filters}
@@ -73,9 +64,9 @@ export const Kanban = () => {
               addItem
               onAddNewTask={onAddNewTask}
             />
-            <div className={styles.projectTitleName} style={{ color: activeProject.color }}>
+            <header className={styles.projectTitleName} style={{ color: activeProject.color }}>
               {activeProject.title}
-            </div>
+            </header>
             <div className={styles.titleDivider} style={{ backgroundColor: activeProject.color }} />
             <DragDropContext onDragEnd={onDragEnd}>
               <StrictModeDroppable droppableId="mainContainer">
@@ -96,9 +87,9 @@ export const Kanban = () => {
               closeAddTaskModal={closeAddTaskModal}
               isAddTaskModalOpen={isAddTaskModalOpen}
             />
-          </div>
+          </section>
         ) : null}
-      </div>
+      </main>
     </Layout>
   );
 };
