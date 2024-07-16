@@ -55,7 +55,7 @@ export const CreateTaskModal: FC<CreateTaskModalProps> = ({
     <Dialog open={isAddTaskModalOpen} onClose={handleCancelTask}>
       <DialogTitle>Add New Task</DialogTitle>
       <DialogContent>
-        <div className={styles.taskForm}>
+        <form className={styles.taskForm}>
           <TextInput
             label="Title"
             name="title"
@@ -97,7 +97,7 @@ export const CreateTaskModal: FC<CreateTaskModalProps> = ({
             onChange={value => formik.setFieldValue('buttonState', value)}
             options={BUTTON_STATES}
           />
-        </div>
+        </form>
       </DialogContent>
       <DialogActions>
         <div className={styles.buttonsContainer}>

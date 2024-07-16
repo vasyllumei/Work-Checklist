@@ -21,7 +21,7 @@ export const TaskEditModal: FC<TaskEditModalProps> = ({ usersList, isEditMode, f
     <Dialog open={isEditMode} onClose={stopEditingTask}>
       <DialogTitle>Add New Task</DialogTitle>
       <DialogContent>
-        <div className={styles.editingContent}>
+        <form className={styles.editingContent}>
           <TextInput
             name={`title-${formik.values.id}`}
             value={formik.values.title || ''}
@@ -55,7 +55,7 @@ export const TaskEditModal: FC<TaskEditModalProps> = ({ usersList, isEditMode, f
             onChange={value => formik.setFieldValue('buttonState', value)}
             options={BUTTON_STATES}
           />
-        </div>
+        </form>
       </DialogContent>
       <DialogActions>
         <div className={styles.taskButtonContainer}>

@@ -51,10 +51,6 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
     },
   });
 
-  useEffect(() => {
-    fetchProjectData();
-  }, []);
-
   const fetchProjectData = async () => {
     try {
       setIsLoading(true);
@@ -65,13 +61,6 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
       console.error('Error fetching projects:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const setInitialActiveProject = (projects: ProjectType[]) => {
-    const activeProject = projects.find(project => project.active);
-    if (activeProject) {
-      dispatch(setActiveProject(activeProject.id));
     }
   };
 
@@ -141,6 +130,17 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
       setIsLoading(false);
     }
   };
+
+  const setInitialActiveProject = (projects: ProjectType[]) => {
+    const activeProject = projects.find(project => project.active);
+    if (activeProject) {
+      dispatch(setActiveProject(activeProject.id));
+    }
+  };
+
+  useEffect(() => {
+    fetchProjectData();
+  }, []);
 
   const handleDialogOpen = () => {
     formik.setValues(initialProjectForm);

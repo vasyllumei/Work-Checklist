@@ -1,4 +1,3 @@
-
 .projectTitleColumn{
     display: flex;
     align-items: center;
@@ -22,9 +21,11 @@
 .lineDivider {
     width: 90%;
 }
+
 .projectAdd {
     cursor: pointer;
 }
+
 .projectAdd:hover path {
     stroke: #4318FF;
 }
