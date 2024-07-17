@@ -1,15 +1,15 @@
 import classNames from 'classnames';
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import styles from './Menu.module.css';
 import { useRouter } from 'next/router';
 import DashboardIcon from '../../assets/image/menuicon/dashboardicon.svg';
-import BacklogIcon from './../../assets/image/menuicon/tablesIcon.svg';
+import BacklogIcon from '../../assets/image/menuicon/backlog.svg';
 import KanbanIcon from '../../assets/image/menuicon/kanbasicon.svg';
-import ConfigIcon from '../../assets/image/menuicon/configIcon.svg';
+import BoardConfigs from '../../assets/image/menuicon/boardsConfigs.svg';
 import ProfileIcon from '../../assets/image/menuicon/prifoleicon.svg';
 import SettingIcon from '../../assets/image/menuicon/settingicon.svg';
 import { ProjectsList } from 'src/components/ProjectList';
-import Loader from '@/components/Loader/Loader';
+
 const pages = [
   { id: 1, title: 'Dashboard', link: '/', disabled: false, icon: DashboardIcon },
   { id: 2, title: 'Users', link: '/users', disabled: false, icon: ProfileIcon },
@@ -20,19 +20,15 @@ const pages = [
     title: 'Board Configs',
     link: '/configs',
     disabled: false,
-    icon: ConfigIcon,
+    icon: BoardConfigs,
   },
   { id: 6, title: 'Setting', link: '/menulist', disabled: false, icon: SettingIcon },
 ];
 
 export const Menu: FC = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const handleNavigation = (link: string) => {
-    setIsLoading(true);
-    router.push(link).finally(() => {
-      setIsLoading(false);
-    });
+    router.push(link);
   };
 
   return (
@@ -61,14 +57,7 @@ export const Menu: FC = () => {
           );
         })}
       </ul>
-      {(router.pathname.includes('kanban') || router.pathname.includes('backlog')) && (
-        <ProjectsList setIsLoading={setIsLoading} />
-      )}
-      {isLoading && (
-        <div className={styles.loaderContainer}>
-          <Loader />
-        </div>
-      )}
+      {(router.pathname.includes('kanban') || router.pathname.includes('backlog')) && <ProjectsList />}
     </div>
   );
 };

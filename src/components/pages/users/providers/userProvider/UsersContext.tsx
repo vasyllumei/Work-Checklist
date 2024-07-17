@@ -9,8 +9,8 @@ import { createUser, deleteAllUsers, deleteUser, getAllUsers, updateUser } from 
 import { FilterType } from '@/types/Filter';
 import { usePagination } from '@/hooks/usePagination';
 import { useHandleInteraction } from '@/hooks/useHandleInteraction';
-import { addEditUserValidationSchema } from '@/components/pages/users/utils';
 import { debounce } from 'lodash';
+import { userValidationSchema } from '@/components/pages/users/utils';
 
 export interface UsersContext {
   users: UserType[];
@@ -75,9 +75,10 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   const handleInteraction = useHandleInteraction();
   const { filters, handleFilterChange } = useFilters();
   const { isOpen: isDialogOpen, openDialog: openUserDialog, closeDialog: closeUserDialog } = useDialogControl();
+
   const formik = useFormik({
     initialValues: initialUserForm,
-    validationSchema: addEditUserValidationSchema,
+    validationSchema: userValidationSchema,
     onSubmit: async () => {
       try {
         if (formik.values.id) {
@@ -140,7 +141,7 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
     }
   };
 
-  const handleSaveUpdatedUser = async (): Promise<void> => {
+  const handleSaveUpdatedUser = async () => {
     try {
       await updateUser(formik.values.id, formik.values);
       await fetchUsers();
@@ -166,7 +167,6 @@ export const UsersProvider = ({ children }: { children: JSX.Element }) => {
   };
 
   const handleDialogClose = () => {
-    formik.resetForm();
     closeUserDialog();
     formik.resetForm();
   };

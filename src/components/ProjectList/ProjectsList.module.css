@@ -12,10 +12,11 @@
     font-family: "DM Sans", sans-serif;
     font-style: normal;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 0.8em;
+    letter-spacing: -0.02em;
     line-height: 15px;
     text-transform: uppercase;
-    color: #787486;
+    color: #2B3674;
 }
 
 .lineDivider {

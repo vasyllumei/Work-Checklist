@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 
 export const stringValidation = (field: string) =>
-  Yup.string().min(2, `Too Short!`).max(10, `Too Long!`).required(`${field} is required`);
+  Yup.string().min(2, `Too Short!`).max(14, `Too Long!`).required(`${field} is required`);
 
 export const emailValidation = Yup.string()
   .email('Invalid email address')
@@ -51,3 +51,14 @@ export const taskValidationSchema = Yup.object().shape({
   description: Yup.string().required('Description is required'),
   editMode: Yup.boolean(),
 });
+
+export const hexToRgb = (hex: string) => {
+  hex = hex.replace(/^#/, '');
+
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return `${r}, ${g}, ${b}`;
+};

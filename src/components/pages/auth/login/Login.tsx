@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import { loginValidationSchema } from '@/components/pages/auth/login/utils';
 import useFieldError from '@/hooks/useFieldError';
-import Loader from '@/components/Loader/Loader';
 
 const initialLoginForm = {
   email: '',
@@ -21,7 +20,6 @@ const initialLoginForm = {
 
 export const Login: FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const { t } = useTranslation();
   const formik = useFormik({
@@ -45,7 +43,6 @@ export const Login: FC = () => {
   };
 
   const handleLogin = async () => {
-    setIsLoading(true);
     try {
       await login({ email: formik.values.email, password: formik.values.password });
       await router.push('/');
@@ -53,8 +50,6 @@ export const Login: FC = () => {
       if (error.response && error.response.data && error.response.data.message) {
         formik.setErrors({ loginError: error.response.data.message });
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -125,16 +120,11 @@ export const Login: FC = () => {
         <div className={styles.infoContainer}>
           <div className={styles.logoContainer}></div>
           <div className={styles.infoBox}>
-            <p className={styles.learnInfo}>Learn more about Horizon UI on </p>
-            <p className={styles.infoLink}>horizon-ui.com</p>
+            <p className={styles.learnInfo}>Welcome! </p>
+            <p className={styles.infoLink}>Log in to access your dashboard.</p>
           </div>
         </div>
       </aside>
-      {isLoading && (
-        <div className={styles.loaderContainer}>
-          <Loader />
-        </div>
-      )}
     </main>
   );
 };

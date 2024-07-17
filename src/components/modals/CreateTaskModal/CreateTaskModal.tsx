@@ -79,20 +79,20 @@ export const CreateTaskModal: FC<CreateTaskModalProps> = ({
           />
           {showColumn ? (
             <SelectComponent
-              label="Select a column"
+              label="column"
               value={formik.values.statusId || ''}
               onChange={value => formik.setFieldValue('statusId', value)}
               options={columnList}
             />
           ) : null}
           <SelectComponent
-            label="Select assigned  user"
+            label="assigned  user"
             value={formik.values.assignedTo || ''}
             onChange={value => formik.setFieldValue('assignedTo', value)}
             options={usersList}
           />
           <SelectComponent
-            label="Select a task stage"
+            label="task stage"
             value={formik.values.buttonState || ''}
             onChange={value => formik.setFieldValue('buttonState', value)}
             options={BUTTON_STATES}
@@ -101,14 +101,8 @@ export const CreateTaskModal: FC<CreateTaskModalProps> = ({
       </DialogContent>
       <DialogActions>
         <div className={styles.buttonsContainer}>
-          <Button
-            text="Cancel"
-            onClick={handleCancelTask}
-            className={styles.modalTaskCancel}
-            size={'small'}
-            outlined={true}
-          />
-          <Button text="Add Task" onClick={handleSubmitForm} className={styles.modalTaskAdd} size={'small'} />
+          <Button text="Cancel" onClick={handleCancelTask} size={'medium'} outlined={true} />
+          <Button text="Add Task" onClick={handleSubmitForm} size={'medium'} />
         </div>
       </DialogActions>
     </Dialog>
