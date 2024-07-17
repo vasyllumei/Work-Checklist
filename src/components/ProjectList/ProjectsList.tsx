@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ProjectType } from '@/types/Project';
 import {
   createProject,
@@ -9,7 +9,7 @@ import {
 } from '@/services/project/projectService';
 import styles from './ProjectsList.module.css';
 import { useFormik } from 'formik';
-import AddProject from './../../assets/image/menuicon/addProjectIcon.svg';
+import AddIcon from './../../assets/image/menuicon/addIcon.svg';
 import { CreateProjectModal } from '@/components/ProjectList/components/modals/CreateProjectModal/CreateProjectModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/projectStore/store';
@@ -27,10 +27,8 @@ const initialProjectForm = {
   editMode: false,
   createProjectError: '',
 };
-type ProjectListProps = {
-  setIsLoading: (isLoading: boolean) => void;
-};
-export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
+
+export const ProjectsList = () => {
   const projects = useSelector((state: RootState) => state.project.projects);
   const dispatch = useDispatch();
   const { isOpen: isDialogOpen, openDialog: openProjectDialog, closeDialog: closeProjectDialog } = useDialogControl();
@@ -53,20 +51,16 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
 
   const fetchProjectData = async () => {
     try {
-      setIsLoading(true);
       const { data: projectsData } = await getAllProjects();
       dispatch(setProjects(projectsData));
       setInitialActiveProject(projectsData);
     } catch (error) {
       console.error('Error fetching projects:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleProjectCreate = async () => {
     try {
-      setIsLoading(true);
       await createProject(formik.values);
       await fetchProjectData();
       handleDialogClose();
@@ -74,47 +68,42 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
       if (error.response?.data?.message) {
         formik.setErrors({ createProjectError: error.response.data.message });
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleProjectDelete = async (projectId: string) => {
     try {
-      setIsLoading(true);
       await deleteProject(projectId);
       await fetchProjectData();
     } catch (error) {
       console.error('Error deleting projectId:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleProjectEdit = (projectId: string) => {
-    const projectData = projects.find(project => project.id === projectId);
-    if (projectData) {
-      formik.setValues({ ...initialProjectForm, ...projectData, editMode: true });
-      openProjectDialog();
+    try {
+      const projectData = projects.find(project => project.id === projectId);
+      if (projectData) {
+        formik.setValues({ ...initialProjectForm, ...projectData, editMode: true });
+        openProjectDialog();
+      }
+    } catch (error) {
+      console.error('Error updating the user', error);
     }
   };
 
   const handleSaveUpdatedProject = async () => {
     try {
-      setIsLoading(true);
       await updateProject(formik.values.id, formik.values);
       await fetchProjectData();
       handleDialogClose();
     } catch (error) {
       console.error('Error updating projectId:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleProjectToggleActive = async (projectId: string) => {
     try {
-      setIsLoading(true);
       const currentActiveProject = projects.find(project => project.active);
 
       if (currentActiveProject?.id === projectId) {
@@ -126,8 +115,6 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
       }
     } catch (error) {
       console.error('Error updating projectId:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -163,7 +150,7 @@ export const ProjectsList: FC<ProjectListProps> = ({ setIsLoading }) => {
       />
       <div className={styles.projectTitleColumn}>
         <h2 className={styles.projectMainTitle}>Projects</h2>
-        <AddProject className={styles.projectAdd} onClick={handleDialogOpen} data-testid="addProject" />
+        <AddIcon className={styles.projectAdd} onClick={handleDialogOpen} data-testid="addProject" />
       </div>
       <div className={styles.projectListContainer}>
         {projects.map((project: ProjectType) =>

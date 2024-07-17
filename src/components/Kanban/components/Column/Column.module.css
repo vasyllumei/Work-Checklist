@@ -49,6 +49,10 @@
     border: none;
 }
 
+.projectAdd:hover path {
+    stroke: #4318FF;
+}
+
 .droppable {
     display: flex;
     flex-direction: column;

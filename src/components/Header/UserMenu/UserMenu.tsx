@@ -13,7 +13,7 @@ interface UserDisplayData {
   backgroundColor: string;
 }
 
-export const UserMenu: React.FC = () => {
+export const UserMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const currentUserString = localStorage.getItem('currentUser');
   const [userDisplayData, setUserDisplayData] = useState<UserDisplayData | null>(null);
@@ -42,7 +42,7 @@ export const UserMenu: React.FC = () => {
 
   const handleLogout = () => {
     Cookies.remove(LOCAL_STORAGE_TOKEN);
-    localStorage.clear();
+    localStorage.removeItem('currentUser');
     router.push('/login');
   };
 

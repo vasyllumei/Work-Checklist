@@ -10,7 +10,7 @@ export const Form = () => {
   const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   return (
-    <>
+    <form>
       <TextInput
         dataTestId="firstName"
         label="First Name"
@@ -75,6 +75,6 @@ export const Form = () => {
           )}
         </FormControl>
       </div>
-    </>
+    </form>
   );
 };

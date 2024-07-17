@@ -58,7 +58,7 @@ export const Column: FC<ColumnProps> = ({ column }) => {
           </div>
         </h2>
         <button onClick={() => onAddNewTask(column.id)} className={styles.addButton}>
-          <AddIcon />
+          <AddIcon className={styles.projectAdd} />
         </button>
       </div>
       <StrictModeDroppable droppableId={column.id} type="TASK">

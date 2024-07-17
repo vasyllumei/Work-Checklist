@@ -9,7 +9,6 @@ import { LOCAL_STORAGE_TOKEN } from '@/constants';
 import { useFormik } from 'formik';
 import { signUpValidationSchema } from '@/components/pages/auth/signup/utils';
 import useFieldError from '@/hooks/useFieldError';
-import Loader from '@/components/Loader/Loader';
 import { LanguageMenu } from 'src/components/LanguageMenu';
 import { useTranslation } from 'react-i18next';
 
@@ -24,7 +23,6 @@ const initialUserForm = {
 };
 export const SignUp: FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -39,7 +37,6 @@ export const SignUp: FC = () => {
   const { getFieldError } = useFieldError(formik.touched, formik.errors);
 
   const handleSignUp = async () => {
-    setIsLoading(true);
     try {
       const response = await signUp(formik.values);
       if (response && response.token) {
@@ -51,8 +48,6 @@ export const SignUp: FC = () => {
       if (error.response && error.response.data && error.response.data.message) {
         formik.setErrors({ signUpError: error.response.data.message });
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -135,16 +130,11 @@ export const SignUp: FC = () => {
         <div className={styles.infoContainer}>
           <div className={styles.logoContainer}></div>
           <div className={styles.infoBox}>
-            <p className={styles.learnInfo}>Learn more about Horizon UI on </p>
-            <p className={styles.infoLink}>horizon-ui.com</p>
+            <p className={styles.learnInfo}>Welcome! </p>
+            <p className={styles.infoLink}>Log in to access your dashboard.</p>
           </div>
         </div>
       </aside>
-      {isLoading && (
-        <div className={styles.loaderContainer}>
-          <Loader />
-        </div>
-      )}
     </main>
   );
 };
