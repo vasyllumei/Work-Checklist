@@ -21,6 +21,7 @@ import { CreateTaskModal } from '@/components/modals/CreateTaskModal/CreateTaskM
 import useTaskForm from '@/hooks/useTaskForm';
 import { breadcrumbsBacklog } from '@/components/Backlog/utils';
 import { handleTaskDragEnd } from '@/components/Backlog/utils/onDragEndTask';
+import { hexToRgb } from '@/utils';
 export enum Filters {
   ASSIGNED_TO = 'assignedTo',
   BUTTON_STATE = 'buttonState',
@@ -209,7 +210,14 @@ export const Backlog = () => {
             <header className={styles.projectTitleName} style={{ color: activeProject.color }}>
               {activeProject.title}
             </header>
-            <div className={styles.titleDivider} style={{ backgroundColor: activeProject.color }} />
+            <div
+              className={styles.titleDivider}
+              style={{
+                background: `linear-gradient(to right, ${activeProject.color} 0%, rgba(${hexToRgb(
+                  activeProject.color,
+                )}, 0) 100%)`,
+              }}
+            />
             <DragDropContext onDragEnd={handleTaskDragEndLocal}>
               <StrictModeDroppable droppableId="columnContainer">
                 {provided => (

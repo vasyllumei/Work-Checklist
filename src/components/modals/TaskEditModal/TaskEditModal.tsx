@@ -59,8 +59,8 @@ export const TaskEditModal: FC<TaskEditModalProps> = ({ usersList, isEditMode, f
       </DialogContent>
       <DialogActions>
         <div className={styles.taskButtonContainer}>
-          <Button text="Cancel" onClick={stopEditingTask} size={'small'} outlined={true} />
-          <Button text="Save" onClick={formik.handleSubmit} size={'small'} />
+          <Button text="Cancel" onClick={stopEditingTask} size={'medium'} outlined={true} />
+          <Button text="Save" onClick={formik.handleSubmit} size={'medium'} />
         </div>
       </DialogActions>
     </Dialog>

@@ -44,7 +44,7 @@ export const columnsConfig: GridColDef[] = [
     align: 'center',
     type: 'string',
     flex: 1,
-    minWidth: 150,
+    minWidth: 240,
     editable: false,
   },
   {
@@ -71,7 +71,7 @@ export const columnsConfig: GridColDef[] = [
     renderCell: ({ row }) => <UserActionsCell row={row} />,
   },
 ];
-export const addEditUserValidationSchema = Yup.object().shape({
+export const userValidationSchema = Yup.object().shape({
   firstName: stringValidation('First name'),
   lastName: stringValidation('Last name'),
   email: emailValidation,

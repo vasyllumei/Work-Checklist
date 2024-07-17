@@ -83,7 +83,7 @@ export const SelectComponent: React.FC<SelectProps> = ({
   return (
     <Box>
       {multiple ? (
-        <FormControl size="small" sx={{ m: 0.5, minWidth: 180 }} ref={containerRef}>
+        <FormControl size="small" sx={{ m: 0.5, minWidth: 180, maxWidth: 180 }} ref={containerRef}>
           <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
           <Select
             labelId="demo-multiple-checkbox-label"

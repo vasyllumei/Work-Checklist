@@ -1,11 +1,17 @@
-import * as React from 'react';
+import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
-export default function Loader() {
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <CircularProgress size={30} />
-    </Box>
-  );
-}
+const Loader = () => (
+  <Box
+    sx={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '20px',
+    }}
+  >
+    <CircularProgress size={30} />
+  </Box>
+);
+
+export default Loader;
