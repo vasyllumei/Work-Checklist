@@ -17,7 +17,7 @@ const pages = [
   { id: 4, title: 'Kanban', link: '/kanban', disabled: false, icon: KanbanIcon },
   {
     id: 5,
-    title: 'Board Configs',
+    title: 'Configs',
     link: '/configs',
     disabled: false,
     icon: BoardConfigs,

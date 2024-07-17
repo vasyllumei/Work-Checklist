@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { Layout } from '@/components/Layout/Layout';
-import { Guide } from '@/components/pages/home/Guide';
+import { Guide } from '@/components/Guide/Guide';
 
 export default function Home() {
   return (

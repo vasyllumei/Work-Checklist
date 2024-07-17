@@ -2,17 +2,15 @@
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    height: 85%;
-    gap:2em;
+    gap: 2em;
     justify-content: center;
     margin-top: 2em;
 }
 
-
 .box {
     position: relative;
     width: 40%;
-    height: 40%;
+    max-height: 350px;
     overflow: hidden;
     margin: 0 10px;
     border: 1px solid rgba(163, 174, 208, 0.52);
@@ -36,7 +34,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.69);
     color: #fff;
     display: flex;
     justify-content: center;
@@ -50,6 +48,32 @@
 }
 
 .overlay p {
-    text-align: center;
+    text-align: justify;
+    margin: 0;
     padding: 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: clamp(3px, 1.3vw, 16px); 
+}
+
+@media screen and (max-width: 600px) {
+    .boxesContainer {
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .box {
+        width: 70%;
+        margin: 0 auto;
+    }
+    .overlay p {
+        text-align: justify;
+        margin: 0;
+        padding: 20px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        font-size: clamp(3px, 2vw, 16px);
+    }
 }
