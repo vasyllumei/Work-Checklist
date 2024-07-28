@@ -29,14 +29,4 @@ export const updateProject = async (projectId: string, projectData: ProjectType)
   await api.put<ProjectType>(`/projects/updateProject?id=${projectId}`, projectData).then(resolve => resolve.data);
 export const getProjectById = async (projectId: string): Promise<ResponseType<ProjectType>> =>
   await api.get<ResponseType<ProjectType>>(`/projects/getProjectById?id=${projectId}`).then(resolve => resolve.data);
-/*
-export const updateProjects = async (projectData: ProjectType[]): Promise<ResponseType<ProjectType>> => {
-  try {
-    const response = await api.patch<ResponseType<ProjectType>>('/projects/updateProjects', projectData);
-    return response.data;
-  } catch (error) {
-    console.error('Error updating tasks:', error);
-    throw error;
-  }
-};
-*/
+
